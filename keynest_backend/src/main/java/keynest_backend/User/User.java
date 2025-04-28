@@ -1,6 +1,9 @@
-package keynest_backend.Models;
+package keynest_backend.User;
 
 import jakarta.persistence.*;
+import keynest_backend.Model.Country;
+import keynest_backend.Model.Locality;
+import keynest_backend.Model.Province;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,12 +62,15 @@ public class User implements UserDetails {
     private String profilePictureUrl;
 
     // Contacto y localizacion
-    @Column(name = "country_id")
-    private int countryId;
-    @Column(name = "province_id")
-    private int provinceId;
-    @Column(name = "locality_id")
-    private int localityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
+    private Country country;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "province_id", referencedColumnName = "id", nullable = false)
+    private Province province;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
+    private Locality locality;
     @Column(name = "address")
     private String address;
     @Column(name = "postal_code")

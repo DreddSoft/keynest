@@ -1,4 +1,4 @@
-package keynest_backend.Models;
+package keynest_backend.User;
 
 public enum Role {
 

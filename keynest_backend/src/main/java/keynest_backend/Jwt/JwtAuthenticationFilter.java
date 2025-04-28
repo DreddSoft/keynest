@@ -17,49 +17,73 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-// Clase abstracta que se utiliza para crear filtros personalizados
+/**
+ * @author DreddSoft
+ * @version 1.0
+ * @since 19/04/2025
+ * Filtro personalizado de autenticación JWT.
+ * Intercepta cada solicitud HTTP y extrae el token del encabezado Authorization, valida el token y establece el contexto de seguridad.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    // Filter chain es la cadena de filtros que nosotros hemos configurado
+    /**
+     * Método principal que intercepta la solicitud.
+     * Extrae el token JWT y lo valida.
+     * @param request - Solicitud HTTP entrante.
+     * @param response - Respuesta HTTP.
+     * @param filterChain - Cadena de filtros.
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // Todos los filtros relacionados con el token
+        // Extraemos el token del encabezado
         final String token = getTokenFromRequest(request);
         final String email;
 
+        // Si no hay token, continuamos con la cadena de filtros sin autenticar
         if (token ==  null) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // Extraemos el email(username) del token
         email = jwtService.getEmailFromToken(token);
 
+        // Si obtenemos el email y aún no hay autenticación
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
+            // Cargamos los detalles del usuario desde la base de datos
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             // Validar si el token es valido
             if (jwtService.isTokenValid(token, userDetails)) {
 
-                // Si es valido tengo que actualizar
+                // Creamos un token de autenticación manualmente
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+                // Establecemos el contexto de seguridad con el token de autenticación
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
+        // Continuamos con la cadena de filtros
         filterChain.doFilter(request, response);
 
     }
 
+    /**
+     * Método auxiliar para extraer el token JWT del encabezado.
+     * @param request - Solicitud HTTP entrante.
+     * @return - Token JWT si existe, de lo contrario null.
+     */
     private String getTokenFromRequest(HttpServletRequest request) {
 
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
