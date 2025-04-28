@@ -5,6 +5,7 @@ import keynest_backend.Model.Locality;
 import keynest_backend.Model.Province;
 import keynest_backend.User.User;
 import keynest_backend.User.UserDTO;
+import keynest_backend.User.UserLocationDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -74,6 +75,20 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "WHERE u.id = :userId")
     UserDTO getAllInfoFromUser(Integer userId);
      */
+
+    @Query("SELECT new keynest_backend.User.UserLocationDTO(" +
+            "u.username, " +
+            "u.firstname, " +
+            "u.lastname, " +
+            "c.name AS countryName, " +
+            "p.name AS provinceName, " +
+            "l.name AS localityName) " +
+            "FROM User u " +
+            "JOIN u.country c " +
+            "JOIN u.province p " +
+            "JOIN u.locality l " +
+            "WHERE u.id = :userId")
+    UserLocationDTO getUserLocationInfo(@Param("userId") Integer userId);
 
 
 }

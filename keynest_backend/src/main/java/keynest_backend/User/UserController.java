@@ -32,22 +32,22 @@ public class UserController {
 
     }
 
-    /*
-    @GetMapping(value = "allInfo/{id}")
-    public ResponseEntity<UserDTO> getAllInfoFromUser(@PathVariable Integer id) {
 
-        UserDTO userDTO = userService.getUserInfo(id);
+    @GetMapping(value = "allInfo/{id}")
+    public ResponseEntity<UserLocationDTO> getAllInfoFromUser(@PathVariable Integer id) {
+
+        UserLocationDTO userLocationDTO = userService.getUserInfo(id);
 
         // SI no se encuentra, devolvemos un 404
-        if (userDTO == null) {
+        if (userLocationDTO == null) {
             return ResponseEntity.notFound().build();
         }
 
         // Si se encuentra, un 200 con el userDTO
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(userLocationDTO);
 
     }
-    */
+
 
 
 }

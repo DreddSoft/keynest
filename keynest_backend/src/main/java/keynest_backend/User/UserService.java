@@ -97,11 +97,11 @@ public class UserService {
         return null;
     }
 
-    /*
-    public UserDTO getUserInfo(Integer userId) {
-        return userRepository.getAllInfoFromUser(userId);
+
+    public UserLocationDTO getUserInfo(Integer userId) {
+        return userRepository.getUserLocationInfo(userId);
     }
-    */
+
 
 
 
