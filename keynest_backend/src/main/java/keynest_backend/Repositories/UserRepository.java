@@ -62,20 +62,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                     @Param(value = "language") String language);
 
 
-    /*
-    @Query("SELECT keynest_backend.User.UserDTO(" +
-            "u.id, u.username, u.email, u.firstname, u.lastname, " +
-            "c.name AS countryName," +
-            "p.name AS provinceName," +
-            "l.name AS localityName)" +
-            "FROM User u " +
-            "JOIN u.country c " +
-            "JOIN u.province p " +
-            "JOIN u.locality l " +
-            "WHERE u.id = :userId")
-    UserDTO getAllInfoFromUser(Integer userId);
-     */
-
     @Query("SELECT new keynest_backend.User.UserLocationDTO(" +
             "u.username, " +
             "u.firstname, " +
