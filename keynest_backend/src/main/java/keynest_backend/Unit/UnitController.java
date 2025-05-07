@@ -21,9 +21,9 @@ public class UnitController {
     }
 
     @GetMapping(value = "{id}")
-    public ResponseEntity<Unit> getUnit(@PathVariable Integer id) {
+    public ResponseEntity<UnitDTO> getUnit(@PathVariable Integer id) {
 
-        Unit unit = unitService.getUnit(id);
+        UnitDTO unit = unitService.getUnit(id);
 
         if (unit == null) {
             return ResponseEntity.notFound().build();

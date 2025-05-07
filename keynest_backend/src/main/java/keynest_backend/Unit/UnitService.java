@@ -74,14 +74,40 @@ public class UnitService {
     }
 
     // Metodo para devolver una unidad por el ID
-    public Unit getUnit(Integer id) {
+    public UnitDTO getUnit(Integer id) {
 
         // Creamos unidad
         Unit unit = unitRepository.findById(id).orElse(null);
 
         if (unit != null) {
 
-            return unit;
+            // Creamos el DTO para devolver datos
+            UnitDTO unitDTO = UnitDTO.builder()
+                    // Datos principales
+                    .name(unit.getName())
+                    // Localizacion
+                    .countryName(unit.getCountry().getName())
+                    .provinceName(unit.getProvince().getName())
+                    .localityName(unit.getLocality().getName())
+                    .address(unit.getAddress())
+                    .buildingBlock(unit.getBuildingBlock())
+                    .streetNumber(unit.getStreetNumber())
+                    .floor(unit.getFloor())
+                    .postalCode(unit.getPostalCode())
+                    .latitude(unit.getLatitude())
+                    .longitude(unit.getLongitude())
+                    // Descripcion
+                    .rooms(unit.getRooms())
+                    .bathrooms(unit.getBathrooms())
+                    .hasKitchen(unit.isHasKitchen())
+                    .minOccupancy(unit.getMinOccupancy())
+                    .maxOccupancy(unit.getMaxOccupancy())
+                    .areaM2(unit.getAreaM2())
+                    .description(unit.getDescription())
+                    .build();
+
+
+            return unitDTO;
 
         }
 
