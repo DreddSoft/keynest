@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -112,6 +115,16 @@ public class UnitService {
         }
 
         return null;
+    }
+
+    public List<UnitDTO> allUnitsPerUser(Integer userId) {
+
+        if (!userRepository.existsById(userId)) {
+            return Collections.emptyList();
+        }
+
+        return unitRepository.findAllByUser(userId);
+
     }
 
 }
