@@ -18,4 +18,17 @@ public class ClientController {
         return ResponseEntity.ok(clientService.createNewClient(request));
     }
 
+    @GetMapping(value = "{id}")
+    public ResponseEntity<ClientDTO> getClient(@PathVariable Integer id) {
+
+        ClientDTO client = clientService.getClient(id);
+
+        if (client == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(client);
+
+    }
+
 }
