@@ -120,4 +120,46 @@ public class ClientService {
 
     }
 
+    public ClientDTO getClient(Integer id) {
+
+        // Buscamos el cliente
+        Client client = clientRepository.findById(id).orElse(null);
+
+        // Creamos el clienteDTO
+        if (client != null) {
+
+            ClientDTO clientDTO = ClientDTO.builder()
+                    // Identificador
+                    .id(client.getId())
+                    // Nombre completo
+                    .name(client.getName())
+                    .middleName(client.getMiddleName())
+                    .lastname1(client.getLastname1())
+                    .lastname2(client.getLastname2())
+                    // Genero y fecha de nacimiento
+                    .gender(client.getGender().name())
+                    .birthday(client.getBirthday().toString())
+                    // Nacionalidad y documentos
+                    .nationality(client.getNationality().getName())
+                    .documentType(client.getDocumentType().name())
+                    .documentNumber(client.getDocumentNumber())
+                    .documentExpirationDate(client.getDocumentExpirationDate().toString())
+                    // CRM
+                    .address(client.getAddress())
+                    .country(client.getCountry().getName())
+                    .province(client.getProvince().getName())
+                    .locality(client.getLocality().getName())
+                    .postalCode(client.getPostalCode())
+                    // Contacto
+                    .email(client.getEmail())
+                    .phone(client.getPhone())
+                    .build();
+
+            return clientDTO;
+        }
+
+        return null;
+
+    }
+
 }
