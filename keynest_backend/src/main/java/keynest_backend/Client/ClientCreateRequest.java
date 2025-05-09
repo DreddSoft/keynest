@@ -36,7 +36,7 @@ public class ClientCreateRequest {
     private String documentNumber;
     private String documentSupportNumber;
     private String documentIssueDate;
-    private String odcumentExpirationDate;
+    private String documentExpirationDate;
 
     // Datos de direccion para CRM, estos seran opcionales en el form de checkin
     private String address;
