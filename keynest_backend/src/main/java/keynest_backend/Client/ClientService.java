@@ -35,10 +35,11 @@ public class ClientService {
         Province province = provinceRepository.findById(request.getProvinceId()).orElse(null);
         Locality locality = localityRepository.findById(request.getLocalityId()).orElse(null);
 
+        int genderPick = request.getGender();
         Gender gender;
 
         // Sacar el genero
-        switch (request.getGender()) {
+        switch (genderPick) {
             case 0:
                 gender = Gender.MALE;
                 break;
@@ -75,7 +76,7 @@ public class ClientService {
 
         // Fecha de issue y expiracion del documento
         LocalDate issueDate = LocalDate.parse(request.getDocumentIssueDate(), formatter);
-        LocalDate expireDate = LocalDate.parse(request.getOdcumentExpirationDate(), formatter);
+        LocalDate expireDate = LocalDate.parse(request.getDocumentExpirationDate(), formatter);
 
         // Creamos el cliente
         Client newClient = Client.builder()

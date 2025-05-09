@@ -38,6 +38,7 @@ public class Client {
     private String lastname2;
 
     // Genero y fecha de nacimiento
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
     private Gender gender;
     @Column(name = "birthday", nullable = false)
@@ -47,6 +48,7 @@ public class Client {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nationality_country_id", referencedColumnName = "id", nullable = false)
     private Country nationality;
+    @Enumerated(EnumType.STRING)
     @Column(name = "document_type", nullable = false)
     private DocumentTypes documentType;
     @Column(name = "document_number", nullable = false)
