@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface UnitRepository extends JpaRepository<Unit, Integer> {
 
     @Override
-    Optional<Unit> findById(Integer integer);
+    Optional<Unit> findById(Integer unitId);
 
     @Override
     List<Unit> findAll();
