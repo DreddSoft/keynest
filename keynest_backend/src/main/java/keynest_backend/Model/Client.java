@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -40,9 +41,9 @@ public class Client {
     @Column(name = "gender", nullable = false)
     private Gender gender;
     @Column(name = "birthday", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
-    // Nationality and documents
+    // Nacionalidad y documentos
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nationality_country_id", referencedColumnName = "id", nullable = false)
     private Country nationality;
@@ -53,9 +54,9 @@ public class Client {
     @Column(name = "document_support_number")
     private String documentSupportNumber;
     @Column(name = "document_issue_date", nullable = false)
-    private Date documentIssueDate;
+    private LocalDate documentIssueDate;
     @Column(name = "document_expiration_date", nullable = false)
-    private Date documentExpirationDate;
+    private LocalDate documentExpirationDate;
 
     // Datos de direcccion para CRM
     @Column(name = "address")
