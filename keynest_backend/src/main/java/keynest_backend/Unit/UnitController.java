@@ -10,7 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/unit")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "")
+@CrossOrigin(origins = {"http://localhost:5173"})
 public class UnitController {
 
     private final UnitService unitService;
