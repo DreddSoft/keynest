@@ -20,11 +20,12 @@ function Login() {
       // Capturar respuesta
       const response = await fetch('http://localhost:8080/auth/login', {
         method: 'POST',
-        //'credentials':'include',
+        credentials:'include',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email:username, password:password })
       })
 
       // Tratamiento de la respuesta, si no es correct

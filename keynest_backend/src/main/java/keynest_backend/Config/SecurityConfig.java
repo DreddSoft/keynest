@@ -46,7 +46,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
-                .csrf(AbstractHttpConfigurer::disable) // No usamos tokens csrf
+                .csrf(csrf -> csrf.disable()) // No usamos tokens csrf
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(authRequest ->
                         authRequest
