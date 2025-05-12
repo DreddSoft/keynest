@@ -18,8 +18,9 @@ function Login() {
     try {
 
       // Capturar respuesta
-      const response = await fetch('/auth/login', {
+      const response = await fetch('http://localhost:8080/auth/login', {
         method: 'POST',
+        //'credentials':'include',
         headers: {
           'Content-Type': 'application/json'
         },

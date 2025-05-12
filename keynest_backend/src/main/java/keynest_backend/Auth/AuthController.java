@@ -1,17 +1,20 @@
 package keynest_backend.Auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "")
+@CrossOrigin(origins = {"http://localhost:5173"})
 public class AuthController {
 
     // Objeto de la clase de servicio encargada de gestionar la autenticación
     // Al usar Lombok con la notación @RequiredArgsConstructor, no es necesario crear un constructor
+
+    @Autowired
     private final AuthService authService;
 
 
@@ -21,6 +24,7 @@ public class AuthController {
      * @return - ResponseEntity con la respuesta de autenticación (token, datos del usuario, etc)
      */
     @PostMapping(value = "login")
+    @CrossOrigin(origins = {"http://localhost:5173"})
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
 
         // Devolvemos la respuesta HTTP 200
