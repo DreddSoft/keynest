@@ -1,74 +1,88 @@
 import { useState } from 'react'
+import logo from '../assets/keynest_logo_mini.svg'
 
 function Login() {
 
-    // constantes con estados para los valores
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
+  // constantes con estados para los valores
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-    // Logica de funcionalidad
-    const handleSubmit = async(e) => {
-        
-        // Prevenimos el evento por defecto de envio de form
-        e.preventDefault();
-        setError(null);
+  // Logica de funcionalidad
+  const handleSubmit = async (e) => {
 
-        try {
+    // Prevenimos el evento por defecto de envio de form
+    e.preventDefault();
+    setError(null);
 
-            // Capturar respuesta
-            const response = await fetch('/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type' : 'application/json'
-                },
-                body: JSON.stringify({username, password})
-            })
+    try {
 
-            // Tratamiento de la respuesta, si no es correct
-            if (!response.ok) {
-                // Lanzamos error
-                throw new Error("No se puede acceder. Contraseña o email incorrectos.");
-                
-            }
+      // Capturar respuesta
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      })
 
-            // sacamos los datos de la respuesta
-            const data = await response.json();
-            // Guardamos el token JWT en el localStorage
-            localStorage.setItem('token', data.token);
+      // Tratamiento de la respuesta, si no es correct
+      if (!response.ok) {
+        // Lanzamos error
+        throw new Error("No se puede acceder. Contraseña o email incorrectos.");
 
-            // Redirigimos tras el login correcto
-            window.location.href = '/dashboard';
+      }
 
-        } catch(err) {
-            setError('Incio de sesion erroneo. ' + err.message);
-        }
+      // sacamos los datos de la respuesta
+      const data = await response.json();
+      // Guardamos el token JWT en el localStorage
+      localStorage.setItem('token', data.token);
+      console.log(data.token);
 
-        return(
-            <div className="login-container">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button type="submit">Login</button>
-            </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-          </div>
-        )
+      // Redirigimos tras el login correcto
+      window.location.href = '/dashboard';
+
+    } catch (err) {
+      setError('Incio de sesion erroneo. ' + err.message);
     }
-    
+
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-md flex flex-col items-center">
+        <img src={logo} alt='Logo de Keynest' className='w-32 h-auto ' />
+        <h2 className="text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Usuario"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+          />
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition"
+          >
+            Entrar
+          </button>
+        </form>
+        {error && <p className="text-red-600 text-sm mt-4 text-center">{error}</p>}
+      </div>
+    </div>
+  )
+
 }
 
 export default Login
