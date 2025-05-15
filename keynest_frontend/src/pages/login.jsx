@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import logo from '../assets/keynest_logo_mini.svg'
 
-function Login() {
+function Login({ setIsAuthenticated }) {
 
   // constantes con estados para los valores
   const [username, setUsername] = useState('')
@@ -39,7 +39,13 @@ function Login() {
       const data = await response.json();
       // Guardamos el token JWT en el localStorage
       localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('email', data.email)
+      localStorage.setItem('role', data.role)
+      localStorage.setItem('firstname', data.firstname)
+      localStorage.setItem('lastname', data.lastname)
       console.log(data.token);
+      setIsAuthenticated(true)
 
       // Redirigimos tras el login correcto
       window.location.href = '/dashboard';
@@ -75,7 +81,7 @@ function Login() {
           />
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition"
+            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition cursor-pointer"
           >
             Entrar
           </button>

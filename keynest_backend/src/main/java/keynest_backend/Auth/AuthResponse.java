@@ -1,5 +1,6 @@
 package keynest_backend.Auth;
 
+import keynest_backend.User.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor // Lombok, genera un constructor con todos los argumentos
 public class AuthResponse {
 
+    Integer userId;
+    String email;
+    Role role;
+    String firstname;
+    String lastname;
     String token;
 }

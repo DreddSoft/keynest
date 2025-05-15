@@ -87,6 +87,7 @@ public class UnitService {
             // Creamos el DTO para devolver datos
             UnitDTO unitDTO = UnitDTO.builder()
                     // Datos principales
+                    .id(unit.getId())
                     .name(unit.getName())
                     // Localizacion
                     .countryName(unit.getCountry().getName())

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class UnitDTO {
 
     // Datos principales
+    public Integer id;
     public String name;
 
     // Localizacion

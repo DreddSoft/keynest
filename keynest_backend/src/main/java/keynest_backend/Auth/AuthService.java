@@ -48,13 +48,21 @@ public class AuthService {
 
         // Buscamos el usuario en la base de datos
         // Usamos UserDetails porque la clase User extiende de UserDetails
-        UserDetails user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        // Actualizamos el lastLogin
+        user.setLastLogin(LocalDateTime.now());
 
         // Generamos el token con la clase de servicio y pasando el usuario como argument
         String token = jwtService.getToken(user); // Generamos el token
 
         // REtornamos la respuesta (el token)
         return AuthResponse.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
                 .token(token)
                 .build();
 

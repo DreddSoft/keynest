@@ -19,6 +19,7 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
 
     @Query("""
                 SELECT new keynest_backend.Unit.UnitDTO(
+                    u.id,
                     u.name,
                     c.name,
                     p.name,
