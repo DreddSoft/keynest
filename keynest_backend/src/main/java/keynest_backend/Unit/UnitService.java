@@ -33,25 +33,14 @@ public class UnitService {
         Province province = provinceRepository.findById(request.getProvinceId()).orElse(null);
         Locality locality = localityRepository.findById(request.getLocalityId()).orElse(null);
         User worker = userRepository.findById(request.getWorker()).orElse(null);
+        UnitType type = UnitType.valueOf(request.getType());
 
         // Creamos una unidad
         Unit unit = Unit.builder()
-                // Datos principales
+                //* Data principal
                 .user(owner)
+                //* Informacion personal
                 .name(request.getName())
-                // Localizacion
-                .country(country)
-                .province(province)
-                .locality(locality)
-                .address(request.getAddress())
-                .buildingBlock(request.getBuildingBlock())
-                .streetNumber(request.getStreetNumber())
-                .floor(request.getFloor())
-                .doorLetter(request.getDoorLetter())
-                .postalCode(request.getPostalCode())
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                // DEscripcion
                 .rooms(request.getRooms())
                 .bathrooms(request.getBathrooms())
                 .hasKitchen(request.isHasKitchen())
@@ -59,7 +48,16 @@ public class UnitService {
                 .maxOccupancy(request.getMaxOccupancy())
                 .areaM2(request.getAreaM2())
                 .description(request.getDescription())
-                // Seguridad
+                .type(type)
+                //* GEO Data
+                .country(country)
+                .province(province)
+                .locality(locality)
+                .address(request.getAddress())
+                .postalCode(request.getPostalCode())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
+                //* Auditoria
                 .createdAt(LocalDateTime.now())
                 .createdBy(worker)
                 .updatedAt(LocalDateTime.now())
@@ -85,22 +83,11 @@ public class UnitService {
         if (unit != null) {
 
             // Creamos el DTO para devolver datos
-            UnitDTO unitDTO = UnitDTO.builder()
-                    // Datos principales
+            return UnitDTO.builder()
+                    //* Identificación y autenticación
                     .id(unit.getId())
+                    //* Informacion
                     .name(unit.getName())
-                    // Localizacion
-                    .countryName(unit.getCountry().getName())
-                    .provinceName(unit.getProvince().getName())
-                    .localityName(unit.getLocality().getName())
-                    .address(unit.getAddress())
-                    .buildingBlock(unit.getBuildingBlock())
-                    .streetNumber(unit.getStreetNumber())
-                    .floor(unit.getFloor())
-                    .postalCode(unit.getPostalCode())
-                    .latitude(unit.getLatitude())
-                    .longitude(unit.getLongitude())
-                    // Descripcion
                     .rooms(unit.getRooms())
                     .bathrooms(unit.getBathrooms())
                     .hasKitchen(unit.isHasKitchen())
@@ -108,10 +95,16 @@ public class UnitService {
                     .maxOccupancy(unit.getMaxOccupancy())
                     .areaM2(unit.getAreaM2())
                     .description(unit.getDescription())
+                    .type(unit.getType())
+                    //* GEO Data
+                    .countryName(unit.getCountry().getName())
+                    .provinceName(unit.getProvince().getName())
+                    .localityName(unit.getLocality().getName())
+                    .address(unit.getAddress())
+                    .postalCode(unit.getPostalCode())
+                    .latitude(unit.getLatitude())
+                    .longitude(unit.getLongitude())
                     .build();
-
-
-            return unitDTO;
 
         }
 

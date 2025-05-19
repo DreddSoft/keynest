@@ -1,14 +1,18 @@
 package keynest_backend.Auth;
 
+import keynest_backend.Exceptions.ErrorGeoDataException;
+import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:5173/"})
+@CrossOrigin(origins = "")
 public class AuthController {
 
     // Objeto de la clase de servicio encargada de gestionar la autenticación
@@ -39,11 +43,20 @@ public class AuthController {
      */
     // TODO: Esto en un futuro no será público y no devolverá un token, solo la respuesta de confirmación
     @PostMapping(value = "register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request) throws ErrorGeoDataException {
+
+        User userBase = authService.register(request);
+        String response = "";
+
+        if (userBase == null) {
+            response = "Error al crear el usuario.";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
 
         // Devuelve token y respuesta HTTP 200
-        // En el futuro, esto no será público y no devolverá un token, solo la respuesta de confirmación
-        return ResponseEntity.ok(authService.register(request));
+        // TODO: Bloquear el acceso publico
+        response = "Usuario creador correctamente.";
+        return ResponseEntity.ok(response);
     }
 
 

@@ -25,11 +25,12 @@ import java.util.List;
 })
 public class User implements UserDetails {
 
+    //* Identificación y autenticación
     @Id
     @GeneratedValue
     private Integer id;
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
+
+    //* Data principal
     @Column(name = "email", nullable = false, unique = true)
     private String email;
     @Column(name = "password", nullable = false)
@@ -37,14 +38,8 @@ public class User implements UserDetails {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER; // Por defecto el rol es USER
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true; // Por defecto el usuario esta activo
-    @Column(name = "last_login", nullable = true)
-    private LocalDateTime lastLogin;
-    @Column(name = "failed_attempts")
-    private int failedAttempts;
 
-    // Informacion personal
+    //* Informacion personal
     @Column(name = "first_name", nullable = false)
     private String firstname;
     @Column(name = "last_name", nullable = false)
@@ -58,7 +53,7 @@ public class User implements UserDetails {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    // Contacto y localizacion
+    //* GEO Data
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
     private Country country;
@@ -73,23 +68,40 @@ public class User implements UserDetails {
     @Column(name = "postal_code")
     private String postalCode;
 
-    // Empresa
+    //* Company Data
+    @Column(name = "is_company", nullable = true)
+    private boolean isCompany;
     @Column(name = "company_id", nullable = true)
     private Integer companyId = null;
 
-    // Datos del sistema
+    //* Auditoria
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
+    private User createdBy;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by", referencedColumnName = "id", nullable = false)
+    private User updatedBy;
     @Column(name = "language")
     private String language;
+    @Column(name = "last_login", nullable = true)
+    private LocalDateTime lastLogin;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true; // Por defecto el usuario esta activo
 
 
     // La interfaz nos obliga a implementar estos metodos, pero no los vamos a usar, porque la validacion la hacemos con JWT
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return getEmail();
     }
 
     @Override

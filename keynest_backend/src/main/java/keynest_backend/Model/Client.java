@@ -22,45 +22,41 @@ import java.util.Date;
         @UniqueConstraint(columnNames = "{id}")
 })
 public class Client {
-    // Identificardor
+    //* Identificación y autenticación
     @Id
     @GeneratedValue
     private Integer id;
 
-    // Nombre completo
+    //* Data principal
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "middle_name")
     private String middleName;
-    @Column(name = "lastname1", nullable = false)
-    private String lastname1;
-    @Column(name = "lastname2")
-    private String lastname2;
-
-    // Genero y fecha de nacimiento
+    @Column(name = "lastname", nullable = false)
+    private String lastname;
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
     private Gender gender;
     @Column(name = "birthday", nullable = false)
     private LocalDate birthday;
 
-    // Nacionalidad y documentos
+    //* Nacionalidad y documentos
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nationality_country_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "nationality", referencedColumnName = "id", nullable = false)
     private Country nationality;
     @Enumerated(EnumType.STRING)
-    @Column(name = "document_type", nullable = false)
-    private DocumentTypes documentType;
-    @Column(name = "document_number", nullable = false)
-    private String documentNumber;
-    @Column(name = "document_support_number")
-    private String documentSupportNumber;
-    @Column(name = "document_issue_date", nullable = false)
-    private LocalDate documentIssueDate;
-    @Column(name = "document_expiration_date", nullable = false)
-    private LocalDate documentExpirationDate;
+    @Column(name = "doc_type", nullable = false)
+    private DocumentTypes docType;
+    @Column(name = "doc_number", nullable = false)
+    private String docNumber;
+    @Column(name = "doc_support_number")
+    private String docSupportNumber;
+    @Column(name = "doc_issue_date", nullable = false)
+    private LocalDate docIssueDate;
+    @Column(name = "doc_expiration_date", nullable = false)
+    private LocalDate docExpirationDate;
 
-    // Datos de direcccion para CRM
+    //* GEO Data
     @Column(name = "address")
     private String address;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -75,7 +71,7 @@ public class Client {
     @Column(name = "postal_code")
     private String postalCode;
 
-    // Contacto
+    //* Contacto
     @Column(name = "email", nullable = false)
     private String email;
     @Column(name = "phone", nullable = false)
@@ -84,8 +80,10 @@ public class Client {
     private boolean isEmailVerified;
     @Column(name = "is_phone_verified")
     private boolean isPhoneVerified;
+    @Column(name = "notes")
+    private String notes;
 
-    // Auditoria
+    //* Auditoria
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;

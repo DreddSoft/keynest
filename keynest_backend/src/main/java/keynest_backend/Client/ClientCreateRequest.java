@@ -19,7 +19,7 @@ public class ClientCreateRequest {
     // Aqui tengo que pensar como pasar los datos del cliente en JSON o form
     private String name;
     private String middleName;
-    private String lastname1, lastname2;
+    private String lastname;
 
     // Genero y fecha de nacimiento
     // El genero lo voy a tratar en el request como un control de 0 a 3
@@ -32,11 +32,11 @@ public class ClientCreateRequest {
 
     // Nacionalidad y documentos
     private int nationalityId;
-    private int documentType;
-    private String documentNumber;
-    private String documentSupportNumber;
-    private String documentIssueDate;
-    private String documentExpirationDate;
+    private int docType;
+    private String docNumber;
+    private String docSupportNumber;
+    private String docIssueDate;
+    private String docExpirationDate;
 
     // Datos de direccion para CRM, estos seran opcionales en el form de checkin
     private String address;
@@ -48,5 +48,6 @@ public class ClientCreateRequest {
     // Contact details
     private String email;
     private String phone;
+    private String notes;
 
 }

@@ -10,10 +10,12 @@ import keynest_backend.Repositories.ProvinceRepository;
 import keynest_backend.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,40 +30,60 @@ public class UserService {
     @Transactional
     public UserResponse updateUser(UserRequest userRequest) {
 
+        // Sacar el usuario a modificar
+        User user = userRepository.findById(userRequest.getId()).orElse(null);
+        if (user == null) return new UserResponse("Usuario no encontrado.");
 
-        // Obtenemos las entiudades
+
+        // GEO y updater
         Country country = countryRepository.findById(userRequest.getCountryId()).orElse(null);
         Province province = provinceRepository.findById(userRequest.getProvinceId()).orElse(null);
         Locality locality = localityRepository.findById(userRequest.getLocalityId()).orElse(null);
+        User updaterUser = userRepository.findById(userRequest.getUpdaterId()).orElse(null);
+        if (updaterUser == null)
+            return new UserResponse("Usuario actualizador no parametrizado.");
 
-        // TODO: Temporal, porque nunca van a ser nulos por que seran un select required
-        if (country == null || province == null || locality == null) {
-            return new UserResponse("Error: pais, provincia o localidad no encontrados.");
-        }
+        // Modificamos los campos que llegan del request
+        //* Identificacion y autenticacion
+        if (isNotEmpty(userRequest.getEmail()))
+            user.setEmail(userRequest.getEmail());
+        if (isNotEmpty(userRequest.getPassword()))
+            user.setPassword(userRequest.getPassword());
 
+        //* Informacion personal
+        if (isNotEmpty(userRequest.getFirstname()))
+            user.setFirstname(userRequest.getFirstname());
+        if (isNotEmpty(userRequest.getLastname()))
+            user.setLastname(userRequest.getLastname());
+        if (userRequest.getBirthDate() != null && !userRequest.getBirthDate().toString().isEmpty())
+            user.setBirthDate(userRequest.getBirthDate());
+        if (isNotEmpty(userRequest.getPhone1()))
+            user.setPhone1(userRequest.getPhone1());
+        if (isNotEmpty(userRequest.getPhone2()))
+            user.setPhone2(userRequest.getPhone2());
+        if (isNotEmpty(userRequest.getProfilePictureUrl()))
+            user.setProfilePictureUrl(userRequest.getProfilePictureUrl());
 
-        User user = User.builder()
-                .id(userRequest.getId())
-                .username(userRequest.getEmail())
-                .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.password))
-                .firstname(userRequest.getFirstname())
-                .lastname(userRequest.getLastname())
-                .phone1(userRequest.getPhone1())
-                .phone2(userRequest.getPhone2())
-                .profilePictureUrl(userRequest.getProfilePictureUrl())
-                .country(country)
-                .province(province)
-                .locality(locality)
-                .address(userRequest.getAddress())
-                .postalCode(userRequest.getPostalCode())
-                .companyId(userRequest.getCompanyId())
-                .updatedAt(LocalDateTime.now())
-                .language(userRequest.getLanguage())
-                .build();
+        //* GEO Data
+        if (country != null)
+            user.setCountry(country);
+        if (province != null)
+            user.setProvince(province);
+        if (locality != null)
+            user.setLocality(locality);
+        if (isNotEmpty(userRequest.getAddress()))
+            user.setAddress(userRequest.getAddress());
+        if (isNotEmpty(userRequest.getPostalCode()))
+            user.setPostalCode(userRequest.getPostalCode());
 
+        //* Auditoria
+        if (isNotEmpty(userRequest.getLanguage()))
+            user.setLanguage(user.getLanguage());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedBy(updaterUser);
 
-        userRepository.updateUser(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getFirstname(), user.getLastname(), user.getBirthDate(), user.getPhone1(), user.getPhone2(), user.getProfilePictureUrl(), user.getCountry(), user.getProvince(), user.getLocality(), user.getAddress(), user.getPostalCode(), user.getCompanyId(), user.getUpdatedAt(), user.getLanguage());
+        // guardamos los cambios
+        userRepository.save(user);
 
         return new UserResponse("El usuario ha sido actualizado correctamente.");
 
@@ -98,8 +120,10 @@ public class UserService {
     }
 
 
-    public UserLocationDTO getUserInfo(Integer userId) {
-        return userRepository.getUserLocationInfo(userId);
+
+    //* Metodos auxiliares
+    private boolean isNotEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
 

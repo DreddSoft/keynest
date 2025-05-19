@@ -11,33 +11,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UnitDTO {
 
-    // Datos principales
-    public Integer id;
-    public String name;
+    //* Identificación y autenticación
+    private Integer id;
 
-    // Localizacion
-    public String countryName;
-    public String provinceName;
-    public String localityName;
-    public String address;
-    public String buildingBlock;
-    public String streetNumber;
-    public String floor;
-    public String doorLetter;
-    public String postalCode;
-    public double latitude;
-    public double longitude;
+    //* Informacion personal
+    private String name;
+    private int rooms;
+    private int bathrooms;
+    private boolean hasKitchen;
+    private int minOccupancy;
+    private int maxOccupancy;
+    private double areaM2;
+    private String description;
+    private UnitType type;
 
-    // Descripcion
-    public Integer rooms;
-    public Integer bathrooms;
-    public boolean hasKitchen;
-    public Integer minOccupancy;
-    public Integer maxOccupancy;
-    public double areaM2;
-    public String description;
-
-    // Seguridad
-
+    //* GEO Data
+    private String countryName;
+    private String provinceName;
+    private String localityName;
+    private String address;
+    private String postalCode;
+    private double latitude;
+    private double longitude;
 
 }

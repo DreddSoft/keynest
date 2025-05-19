@@ -11,35 +11,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClientDTO {
 
-    // Los datos que quiero obtener del cliente
-    // Identificador
-    public Integer id;
+    //* Identificación y autenticación
+    private Integer id;
 
-    // Nombre completo
-    public String name;
-    public String middleName;
-    public String lastname1;
-    public String lastname2;
+    //* Data principal
+    private String name;
+    private String middleName;
+    private String lastname;
+    private String gender;
+    private String birthday;
 
-    // Genero y fecha de nacimiento
-    public String gender;
-    public String birthday;
+    //* Nacionalidad y documentos
+    private String nationality;
+    private String docType;
+    private String docNumber;
+    private String docIssueDate;
+    private String docExpirationDate;
 
-    // Nacionalidad y documentos
-    public String nationality;
-    public String documentType;
-    public String documentNumber;
-    public String documentExpirationDate;
-
-    // CRM
-    public String address;
-    public String country;
-    public String province;
-    public String locality;
-    public String postalCode;
-
-    // Contacto
-    public String email;
-    public String phone;
+    //* Contacto
+    private String email;
+    private String phone;
 
 }

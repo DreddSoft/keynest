@@ -61,7 +61,7 @@ public class ClientService {
 
         // Sacar el tipo de documento
         DocumentTypes docType;
-        switch (request.getDocumentType()) {
+        switch (request.getDocType()) {
             case 0:
                 docType = DocumentTypes.DNI;
                 break;
@@ -75,38 +75,37 @@ public class ClientService {
         }
 
         // Fecha de issue y expiracion del documento
-        LocalDate issueDate = LocalDate.parse(request.getDocumentIssueDate(), formatter);
-        LocalDate expireDate = LocalDate.parse(request.getDocumentExpirationDate(), formatter);
+        LocalDate issueDate = LocalDate.parse(request.getDocIssueDate(), formatter);
+        LocalDate expireDate = LocalDate.parse(request.getDocExpirationDate(), formatter);
 
         // Creamos el cliente
         Client newClient = Client.builder()
-                // Nombre completo
+                //* Data principal
                 .name(request.getName())
                 .middleName(request.getMiddleName())
-                .lastname1(request.getLastname1())
-                .lastname2(request.getLastname2())
-                // Genero y fecha de nacimiento
+                .lastname(request.getLastname())
                 .gender(gender)
                 .birthday(birthday)
-                // Nacionalidad y documentos
+                //* Nacionalidad y documentos
                 .nationality(nationality)
-                .documentType(docType)
-                .documentNumber(request.getDocumentNumber())
-                .documentSupportNumber(request.getDocumentSupportNumber())
-                .documentIssueDate(issueDate)
-                .documentExpirationDate(expireDate)
-                // CRM
+                .docType(docType)
+                .docNumber(request.getDocNumber())
+                .docSupportNumber(request.getDocSupportNumber())
+                .docIssueDate(issueDate)
+                .docExpirationDate(expireDate)
+                //* GEO Data
                 .address(request.getAddress())
                 .country(country)
                 .province(province)
                 .locality(locality)
                 .postalCode(request.getPostalCode())
-                // Contacto
+                //* Contacto
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .isEmailVerified(false) // Por defecto en la creacion como falso
                 .isPhoneVerified(false)
-                // Auditoria
+                .notes(request.getNotes())
+                //* Auditoria
                 .createdBy(creator)
                 .createdAt(LocalDateTime.now())
                 .updatedBy(creator)
@@ -128,34 +127,25 @@ public class ClientService {
         // Creamos el clienteDTO
         if (client != null) {
 
-            ClientDTO clientDTO = ClientDTO.builder()
-                    // Identificador
+            return ClientDTO.builder()
+                    //* Identificación y autenticación
                     .id(client.getId())
-                    // Nombre completo
+                    //* Data principal
                     .name(client.getName())
                     .middleName(client.getMiddleName())
-                    .lastname1(client.getLastname1())
-                    .lastname2(client.getLastname2())
-                    // Genero y fecha de nacimiento
+                    .lastname(client.getLastname())
                     .gender(client.getGender().name())
                     .birthday(client.getBirthday().toString())
-                    // Nacionalidad y documentos
+                    //* Nacionalidad y documentos
                     .nationality(client.getNationality().getName())
-                    .documentType(client.getDocumentType().name())
-                    .documentNumber(client.getDocumentNumber())
-                    .documentExpirationDate(client.getDocumentExpirationDate().toString())
-                    // CRM
-                    .address(client.getAddress())
-                    .country(client.getCountry().getName())
-                    .province(client.getProvince().getName())
-                    .locality(client.getLocality().getName())
-                    .postalCode(client.getPostalCode())
-                    // Contacto
+                    .docType(client.getDocType().name())
+                    .docNumber(client.getDocNumber())
+                    .docIssueDate(client.getDocIssueDate().toString())
+                    .docExpirationDate(client.getDocExpirationDate().toString())
+                    //* Contacto
                     .email(client.getEmail())
                     .phone(client.getPhone())
                     .build();
-
-            return clientDTO;
         }
 
         return null;

@@ -15,9 +15,14 @@ import java.util.Date;
 @AllArgsConstructor
 public class UserRequest {
 
+    //* Identificación y autenticación
     Integer id;
+
+    //* Data principal
     String email;
     String password;
+
+    //* Informacion personal
     String firstname;
     String lastname;
     Date birthDate;
@@ -25,15 +30,16 @@ public class UserRequest {
     String phone2;
     String profilePictureUrl;
 
+    //* GEO Data
     int countryId;
     int provinceId;
     int localityId;
     String address;
     String postalCode;
 
-    Integer companyId;
-
+    //* Auditoria
     String language;
+    Integer updaterId;
 
 
 }

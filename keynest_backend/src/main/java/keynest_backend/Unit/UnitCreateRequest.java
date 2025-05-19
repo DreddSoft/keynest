@@ -11,34 +11,31 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UnitCreateRequest {
 
-    // Datos principales
-    private Integer userId;
-    private String name;
+    //* Data principal
+    Integer userId;
 
-    // Localizacion
-    private Integer countryId;
-    private Integer provinceId;
-    private Integer localityId;
-    private String address;
-    private String buildingBlock;
-    private String streetNumber;
-    private String floor;
-    private String doorLetter;
-    private String postalCode;
-    private double latitude;
-    private double longitude;
+    //* Informacion personal
+    String name;
+    Integer rooms;
+    Integer bathrooms;
+    boolean hasKitchen;
+    Integer minOccupancy;
+    Integer maxOccupancy;
+    double areaM2;
+    String description;
+    String type;
 
-    // Descripcion
-    private Integer rooms;
-    private Integer bathrooms;
-    private boolean hasKitchen;
-    private Integer minOccupancy;
-    private Integer maxOccupancy;
-    private double areaM2;
-    private String description;
+    //* GEO Data
+    Integer countryId;
+    Integer provinceId;
+    Integer localityId;
+    String address;
+    String postalCode;
+    double latitude;
+    double longitude;
 
-    // Seguridad
+    //* Auditoria
     // Los datos de seguridad no se piden en el request para crear, se automatizan en servicio
-    private Integer worker;
+    Integer worker;
 
 }

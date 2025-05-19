@@ -21,24 +21,21 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
                 SELECT new keynest_backend.Unit.UnitDTO(
                     u.id,
                     u.name,
-                    c.name,
-                    p.name,
-                    l.name,
-                    u.address,
-                    u.buildingBlock,
-                    u.streetNumber,
-                    u.floor,
-                    u.doorLetter,
-                    u.postalCode,
-                    u.latitude,
-                    u.longitude,
                     u.rooms,
                     u.bathrooms,
                     u.hasKitchen,
                     u.minOccupancy,
                     u.maxOccupancy,
                     u.areaM2,
-                    u.description
+                    u.description,
+                    u.type,
+                    c.name,
+                    p.name,
+                    l.name,
+                    u.address,
+                    u.postalCode,
+                    u.latitude,
+                    u.longitude
                 )
                 FROM Unit u
                 JOIN u.country c
@@ -47,5 +44,7 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
                 WHERE u.user.id = :userId
             """)
     List<UnitDTO> findAllByUser(@Param("userId") Integer userId);
+
+
 
 }

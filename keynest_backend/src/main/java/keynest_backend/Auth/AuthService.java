@@ -1,5 +1,6 @@
 package keynest_backend.Auth;
 
+import keynest_backend.Exceptions.ErrorGeoDataException;
 import keynest_backend.Jwt.JwtService;
 import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
@@ -11,11 +12,13 @@ import keynest_backend.User.Role;
 import keynest_backend.User.User;
 import keynest_backend.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 
@@ -73,38 +76,44 @@ public class AuthService {
      * @param request - Objeto RegisterRequest que contiene los datos para crear un nuevo usuario
      * @return - AuthResponse con el token JWT (de momento)
      */
-    public AuthResponse register(RegisterRequest request) {
+    public User register(RegisterRequest request) throws ErrorGeoDataException {
 
         // Tenemos que sacar los paises, provincias y localidades
-        Country country = countryRepository.findById(request.getCountryId()).orElse(null);
-        Province province = provinceRepository.findById(request.getProvinceId()).orElse(null);
-        Locality locality = localityRepository.findById(request.getLocalityId()).orElse(null);
-
+        Country country = countryRepository.findById(request.getCountryId()).orElseThrow(() -> new ErrorGeoDataException("Error en el pais al registrar Usuario."));
+        Province province = provinceRepository.findById(request.getProvinceId()).orElseThrow(() -> new ErrorGeoDataException("Error en la provincia al registrar Usuario."));
+        Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new ErrorGeoDataException("Error en la localidad al registrar Usuario."));
+        User creator = userRepository.findById(request.getCreatorId()).orElse(null);
 
         // Creamos usuario
         User user = User.builder()  // Usamos el patron de diseño Builder
-                .username(request.getEmail())
+                // Data principal
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword())) // Encriptamos la contraseña
                 .role(Role.USER) // Por defecto el rol es USER
-                .isActive(true) // Por defecto el usuario esta activo
-                .lastLogin(LocalDateTime.now()) // Por defecto la fecha de login es ahora
-                .failedAttempts(0)  // Por defecto el usuario no tiene intentos fallidos
+                // Informacion personal
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .birthDate(request.getBirthDate())
                 .phone1(request.getPhone1())
                 .phone2(request.getPhone2())
                 .profilePictureUrl(null)    // Por defecto no tiene foto de perfil
+                // GEO Data
                 .country(country)
                 .province(province)
                 .locality(locality)
                 .address(request.getAddress())
                 .postalCode(request.getPostalCode())
+                // Company Data
+                .isCompany(false)
                 .companyId(null)
+                // Auditoria
                 .createdAt(LocalDateTime.now()) // Por defecto la fecha de creacion es ahora
+                .createdBy(creator)
                 .updatedAt(LocalDateTime.now()) // Por defecto la fecha de actualizacion es ahora
+                .updatedBy(creator)
                 .language(request.getLanguage())
+                .lastLogin(null)
+                .isActive(true)
                 .build();
 
         // Guardamos el usuario en la base de datos usando Hibernate y la interfaz UserRepository
@@ -112,8 +121,10 @@ public class AuthService {
 
         // Devolvemos el token del nuevo usuario
         // TODO: cambiar el tipo de respuesta al registrar, pues no va a ser público
-        return AuthResponse.builder()
-                .token(jwtService.getToken(user))
-                .build();
+        if (user == null) {
+            return null;
+        }
+
+        return user;
     }
 }

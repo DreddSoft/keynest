@@ -35,4 +35,7 @@ public class RegisterRequest {
 
     // Datos del sistema
     private String language;
+
+    // Datos auditoria
+    private Integer creatorId;
 }

@@ -1,6 +1,7 @@
 package keynest_backend.Model;
 
 import jakarta.persistence.*;
+import keynest_backend.Unit.UnitType;
 import keynest_backend.User.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,44 +21,19 @@ import java.time.LocalDateTime;
 })
 public class Unit {
 
-    // Datos principales
+    //* Identificación y autenticación
     @Id
     @GeneratedValue
     private Integer id;
+
+    //* Data principal
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    //* Informacion personal
     @Column(name = "name", nullable = false)
     private String name;
-
-    // Localizacion
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
-    private Country country;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id", referencedColumnName = "id", nullable = false)
-    private Province province;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
-    private Locality locality;
-    @Column(name = "address", nullable = false)
-    private String address;
-    @Column(name = "building_block")
-    private String buildingBlock;
-    @Column(name = "street_number")
-    private String streetNumber;
-    @Column(name = "floor")
-    private String floor;
-    @Column(name = "door_letter")
-    private String doorLetter;
-    @Column(name = "postal_code")
-    private String postalCode;
-    @Column(name = "latitude")
-    private double latitude;
-    @Column(name = "longitude")
-    private double longitude;
-
-    // Descripcion
     @Column(name = "rooms", nullable = false)
     private Integer rooms = 1;  // Por defecto 1
     @Column(name = "bathrooms", nullable = false)
@@ -72,8 +48,31 @@ public class Unit {
     private double areaM2;
     @Column(name = "description")
     private String description;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private UnitType type;
 
-    // Seguridad
+
+    //* GEO Data
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
+    private Country country;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "province_id", referencedColumnName = "id", nullable = false)
+    private Province province;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
+    private Locality locality;
+    @Column(name = "address", nullable = false)
+    private String address;
+    @Column(name = "postal_code")
+    private String postalCode;
+    @Column(name = "latitude")
+    private double latitude;
+    @Column(name = "longitude")
+    private double longitude;
+
+    //* Auditoria
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne(fetch = FetchType.LAZY)

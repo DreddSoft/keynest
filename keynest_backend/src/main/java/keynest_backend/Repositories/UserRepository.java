@@ -21,7 +21,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // Esto es un queryMethod
     Optional<User> findByEmail(String email);
 
+    @Override
+    Optional<User> findById(Integer integer);
 
+    /*
     @Modifying()
     @Query("UPDATE User u SET " + // Ojo, en consultas HQL se usa el nombre de la clase, no de la tabla
             "u.username=:username, " +
@@ -61,20 +64,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                     @Param(value = "updatedAt") LocalDateTime updatedAt,
                     @Param(value = "language") String language);
 
-
-    @Query("SELECT new keynest_backend.User.UserLocationDTO(" +
-            "u.username, " +
-            "u.firstname, " +
-            "u.lastname, " +
-            "c.name AS countryName, " +
-            "p.name AS provinceName, " +
-            "l.name AS localityName) " +
-            "FROM User u " +
-            "JOIN u.country c " +
-            "JOIN u.province p " +
-            "JOIN u.locality l " +
-            "WHERE u.id = :userId")
-    UserLocationDTO getUserLocationInfo(@Param("userId") Integer userId);
+     */
 
 
 }
