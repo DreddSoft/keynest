@@ -26,20 +26,11 @@ public class UserRequest {
     String firstname;
     String lastname;
     Date birthDate;
-    String phone1;
-    String phone2;
+    String phone;
     String profilePictureUrl;
 
     //* GEO Data
-    int countryId;
-    int provinceId;
-    int localityId;
-    String address;
-    String postalCode;
-
-    //* Auditoria
-    String language;
-    Integer updaterId;
+    int addressId;
 
 
 }

@@ -19,22 +19,10 @@ public class UserDTO {
     // Usando esta clase UserDTO decidimos que datos exponer al frontend
 
     Integer id;
-    String username;
     String email;
     String firstname;
     String lastname;
-    String phone1;
-    String phone2;
     String profilePictureUrl;
 
-    String countryName;
-    String provinceName;
-    String localityName;
-    String address;
-    String postalCode;
-
-    Integer companyId;
-
-    String language;
 
 }

@@ -1,6 +1,7 @@
 package keynest_backend.User;
 
 import jakarta.persistence.*;
+import keynest_backend.Model.Address;
 import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
 import keynest_backend.Model.Province;
@@ -25,72 +26,52 @@ import java.util.List;
 })
 public class User implements UserDetails {
 
-    //* Identificación y autenticación
+    //* Identificación
     @Id
     @GeneratedValue
     private Integer id;
 
-    //* Data principal
+    //* Autenticación
     @Column(name = "email", nullable = false, unique = true)
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER; // Por defecto el rol es USER
 
-    //* Informacion personal
+    //* Data
     @Column(name = "first_name", nullable = false)
     private String firstname;
     @Column(name = "last_name", nullable = false)
     private String lastname;
-    @Column(name = "birth_date")
+    @Column(name = "birth_date", nullable = false)
     private Date birthDate;
-    @Column(name = "phone1")
-    private String phone1;
-    @Column(name = "phone2")
-    private String phone2;
+    @Column(name = "phone", nullable = false)
+    private String phone;
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    //* GEO Data
+    //* GEO
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
-    private Country country;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id", referencedColumnName = "id", nullable = false)
-    private Province province;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
-    private Locality locality;
-    @Column(name = "address")
-    private String address;
-    @Column(name = "postal_code")
-    private String postalCode;
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
 
-    //* Company Data
-    @Column(name = "is_company", nullable = true)
+    // Other info
+    @Column(name = "is_company")
     private boolean isCompany;
-    @Column(name = "company_id", nullable = true)
-    private Integer companyId = null;
 
     //* Auditoria
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
-    private User createdBy;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by", referencedColumnName = "id", nullable = false)
-    private User updatedBy;
-    @Column(name = "language")
-    private String language;
     @Column(name = "last_login", nullable = true)
     private LocalDateTime lastLogin;
+    @Column(name = "failed_attempts")
+    private int failedAttempts;
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true; // Por defecto el usuario esta activo
+    private boolean isActive = true;
 
 
     // La interfaz nos obliga a implementar estos metodos, pero no los vamos a usar, porque la validacion la hacemos con JWT
