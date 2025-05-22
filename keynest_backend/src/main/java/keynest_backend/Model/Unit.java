@@ -55,8 +55,12 @@ public class Unit {
 
     //* GEO Data
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
-    private Address address;
+    @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
+    private Locality locality;
+    @Column(name = "address")
+    private String address;
+    @Column(name = "postal_code")
+    private String postalCode;
 
     //* Auditoria
     @Column(name = "created_at")

@@ -31,7 +31,5 @@ public class UnitDTO {
     private String localityName;
     private String address;
     private String postalCode;
-    private double latitude;
-    private double longitude;
 
 }

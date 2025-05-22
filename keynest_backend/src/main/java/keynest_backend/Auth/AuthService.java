@@ -79,11 +79,7 @@ public class AuthService {
     public User register(RegisterRequest request) throws ErrorGeoDataException {
 
         // Tenemos que sacar los paises, provincias y localidades
-        Country country = countryRepository.findById(request.getCountryId()).orElseThrow(() -> new ErrorGeoDataException("Error en el pais al registrar Usuario."));
-        Province province = provinceRepository.findById(request.getProvinceId()).orElseThrow(() -> new ErrorGeoDataException("Error en la provincia al registrar Usuario."));
         Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new ErrorGeoDataException("Error en la localidad al registrar Usuario."));
-        User creator = userRepository.findById(request.getCreatorId()).orElse(null);
-
         // Creamos usuario
         User user = User.builder()  // Usamos el patron de diseño Builder
                 // Data principal
@@ -94,24 +90,17 @@ public class AuthService {
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .birthDate(request.getBirthDate())
-                .phone1(request.getPhone1())
-                .phone2(request.getPhone2())
+                .phone(request.getPhone())
                 .profilePictureUrl(null)    // Por defecto no tiene foto de perfil
                 // GEO Data
-                .country(country)
-                .province(province)
                 .locality(locality)
                 .address(request.getAddress())
                 .postalCode(request.getPostalCode())
                 // Company Data
                 .isCompany(false)
-                .companyId(null)
                 // Auditoria
                 .createdAt(LocalDateTime.now()) // Por defecto la fecha de creacion es ahora
-                .createdBy(creator)
                 .updatedAt(LocalDateTime.now()) // Por defecto la fecha de actualizacion es ahora
-                .updatedBy(creator)
-                .language(request.getLanguage())
                 .lastLogin(null)
                 .isActive(true)
                 .build();

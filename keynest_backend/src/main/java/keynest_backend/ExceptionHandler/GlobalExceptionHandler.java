@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlerArgumentException(IllegalArgumentException exception) {
 
         System.out.println(exception.getMessage());
-        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>("Error: " + exception.getMessage(), HttpStatus.BAD_REQUEST);
 
     }
 
@@ -21,7 +21,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlerRuntimeException(RuntimeException exception) {
 
         System.out.println(exception.getMessage());
-        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<String>("Error:" + exception.getMessage(), HttpStatus.BAD_GATEWAY);
+
     }
 
 }

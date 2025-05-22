@@ -34,8 +34,6 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
                     l.name,
                     u.address,
                     u.postalCode,
-                    u.latitude,
-                    u.longitude
                 )
                 FROM Unit u
                 JOIN u.country c

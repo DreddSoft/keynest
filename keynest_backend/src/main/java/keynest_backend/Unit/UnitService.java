@@ -28,18 +28,16 @@ public class UnitService {
     public UnitResponse createUnit(UnitCreateRequest request) {
 
         // Hay que sacar datos de modelos con los repositorios
-        User owner = userRepository.findById(request.getUserId()).orElse(null);
-        Country country = countryRepository.findById(request.getCountryId()).orElse(null);
-        Province province = provinceRepository.findById(request.getProvinceId()).orElse(null);
-        Locality locality = localityRepository.findById(request.getLocalityId()).orElse(null);
-        User worker = userRepository.findById(request.getWorker()).orElse(null);
+        User owner = userRepository.findById(request.getUserId()).orElseThrow(() -> new IllegalArgumentException("CreateUnit - usuario propietario no encontrado."));
+        Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new IllegalArgumentException("CreateUnit - localidad no encontrada."));
+        User creator = userRepository.findById(request.getCreatorId()).orElseThrow(() -> new IllegalArgumentException("CreateUnit - Usuario creador no encontrado."));
         UnitType type = UnitType.valueOf(request.getType());
 
         // Creamos una unidad
         Unit unit = Unit.builder()
-                //* Data principal
+                //* Relacion
                 .user(owner)
-                //* Informacion personal
+                //* Data
                 .name(request.getName())
                 .rooms(request.getRooms())
                 .bathrooms(request.getBathrooms())
@@ -50,18 +48,14 @@ public class UnitService {
                 .description(request.getDescription())
                 .type(type)
                 //* GEO Data
-                .country(country)
-                .province(province)
                 .locality(locality)
                 .address(request.getAddress())
                 .postalCode(request.getPostalCode())
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
                 //* Auditoria
                 .createdAt(LocalDateTime.now())
-                .createdBy(worker)
+                .createdBy(creator)
                 .updatedAt(LocalDateTime.now())
-                .updatedBy(worker)
+                .updatedBy(creator)
                 .isActive(true)
                 // Construimos
                 .build();
@@ -78,15 +72,16 @@ public class UnitService {
     public UnitDTO getUnit(Integer id) {
 
         // Creamos unidad
-        Unit unit = unitRepository.findById(id).orElse(null);
-
-        if (unit != null) {
+        Unit unit = unitRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("getUnit - Unidad no encontrada."));
+        Locality locality = localityRepository.findById(unit.getLocality().getId()).orElseThrow(() -> new IllegalArgumentException("getUnit - Localidad no encontrada."));
+        Province province = provinceRepository.findById(locality.getProvince().getId()).orElseThrow(() -> new IllegalArgumentException("getUnit - Provincia no encontrada."));
+        Country country = countryRepository.findById(province.getCountry().getId()).orElseThrow(() -> new IllegalArgumentException("getUnit - Pais no encontrado."));
 
             // Creamos el DTO para devolver datos
             return UnitDTO.builder()
                     //* Identificación y autenticación
                     .id(unit.getId())
-                    //* Informacion
+                    //* Data
                     .name(unit.getName())
                     .rooms(unit.getRooms())
                     .bathrooms(unit.getBathrooms())
@@ -97,18 +92,13 @@ public class UnitService {
                     .description(unit.getDescription())
                     .type(unit.getType())
                     //* GEO Data
-                    .countryName(unit.getCountry().getName())
-                    .provinceName(unit.getProvince().getName())
-                    .localityName(unit.getLocality().getName())
+                    .countryName(country.getName())
+                    .provinceName(province.getName())
+                    .localityName(locality.getName())
                     .address(unit.getAddress())
                     .postalCode(unit.getPostalCode())
-                    .latitude(unit.getLatitude())
-                    .longitude(unit.getLongitude())
                     .build();
 
-        }
-
-        return null;
     }
 
     public List<UnitDTO> allUnitsPerUser(Integer userId) {

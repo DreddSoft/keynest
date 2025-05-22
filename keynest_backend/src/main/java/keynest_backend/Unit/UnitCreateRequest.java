@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UnitCreateRequest {
 
-    //* Data principal
+    //* Relacion
     Integer userId;
 
-    //* Informacion personal
+    //* Data
     String name;
     Integer rooms;
     Integer bathrooms;
@@ -26,10 +26,12 @@ public class UnitCreateRequest {
     String type;
 
     //* GEO Data
-
+    int localityId;
+    String address;
+    String postalCode;
 
     //* Auditoria
     // Los datos de seguridad no se piden en el request para crear, se automatizan en servicio
-    Integer worker;
+    Integer creatorId;
 
 }

@@ -23,19 +23,11 @@ public class RegisterRequest {
     private String firstname;
     private String lastname;
     private Date birthDate;
-    private String phone1;
-    private String phone2;
+    private String phone;
 
     // Contacto y localizacion
-    private int countryId;
-    private int provinceId;
     private int localityId;
     private String address;
     private String postalCode;
 
-    // Datos del sistema
-    private String language;
-
-    // Datos auditoria
-    private Integer creatorId;
 }
