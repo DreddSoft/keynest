@@ -1,20 +1,13 @@
 package keynest_backend.User;
 
 import jakarta.transaction.Transactional;
-import keynest_backend.Model.Address;
-import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
-import keynest_backend.Model.Province;
 import keynest_backend.Repositories.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

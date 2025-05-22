@@ -22,16 +22,14 @@ import java.util.Date;
         @UniqueConstraint(columnNames = "{id}")
 })
 public class Client {
-    //* Identificación y autenticación
+    //* Identificación
     @Id
     @GeneratedValue
     private Integer id;
 
-    //* Data principal
+    //* Datos
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "middle_name")
-    private String middleName;
     @Column(name = "lastname", nullable = false)
     private String lastname;
     @Enumerated(EnumType.STRING)
@@ -39,11 +37,11 @@ public class Client {
     private Gender gender;
     @Column(name = "birthday", nullable = false)
     private LocalDate birthday;
+    @Enumerated(EnumType.STRING)
 
-    //* Nacionalidad y documentos
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nationality", referencedColumnName = "id", nullable = false)
-    private Country nationality;
+    //* Docs info
+    @Column(name = "nationality", nullable = false)
+    private String nationality;
     @Enumerated(EnumType.STRING)
     @Column(name = "doc_type", nullable = false)
     private DocumentTypes docType;
@@ -56,18 +54,12 @@ public class Client {
     @Column(name = "doc_expiration_date", nullable = false)
     private LocalDate docExpirationDate;
 
-    //* GEO Data
-    @Column(name = "address")
-    private String address;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id", referencedColumnName = "id")
-    private Country country;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id", referencedColumnName = "id")
-    private Province province;
+    //* GEO
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id", referencedColumnName = "id")
     private Locality locality;
+    @Column(name = "address")
+    private String address;
     @Column(name = "postal_code")
     private String postalCode;
 
@@ -76,10 +68,6 @@ public class Client {
     private String email;
     @Column(name = "phone", nullable = false)
     private String phone;
-    @Column(name = "is_email_verified")
-    private boolean isEmailVerified;
-    @Column(name = "is_phone_verified")
-    private boolean isPhoneVerified;
     @Column(name = "notes")
     private String notes;
 

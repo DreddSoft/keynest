@@ -19,21 +19,20 @@ public class ClientService {
 
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
-    private final CountryRepository countryRepository;
-    private final ProvinceRepository provinceRepository;
     private final LocalityRepository localityRepository;
+    private final ProvinceRepository provinceRepository;
+    private final CountryRepository countryRepository;
 
     // Metodo para crear un Cliente (el check-In o pre-checkIn)
     public String createNewClient(ClientCreateRequest request) {
 
         // Sacar el usuario
-        User creator =  userRepository.findById(request.getCreatorUserId()).orElseThrow();
+        User creator =  userRepository.findById(request.getCreatorUserId()).orElseThrow(() -> new IllegalArgumentException("createNewClient - Usuario creador no encontrado."));
 
         // Sacar datos de nacionalidad y paises
-        Country nationality = countryRepository.findById(request.getNationalityId()).orElseThrow();
-        Country country = countryRepository.findById(request.getCountryId()).orElse(null);
-        Province province = provinceRepository.findById(request.getProvinceId()).orElse(null);
-        Locality locality = localityRepository.findById(request.getLocalityId()).orElse(null);
+        Country nationality = countryRepository.findById(request.getNationalityCountryId()).orElseThrow(() -> new IllegalArgumentException("createNewClient - Pais de nacionalidad no encontrado."));
+
+        Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new IllegalArgumentException("createNewClient - Localidad no encontrada."));
 
         int genderPick = request.getGender();
         Gender gender;
@@ -80,30 +79,25 @@ public class ClientService {
 
         // Creamos el cliente
         Client newClient = Client.builder()
-                //* Data principal
+                //* Datos
                 .name(request.getName())
-                .middleName(request.getMiddleName())
                 .lastname(request.getLastname())
                 .gender(gender)
                 .birthday(birthday)
-                //* Nacionalidad y documentos
-                .nationality(nationality)
+                //* Docs info
+                .nationality(nationality.getName())
                 .docType(docType)
                 .docNumber(request.getDocNumber())
                 .docSupportNumber(request.getDocSupportNumber())
                 .docIssueDate(issueDate)
                 .docExpirationDate(expireDate)
-                //* GEO Data
-                .address(request.getAddress())
-                .country(country)
-                .province(province)
+                //* GEO
                 .locality(locality)
+                .address(request.getAddress())
                 .postalCode(request.getPostalCode())
                 //* Contacto
                 .email(request.getEmail())
                 .phone(request.getPhone())
-                .isEmailVerified(false) // Por defecto en la creacion como falso
-                .isPhoneVerified(false)
                 .notes(request.getNotes())
                 //* Auditoria
                 .createdBy(creator)
@@ -122,33 +116,38 @@ public class ClientService {
     public ClientDTO getClient(Integer id) {
 
         // Buscamos el cliente
-        Client client = clientRepository.findById(id).orElse(null);
+        Client client = clientRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("getClient - Cliente no encontrado."));
+
+        // Sacamos los datos GEO
+        Locality locality = localityRepository.findById(client.getLocality().getId()).orElseThrow(() -> new IllegalArgumentException("getClient - Localidad no encontrada."));
+        Province province = provinceRepository.findById(locality.getProvince().getId()).orElseThrow(() -> new IllegalArgumentException("getClient - Provincia no encontrada."));
+        Country country = countryRepository.findById(province.getCountry().getId()).orElseThrow(() -> new IllegalArgumentException("getClient - Pais no encontrado."));
 
         // Creamos el clienteDTO
-        if (client != null) {
-
             return ClientDTO.builder()
                     //* Identificación y autenticación
                     .id(client.getId())
                     //* Data principal
                     .name(client.getName())
-                    .middleName(client.getMiddleName())
                     .lastname(client.getLastname())
                     .gender(client.getGender().name())
                     .birthday(client.getBirthday().toString())
                     //* Nacionalidad y documentos
-                    .nationality(client.getNationality().getName())
+                    .nationality(client.getNationality())
                     .docType(client.getDocType().name())
                     .docNumber(client.getDocNumber())
                     .docIssueDate(client.getDocIssueDate().toString())
                     .docExpirationDate(client.getDocExpirationDate().toString())
+                    //* GEO
+                    .localityName(locality.getName())
+                    .provinceName(province.getName())
+                    .countryName(country.getName())
+                    .address(client.getAddress())
+                    .postalCode(client.getPostalCode())
                     //* Contacto
                     .email(client.getEmail())
                     .phone(client.getPhone())
                     .build();
-        }
-
-        return null;
 
     }
 

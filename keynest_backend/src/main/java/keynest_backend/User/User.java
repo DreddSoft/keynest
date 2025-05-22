@@ -1,10 +1,7 @@
 package keynest_backend.User;
 
 import jakarta.persistence.*;
-import keynest_backend.Model.Address;
-import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
-import keynest_backend.Model.Province;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

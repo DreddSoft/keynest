@@ -12,24 +12,32 @@ import lombok.NoArgsConstructor;
 public class ClientDTO {
 
     //* Identificación y autenticación
-    private Integer id;
+    Integer id;
 
     //* Data principal
-    private String name;
-    private String middleName;
-    private String lastname;
-    private String gender;
-    private String birthday;
+    String name;
+    String lastname;
+    String gender;
+    String birthday;
 
     //* Nacionalidad y documentos
-    private String nationality;
-    private String docType;
-    private String docNumber;
-    private String docIssueDate;
-    private String docExpirationDate;
+    String nationality;
+    String docType;
+    String docNumber;
+    String docIssueDate;
+    String docExpirationDate;
+
+    //* GEO
+    String localityName;
+    String provinceName;
+    String countryName;
+    String address;
+    String postalCode;
 
     //* Contacto
-    private String email;
-    private String phone;
+    String email;
+    String phone;
+
+
 
 }
