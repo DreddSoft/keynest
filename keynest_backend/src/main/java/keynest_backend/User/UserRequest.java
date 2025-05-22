@@ -30,7 +30,9 @@ public class UserRequest {
     String profilePictureUrl;
 
     //* GEO Data
-    int addressId;
+    int localityId;
+    String address;
+    String postalCode;
 
 
 }

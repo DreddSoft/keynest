@@ -8,6 +8,7 @@ import keynest_backend.Model.Province;
 import keynest_backend.Repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,16 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LocalityRepository localityRepository;
     private final PasswordEncoder passwordEncoder; // Inyeccion de dependencias, Spring se encarga de crear la instancia
 
+    // Este metodo corresponde a la funcion modificar por parte del usuario (USER)
     @Transactional
     public UserResponse updateUser(UserRequest userRequest) {
 
         // Sacar el usuario a modificar
         User user = userRepository.findById(userRequest.getId()).orElse(null);
+        Locality locality = localityRepository.findById(userRequest.getLocalityId()).orElse(null);
         if (user == null) return new UserResponse("Usuario no encontrado.");
         if (!user.isActive()) return new UserResponse("Usuario inactivo. Si quiere editarlo, activelo primero.");
 
@@ -48,6 +52,14 @@ public class UserService {
             user.setPhone(userRequest.getPhone());
         if (isNotEmpty(userRequest.getProfilePictureUrl()))
             user.setProfilePictureUrl(userRequest.getProfilePictureUrl());
+
+        //* GEO
+        if (locality != null)
+            user.setLocality(locality);
+        if(isNotEmpty(userRequest.getAddress()))
+            user.setAddress(user.getAddress());
+        if(isNotEmpty(userRequest.getPostalCode()))
+            user.setPostalCode(userRequest.getPostalCode());
 
         //* Auditoria
         user.setUpdatedAt(LocalDateTime.now());

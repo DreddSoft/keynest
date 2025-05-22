@@ -54,8 +54,12 @@ public class User implements UserDetails {
 
     //* GEO
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address address;
+    @JoinColumn(name = "locality_id", referencedColumnName = "id")
+    private Locality locality;
+    @Column(name = "address")
+    private String address;
+    @Column(name = "postal_code")
+    private String postalCode;
 
     // Other info
     @Column(name = "is_company")
@@ -68,8 +72,6 @@ public class User implements UserDetails {
     private LocalDateTime updatedAt;
     @Column(name = "last_login", nullable = true)
     private LocalDateTime lastLogin;
-    @Column(name = "failed_attempts")
-    private int failedAttempts;
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 

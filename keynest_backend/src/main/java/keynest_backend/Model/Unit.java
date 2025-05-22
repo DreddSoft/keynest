@@ -21,17 +21,17 @@ import java.time.LocalDateTime;
 })
 public class Unit {
 
-    //* Identificación y autenticación
+    //* Identificación
     @Id
     @GeneratedValue
     private Integer id;
 
-    //* Data principal
+    //* Relación
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    //* Informacion personal
+    //* Data
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "rooms", nullable = false)
@@ -40,9 +40,9 @@ public class Unit {
     private Integer bathrooms = 1;  // Por defecto 1
     @Column(name = "has_kitchen", nullable = false)
     private boolean hasKitchen = false; // Por defecto no tiene cocina
-    @Column(name = "min_occupancy", nullable = false)
+    @Column(name = "min_occupancy")
     private Integer minOccupancy = 1;   // Por defecto 1
-    @Column(name = "max_occupancy", nullable = false)
+    @Column(name = "max_occupancy")
     private Integer maxOccupancy = 1;   // Por defecto 1
     @Column(name = "area_m2")
     private double areaM2;
@@ -55,31 +55,17 @@ public class Unit {
 
     //* GEO Data
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
-    private Country country;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id", referencedColumnName = "id", nullable = false)
-    private Province province;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
-    private Locality locality;
-    @Column(name = "address", nullable = false)
-    private String address;
-    @Column(name = "postal_code")
-    private String postalCode;
-    @Column(name = "latitude")
-    private double latitude;
-    @Column(name = "longitude")
-    private double longitude;
+    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
+    private Address address;
 
     //* Auditoria
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now(); // Por defecto ahora
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
     private User createdBy;
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();  // Por defecto ahora
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by", referencedColumnName = "id", nullable = false)
     private User updatedBy;

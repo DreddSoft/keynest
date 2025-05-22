@@ -26,13 +26,7 @@ public class UnitCreateRequest {
     String type;
 
     //* GEO Data
-    Integer countryId;
-    Integer provinceId;
-    Integer localityId;
-    String address;
-    String postalCode;
-    double latitude;
-    double longitude;
+
 
     //* Auditoria
     // Los datos de seguridad no se piden en el request para crear, se automatizan en servicio
