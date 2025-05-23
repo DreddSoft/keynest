@@ -39,7 +39,7 @@ public class UnitController {
 
     // Método POST para obtener varios recursos de un user
     @GetMapping(value = "{userId}/units")
-    public List<UnitDTO> allUnitsPerUser(@PathVariable Integer userId) {
+    public List<UnitCardDTO> allUnitsPerUser(@PathVariable Integer userId) {
 
         return unitService.allUnitsPerUser(userId);
 

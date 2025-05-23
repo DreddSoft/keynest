@@ -49,9 +49,8 @@ public class Unit {
     @Column(name = "description")
     private String description;
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "unit_type")
     private UnitType type;
-
 
     //* GEO Data
     @ManyToOne(fetch = FetchType.LAZY)

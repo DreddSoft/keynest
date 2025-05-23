@@ -23,7 +23,7 @@ public class UnitCreateRequest {
     Integer maxOccupancy;
     double areaM2;
     String description;
-    String type;
+    int type;
 
     //* GEO Data
     int localityId;

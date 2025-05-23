@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +30,27 @@ public class UnitService {
         User owner = userRepository.findById(request.getUserId()).orElseThrow(() -> new IllegalArgumentException("CreateUnit - usuario propietario no encontrado."));
         Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new IllegalArgumentException("CreateUnit - localidad no encontrada."));
         User creator = userRepository.findById(request.getCreatorId()).orElseThrow(() -> new IllegalArgumentException("CreateUnit - Usuario creador no encontrado."));
-        UnitType type = UnitType.valueOf(request.getType());
+        UnitType typeUnit;
+        Integer typePick = request.getType();
+
+        switch (typePick) {
+            case 1:
+                typeUnit = UnitType.HOUSE;
+                break;
+
+            case 2:
+                typeUnit = UnitType.STUDIO;
+                break;
+
+            case 3:
+                typeUnit = UnitType.COUNTRY_HOUSE;
+                break;
+
+            default:
+                typeUnit = UnitType.APARTMENT;
+                break;
+
+        }
 
         // Creamos una unidad
         Unit unit = Unit.builder()
@@ -46,7 +65,7 @@ public class UnitService {
                 .maxOccupancy(request.getMaxOccupancy())
                 .areaM2(request.getAreaM2())
                 .description(request.getDescription())
-                .type(type)
+                .type(typeUnit)
                 //* GEO Data
                 .locality(locality)
                 .address(request.getAddress())
@@ -77,31 +96,34 @@ public class UnitService {
         Province province = provinceRepository.findById(locality.getProvince().getId()).orElseThrow(() -> new IllegalArgumentException("getUnit - Provincia no encontrada."));
         Country country = countryRepository.findById(province.getCountry().getId()).orElseThrow(() -> new IllegalArgumentException("getUnit - Pais no encontrado."));
 
-            // Creamos el DTO para devolver datos
-            return UnitDTO.builder()
-                    //* Identificación y autenticación
-                    .id(unit.getId())
-                    //* Data
-                    .name(unit.getName())
-                    .rooms(unit.getRooms())
-                    .bathrooms(unit.getBathrooms())
-                    .hasKitchen(unit.isHasKitchen())
-                    .minOccupancy(unit.getMinOccupancy())
-                    .maxOccupancy(unit.getMaxOccupancy())
-                    .areaM2(unit.getAreaM2())
-                    .description(unit.getDescription())
-                    .type(unit.getType())
-                    //* GEO Data
-                    .countryName(country.getName())
-                    .provinceName(province.getName())
-                    .localityName(locality.getName())
-                    .address(unit.getAddress())
-                    .postalCode(unit.getPostalCode())
-                    .build();
+        if (!unit.isActive())
+            throw new IllegalArgumentException("getUnit - Unidad desactivada.");
+
+        // Creamos el DTO para devolver datos
+        return UnitDTO.builder()
+                //* Identificación y autenticación
+                .id(unit.getId())
+                //* Data
+                .name(unit.getName())
+                .rooms(unit.getRooms())
+                .bathrooms(unit.getBathrooms())
+                .hasKitchen(unit.isHasKitchen())
+                .minOccupancy(unit.getMinOccupancy())
+                .maxOccupancy(unit.getMaxOccupancy())
+                .areaM2(unit.getAreaM2())
+                .description(unit.getDescription())
+                .type(unit.getType())
+                //* GEO Data
+                .countryName(country.getName())
+                .provinceName(province.getName())
+                .localityName(locality.getName())
+                .address(unit.getAddress())
+                .postalCode(unit.getPostalCode())
+                .build();
 
     }
 
-    public List<UnitDTO> allUnitsPerUser(Integer userId) {
+    public List<UnitCardDTO> allUnitsPerUser(Integer userId) {
 
         if (!userRepository.existsById(userId)) {
             return Collections.emptyList();

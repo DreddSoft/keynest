@@ -37,7 +37,6 @@ public class Client {
     private Gender gender;
     @Column(name = "birthday", nullable = false)
     private LocalDate birthday;
-    @Enumerated(EnumType.STRING)
 
     //* Docs info
     @Column(name = "nationality", nullable = false)

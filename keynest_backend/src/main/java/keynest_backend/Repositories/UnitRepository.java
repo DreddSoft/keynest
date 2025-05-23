@@ -1,6 +1,7 @@
 package keynest_backend.Repositories;
 
 import keynest_backend.Model.Unit;
+import keynest_backend.Unit.UnitCardDTO;
 import keynest_backend.Unit.UnitDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,31 +19,19 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
     List<Unit> findAll();
 
     @Query("""
-                SELECT new keynest_backend.Unit.UnitDTO(
+                SELECT new keynest_backend.Unit.UnitCardDTO(
                     u.id,
                     u.name,
-                    u.rooms,
-                    u.bathrooms,
-                    u.hasKitchen,
-                    u.minOccupancy,
-                    u.maxOccupancy,
-                    u.areaM2,
-                    u.description,
-                    u.type,
-                    c.name,
-                    p.name,
-                    l.name,
+                    CAST(u.type AS string),
                     u.address,
-                    u.postalCode,
+                    l.name
                 )
                 FROM Unit u
-                JOIN u.country c
-                JOIN u.province p
                 JOIN u.locality l
                 WHERE u.user.id = :userId
+                AND u.isActive = true
+                ORDER BY u.id
             """)
-    List<UnitDTO> findAllByUser(@Param("userId") Integer userId);
-
-
+    List<UnitCardDTO> findAllByUser(@Param("userId") Integer userId);
 
 }
