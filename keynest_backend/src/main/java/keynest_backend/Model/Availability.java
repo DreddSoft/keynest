@@ -24,7 +24,7 @@ public class Availability {
     //* Relacion
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_id", referencedColumnName = "id", nullable = false)
-    private Integer unitId;
+    private Unit unit;
 
     //* Data
     @Column(name = "date_available")

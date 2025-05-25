@@ -26,7 +26,7 @@ public class Invoice {
     //* Relaciones
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", referencedColumnName = "id", nullable = false)
-    private Integer bookingId;
+    private Booking booking;
 
     //* Data
     @Column(name = "invoice_number", nullable = false)

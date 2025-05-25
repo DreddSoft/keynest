@@ -4,6 +4,7 @@ import { FaHouseChimney } from "react-icons/fa6";
 import { FaHotel } from "react-icons/fa6";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { FiCalendar } from "react-icons/fi";
+import PersonalizedButton from "../components/PersonalizedButton.jsx"
 
 function Card({ name, address, locality, id }) {
 
@@ -40,9 +41,11 @@ function Card({ name, address, locality, id }) {
                 </div>
             </div>
             <div className="flex flex-col gap-1">
-                <button type="button" className="bg-gray-200 border rounded-xl max-w-full py-2 px-2 cursor-pointer hover:bg-gray-800 hover:text-white duration-300">Check-in</button>
-                <button type="button" className="bg-gray-200 border rounded-xl max-w-full py-2 px-2 cursor-pointer hover:bg-gray-800 hover:text-white duration-300">Check-out</button>
-                <button type="button" className="bg-gray-200 border rounded-xl max-w-full py-2 px-2 cursor-pointer hover:bg-gray-800 hover:text-white duration-300">Acceder</button>
+                <PersonalizedButton 
+                    buttonName={"Acceder"}
+                    buttonId={"access"}
+                    buttonFunction={ accessUnit }
+                />
             </div>
 
         </div>

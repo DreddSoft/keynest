@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import logo from '../assets/keynest_logo_mini.svg'
+import logo from '../assets/keynest_logo.svg'
+import miniLogo from '../assets/keynest_logo_mini.svg'
 
 function Login({ setIsAuthenticated }) {
 
@@ -58,9 +59,13 @@ function Login({ setIsAuthenticated }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
+
+      <img src={logo} alt='Logo de Keynest' className='blur-md w-3xl' />
       
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-md flex flex-col items-center">
-        <img src={logo} alt='Logo de Keynest' className='w-32 h-auto ' />
+      <div className="w-full max-w-md bg-white opacity-70 p-8 rounded-xl shadow-2xl flex flex-col items-center absolute">
+
+        <img src={miniLogo} alt='Logo de Keynest' className='w-32 h-auto' />
+        
         <h2 className="text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

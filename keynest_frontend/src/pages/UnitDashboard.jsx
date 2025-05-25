@@ -50,6 +50,8 @@ function UnitDashboard() {
                 // Usamos el estado funcion 
                 setUnits(data);
 
+                console.log(data);
+
             } catch (err) {
                 setError("Error: " + err.message);
             }

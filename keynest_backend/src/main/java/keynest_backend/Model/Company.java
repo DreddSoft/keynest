@@ -1,6 +1,7 @@
 package keynest_backend.Model;
 
 import jakarta.persistence.*;
+import keynest_backend.User.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,10 +23,10 @@ public class Company {
     //* Relaciones
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private Integer userId;
+    private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id", referencedColumnName = "id", nullable = false)
-    private Integer localityId;
+    private Locality locality;
 
     //* Data
     @Column(name = "fiscal_name", nullable = false)

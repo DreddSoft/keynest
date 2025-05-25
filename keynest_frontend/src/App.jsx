@@ -34,7 +34,8 @@ function App() {
         element={
           isAuthenticated
             ? <Navigate to="/dashboard" />
-            : <Login setIsAuthenticated={setIsAuthenticated} />
+            : <InLayout><Login setIsAuthenticated={setIsAuthenticated} /></InLayout> 
+            
         }
       />
 

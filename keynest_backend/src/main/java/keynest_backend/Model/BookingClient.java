@@ -23,10 +23,10 @@ public class BookingClient {
     //* Relaciones
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", referencedColumnName = "id", nullable = false)
-    private Integer bookingId;
+    private Booking booking;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
-    private Integer clientId;
+    private Client client;
 
     //* Data
     @Column(name = "is_main_guest")
