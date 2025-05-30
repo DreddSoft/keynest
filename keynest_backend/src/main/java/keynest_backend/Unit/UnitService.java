@@ -133,4 +133,108 @@ public class UnitService {
 
     }
 
+    public Unit updateUnit(UnitUpdateRequest request) {
+
+        // Obtener el updater
+        User updater = userRepository.findById(request.getUpdaterId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario modificador no encontrado."));
+
+        // Obtener la unidad
+        Unit unit = unitRepository.findById(request.getUnitId())
+                .orElse(null);
+
+        if (unit == null)
+            return unit;
+
+        // Comprobacion y modificacion
+        if (isNotEmpty(request.getName()))
+            unit.setName(request.getName());
+
+        if (request.getRooms() != null)
+            unit.setRooms(request.getRooms());
+
+        if (request.getBathrooms() != null)
+            unit.setBathrooms(request.getBathrooms());
+
+        if (request.getHasKitchen() != null)
+            unit.setHasKitchen(request.getHasKitchen());
+
+        if (request.getMinOccupancy() != null)
+            unit.setMinOccupancy(request.getMinOccupancy());
+
+        if (request.getMaxOccupancy() != null)
+            unit.setMaxOccupancy(request.getMaxOccupancy());
+
+        if (isNotEmpty(request.getDescription()))
+            unit.setDescription(request.getDescription());
+
+        if (request.getAreaM2() != null)
+            unit.setAreaM2(request.getAreaM2());
+
+        if (isNotEmpty(request.getAddress()))
+            unit.setAddress(request.getAddress());
+
+        if (isNotEmpty(request.getPostalCode()))
+            unit.setPostalCode(request.getPostalCode());
+
+        // Si tenemos ID, actualizamos la localidad
+        if (request.getLocalityId() != null) {
+            Locality locality = localityRepository.findById(request.getLocalityId())
+                    .orElseThrow(() -> new IllegalArgumentException("Localidad no encontrada."));
+            unit.setLocality(locality);
+        }
+
+        // UnitType es un enum, y el parametro se recibe siempre, se cambie o no
+        switch (request.getUnitTypeOption()) {
+
+            case 1:
+                unit.setType(UnitType.HOUSE);
+                break;
+
+            case 2:
+                unit.setType(UnitType.STUDIO);
+                break;
+            case 3:
+                unit.setType(UnitType.COUNTRY_HOUSE);
+                break;
+
+                // Por defecto siempre apartamentos
+            default:
+                unit.setType(UnitType.APARTMENT);
+                break;
+
+        }
+
+
+        // Auditoría
+        unit.setUpdatedAt(LocalDateTime.now());
+        unit.setUpdatedBy(updater);
+
+        // Guardar cambios
+        unitRepository.save(unit);
+
+        return unit;
+
+    }
+
+    public UnitResponse deleteUnit(Integer unitId) {
+
+        // Sacar la unidad
+        //TODO: Esto no es optimo en memoria, pero tengo que controlar el resultado
+        Unit unitTarget = unitRepository.findById(unitId).orElse(null);
+
+        if (unitTarget == null)
+            return new UnitResponse("ERROR | No se ha encontrado la unidad a eliminar.");
+
+        unitRepository.delete(unitTarget);
+
+        return new UnitResponse("OK | Unidad eliminada.");
+
+    }
+
+    //* Metodos auxiliares
+    private boolean isNotEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
 }

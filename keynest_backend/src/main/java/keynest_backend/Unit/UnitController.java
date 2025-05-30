@@ -45,4 +45,27 @@ public class UnitController {
 
     }
 
+    // EndPoint para actualizar una unidad
+    @PutMapping()
+    public ResponseEntity<UnitResponse> updateUnit(@RequestBody UnitUpdateRequest request) {
+
+        Unit unit = unitService.updateUnit(request);
+
+        if (unit == null)
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(new UnitResponse("Unidad actualizada con exito."));
+
+
+
+    }
+
+    // EndPoint para eliminar
+    @DeleteMapping(value = "{id}")
+    public UnitResponse deleteUnit(@PathVariable Integer id) {
+
+       return unitService.deleteUnit(id);
+
+    }
+
 }
