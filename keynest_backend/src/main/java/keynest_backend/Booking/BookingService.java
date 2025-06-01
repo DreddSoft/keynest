@@ -7,8 +7,10 @@ import keynest_backend.Repositories.UnitRepository;
 import keynest_backend.Repositories.UserRepository;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -57,6 +59,21 @@ public class BookingService {
         }
 
         return "Reserva " + bk.getId() + " creada correctamente.";
+
+    }
+
+    // Metodo para conseguir todas las noches reservadas de todas las unidades de un usuario
+    public Integer getAllBookedNightsFromUser (Integer userId) {
+
+        // Sacar fechas de inicio y fin de anio de forma dinamica
+        LocalDate now = LocalDate.now();
+        LocalDate startOfTheYear = now.withDayOfYear(1);
+        System.out.println("Fecha de inicio: " + startOfTheYear);
+
+        LocalDate endOfTheYear = now.withDayOfYear(now.lengthOfYear());
+        System.out.println("Fecha de fin: " + endOfTheYear);
+
+        return bookingRepository.sumNightsByUserIdAndDateRange(userId, startOfTheYear, endOfTheYear);
 
     }
 

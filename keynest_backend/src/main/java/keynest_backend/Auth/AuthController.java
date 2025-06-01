@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "")
+@CrossOrigin(origins = {"http://localhost:5173"})
 public class AuthController {
 
     // Objeto de la clase de servicio encargada de gestionar la autenticación

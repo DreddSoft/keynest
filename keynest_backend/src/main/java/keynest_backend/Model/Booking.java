@@ -61,4 +61,8 @@ public class Booking {
     @Column(name = "status")
     private int status;
 
+    //* Aniadido despues
+    @Column(name = "nights")
+    private int nights;
+
 }
