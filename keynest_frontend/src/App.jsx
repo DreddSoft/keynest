@@ -5,24 +5,42 @@ import Login from './pages/Login.jsx'
 import UnitDashboard from './pages/UnitDashboard.jsx'
 import Unit from './pages/Unit.jsx'
 import InLayout from './layout/InLayout.jsx'
+import OutLayout from './layout/OutLayout.jsx'
 
 function App() {
   // Estados para el usuario autenticado o no
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
 
-    // TODO: cambiar a cookie
-    const token = localStorage.getItem('token');
+    const checkAuth = async () => {
 
-    // establecer la autenticacion
-    if (token) {
-      setIsAuthenticated(true);
+      try {
+
+        const response = await fetch("http://localhost:8080/auth/check", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            'Content-Type':'application/json'
+          }
+        });
+
+        console.log(response);
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+
+      } catch (err) {
+        console.error("Error verificando autenticación: ", err);
+        setIsAuthenticated(false);
+
+      }
     }
 
-    // setIsAuthenticated(false)
-
-
+    checkAuth();
   }, []);
 
   return (
@@ -34,8 +52,8 @@ function App() {
         element={
           isAuthenticated
             ? <Navigate to="/dashboard" />
-            : <InLayout><Login setIsAuthenticated={setIsAuthenticated} /></InLayout> 
-            
+            : <OutLayout><Login setIsAuthenticated={setIsAuthenticated} /></OutLayout>
+
         }
       />
 
@@ -55,7 +73,11 @@ function App() {
       {/* Ruta del unit */}
       <Route
         path="/unit/:unitId"
-        element={<InLayout><Unit /></InLayout>}
+        element={
+        isAuthenticated
+         ? <InLayout><Unit /></InLayout>
+        : <Navigate to="/login" />
+        }
       />
 
       {/* Ruta por fectto */}

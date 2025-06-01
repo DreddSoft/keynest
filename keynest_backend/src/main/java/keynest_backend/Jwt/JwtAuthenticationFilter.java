@@ -2,6 +2,7 @@ package keynest_backend.Jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -86,12 +87,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private String getTokenFromRequest(HttpServletRequest request) {
 
+        /* ESTO ES LEYENDO DESDE HEADER BEARER TOKEN
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
 
             // Desde el 7 hasta el final es el token
             return authHeader.substring(7);
+
+        }
+
+         */
+
+        //* Leyendo desde la cookie
+        if (request.getCookies() != null) {
+
+            // Recorremos todas las cookies
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName()))
+                    return cookie.getValue();
+            }
 
         }
 

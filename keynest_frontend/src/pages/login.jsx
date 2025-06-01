@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import logo from '../assets/keynest_logo.svg'
 import miniLogo from '../assets/keynest_logo_mini.svg'
+import { useNavigate } from 'react-router-dom'
 
 function Login({ setIsAuthenticated }) {
 
@@ -8,6 +9,7 @@ function Login({ setIsAuthenticated }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate();
 
   // Logica de funcionalidad
   const handleSubmit = async (e) => {
@@ -39,20 +41,19 @@ function Login({ setIsAuthenticated }) {
       // sacamos los datos de la respuesta
       const data = await response.json();
       // Guardamos el token JWT en el localStorage
-      localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
-      localStorage.setItem('email', data.email)
-      localStorage.setItem('role', data.role)
-      localStorage.setItem('firstname', data.firstname)
-      localStorage.setItem('lastname', data.lastname)
+      localStorage.setItem('email', data.email);
+      localStorage.setItem('firstname', data.firstname);
+      localStorage.setItem('lastname', data.lastname);
       console.log(data.token);
-      setIsAuthenticated(true)
+      setIsAuthenticated(true);
 
       // Redirigimos tras el login correcto
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
 
     } catch (err) {
       setError('Incio de sesion erroneo. ' + err.message);
+      setIsAuthenticated(false);
     }
 
   }

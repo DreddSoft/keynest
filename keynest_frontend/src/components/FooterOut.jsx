@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Footer() {
+function FooterOut() {
 
   // Funcion para cerrar sesion
   const handleLogout = async () => {
@@ -35,14 +35,8 @@ function Footer() {
       © {new Date().getFullYear()} KeyNest. Todos los derechos reservados.
       <a href='https://github.com/DreddSoft' className='border-b-2 border-transparent hover:text-pink-900 hover:border-pink-900 transition-colors duration-200'>@DreddSoft</a>
 
-      <button
-        onClick={handleLogout}
-        className="text-sm text-gray-700 border border-gray-400 px-3 py-1 rounded-lg hover:bg-pink-900 hover:text-white transition-colors duration-200 hover:cursor-pointer"
-      >
-        Logout
-      </button>
     </footer>
   )
 }
 
-export default Footer
+export default FooterOut

@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 let firstname = localStorage.getItem('firstname');
 let lastname = localStorage.getItem('lastname');
-let fullName = firstname + " " + lastname;
 
 function UnitDashboard() {
 
@@ -20,7 +19,6 @@ function UnitDashboard() {
     const USERID = localStorage.getItem('userId');
     const URL = `http://localhost:8080/api/unit/${USERID}/units`;
 
-    const token = localStorage.getItem('token');
     const [date, setDate] = useState(new Date());
 
 
@@ -33,8 +31,7 @@ function UnitDashboard() {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                 });
 
@@ -97,6 +94,7 @@ function UnitDashboard() {
                                     address={unit.address}
                                     locality={unit.localityName}
                                     id={unit.id}
+                                    type={unit.type}
                                 />
                             )
                         })}

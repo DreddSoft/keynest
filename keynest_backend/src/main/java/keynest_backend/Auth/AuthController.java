@@ -1,12 +1,12 @@
 package keynest_backend.Auth;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import keynest_backend.Exceptions.ErrorGeoDataException;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,10 +29,35 @@ public class AuthController {
      */
     @PostMapping(value = "login")
     @CrossOrigin(origins = {"http://localhost:5173"})
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthDTO> login(@RequestBody LoginRequest request, HttpServletResponse Httpresponse) {
+
+        // Enviamos el request al authService
+        AuthResponse response = authService.login(request);
+
+        // Seteamos la cookie de con la info
+        String token = response.getToken();
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(false) // True cuando https
+                .path("/")
+                .maxAge(60 * 60) // 1 hora
+                .sameSite("Strict") // valores Lax o Strict
+                .build();
+
+        Httpresponse.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // Creamos el authDTO
+        AuthDTO authDTO = AuthDTO.builder()
+                .userId(response.getUserId())
+                .email(response.getEmail())
+                .firstname(response.getFirstname())
+                .lastname(response.getLastname())
+                .build();
+
 
         // Devolvemos la respuesta HTTP 200
-        return ResponseEntity.ok(authService.login(request));
+        return ResponseEntity.ok(authDTO);
 
     }
 
@@ -57,6 +82,27 @@ public class AuthController {
         // TODO: Bloquear el acceso publico
         response = "Usuario creador correctamente.";
         return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping(value = "logout")
+    public ResponseEntity<String> logout(HttpServletResponse response, @RequestBody Integer userId) {
+        // Nos cargamos la cookie
+        authService.logout(response, userId);
+
+        // Respuesta
+        return ResponseEntity.ok("Sesión cerrada correctamente.");
+    }
+
+    /**
+     * Endpoint para comprobar si esta autenticado
+     * Al tratar de acceder al backend va a pasar por el security filter chain, donde configure las reglas para que haga la verificación del token jwt.
+     * Si no es correcto devolvera un 403 o 401 porque no esta autorizado, esto lo controlamos en el frontend
+     * Si es correcto, devuelve 200 y continuamos autenticados
+     */
+    @GetMapping("check")
+    public ResponseEntity<?> checkAuthentication() {
+        return ResponseEntity.ok().build();
     }
 
 

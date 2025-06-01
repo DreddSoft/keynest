@@ -1,7 +1,9 @@
 package keynest_backend.Auth;
 
+import jakarta.servlet.http.HttpServletResponse;
 import keynest_backend.Exceptions.ErrorGeoDataException;
 import keynest_backend.Jwt.JwtService;
+import keynest_backend.Logs.Log;
 import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
 import keynest_backend.Model.Province;
@@ -12,6 +14,8 @@ import keynest_backend.User.Role;
 import keynest_backend.User.User;
 import keynest_backend.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +50,7 @@ public class AuthService {
      */
     public AuthResponse login(LoginRequest request) {
 
+
         // Autenticacmos al usuario con el AuthenticationManager
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
@@ -56,8 +61,14 @@ public class AuthService {
         // Actualizamos el lastLogin
         user.setLastLogin(LocalDateTime.now());
 
+        // Log
+        //Log.write(user.getId(), "Auth", "Inicio de sesión.");
+
         // Generamos el token con la clase de servicio y pasando el usuario como argument
         String token = jwtService.getToken(user); // Generamos el token
+
+        // Log
+        //Log.write(user.getId(), "Auth", "Inicio de sesión. Ha generado el token.");
 
         // REtornamos la respuesta (el token)
         return AuthResponse.builder()
@@ -115,5 +126,27 @@ public class AuthService {
         }
 
         return user;
+    }
+
+    /**
+     * Método para logout
+     */
+    public void logout(HttpServletResponse response, Integer userId){
+
+        // Sobreescribimos la cookiea tiempo 0
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .secure(true)
+                .sameSite("Strict")
+                .build();
+
+        // Log
+        //Log.write(userId, "Auth", "Cierre de sesión del usuario.");
+
+        // La guardamos
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
     }
 }
