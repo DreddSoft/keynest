@@ -1,32 +1,24 @@
 import { React, useEffect, useState } from "react";
-import Card from '../components/cards'
-import LogoText from '../assets/keynest_logo_text.png'
-import { Calendar } from "@/components/ui/calendar"
-import PieChartReservas from '../components/PieChartReservas'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
-
+import Card from '../components/cards';
+import LogoText from '../assets/keynest_logo_text.png';
+import { Calendar } from "@/components/ui/calendar";
+import PieChartReservas from '../components/PieChartReservas';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 let firstname = localStorage.getItem('firstname');
 let lastname = localStorage.getItem('lastname');
 
 function UnitDashboard() {
-
-    // constantes
     const [units, setUnits] = useState([]);
     const [error, setError] = useState(null);
+    const [date, setDate] = useState(new Date());
 
     const USERID = localStorage.getItem('userId');
     const URL = `http://localhost:8080/api/unit/${USERID}/units`;
 
-    const [date, setDate] = useState(new Date());
-
-
     useEffect(() => {
-
         const fetchUnits = async () => {
             try {
-                // Hacemos fetch para capturar la respuesta del backend
                 const response = await fetch(URL, {
                     method: 'GET',
                     credentials: 'include',
@@ -35,93 +27,69 @@ function UnitDashboard() {
                     },
                 });
 
-                // Si la respuesta no es ok
                 if (!response.ok) {
-                    // Lanzamos error
                     throw new Error("Error al capturar las unidades.");
                 }
 
-                // Sacamos los datos a formato JSON
                 const data = await response.json();
-
-                // Usamos el estado funcion 
                 setUnits(data);
-
-                console.log(data);
-
             } catch (err) {
                 setError("Error: " + err.message);
             }
-        }
+        };
 
         fetchUnits();
-
     }, [USERID]);
 
-    // Retornamos el html
     return (
-        <div className="h-screen bg-gray-200 rounded-2xl p-6">
-            <header className="flex flex-row justify-between items-center rounded-2xl p-6 my-1 shadow-2xl">
-                <div className="ml-4 ">
-                    <img
-                        className="w-32"
-                        src={LogoText} alt="Texto Logo de Keynest" />
-                </div>
-                <div>
-                    <div>
-
-                    </div>
-                    <div className="mr-4 ">
-                        {/* Aqui iria el componente userCard */}
-                        <Avatar>
-                            <AvatarImage src="https://i.pravatar.cc/300" alt="avatar usuario" />
-                            <AvatarFallback>{firstname}{lastname}</AvatarFallback>
-                        </Avatar>
-                    </div>
-                </div>
+        <div className="min-h-screen bg-gray-100 p-4 md:p-6 flex flex-col">
+            {/* Header */}
+            <header className="flex justify-between items-center bg-white p-4 rounded-xl shadow mb-4">
+                <img src={LogoText} alt="Texto Logo de Keynest" className="w-32" />
+                <Avatar>
+                    <AvatarImage src="https://i.pravatar.cc/300" alt="avatar usuario" />
+                    <AvatarFallback>{firstname?.[0]}{lastname?.[0]}</AvatarFallback>
+                </Avatar>
             </header>
-            <section className="flex flex-row justify-between items-center h-fit shadow-2xl rounded-2xl bg-gray-100">
 
-                <div className="flex flex-col w-full h-full justify-center items-center">
-                    <div className="flex flex-row p-3 justify-center items-center gap-2">
-                        {error && <p className="text-red-600 font-bold mb-4">{error}</p>}
+            {/* Main Section */}
+            <main className="flex flex-col lg:flex-row gap-4 flex-grow ">
+                {/* Cards */}
+                <section className="flex-1 bg-white p-4 rounded-xl shadow flex flex-wrap justify-center items-center gap-4">
+                    {error && <p className="text-red-600 font-bold w-full text-center">{error}</p>}
+                    {units.map((unit, index) => (
+                        <Card
+                            key={index}
+                            name={unit.name}
+                            address={unit.address}
+                            locality={unit.localityName}
+                            id={unit.id}
+                            type={unit.type}
+                        />
+                    ))}
+                </section>
 
-                        {units.map((unit, index) => {
-                            return (
-                                <Card
-                                    key={index}
-                                    name={unit.name}
-                                    address={unit.address}
-                                    locality={unit.localityName}
-                                    id={unit.id}
-                                    type={unit.type}
-                                />
-                            )
-                        })}
-
-                    </div>
-                </div>
-                <aside className="h-full w-1/4 flex flex-col">
-                    <div className="h-1/2 flex flex-col items-center justify-center gap-4 ">
-                        {/* completed circulo */}
+                {/* Sidebar */}
+                <aside className="w-full lg:w-1/3 flex flex-col gap-4">
+                    <div className="bg-white p-4 rounded-xl shadow flex justify-center">
                         <PieChartReservas reservedDays={130} />
                     </div>
-                    <div className="h-1/2 flex items-center justify-center ">
-                        {/* calendario */}
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            className="rounded-md border"
-                        />
+                    <div className="bg-white p-4 rounded-xl shadow flex justify-center h-full flex items-center justify-center flex-col gap-2">
+                        <h3 className="">Calendario</h3>
+                        <div className="">
+                            <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={setDate}
+                                className="rounded-md border"
+                            />
+                        </div>
                     </div>
+
                 </aside>
-
-            </section>
+            </main>
         </div>
-    )
-
-
+    );
 }
 
 export default UnitDashboard;

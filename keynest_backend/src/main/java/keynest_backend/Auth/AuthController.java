@@ -86,7 +86,11 @@ public class AuthController {
 
 
     @PostMapping(value = "logout")
-    public ResponseEntity<String> logout(HttpServletResponse response, @RequestBody Integer userId) {
+    public ResponseEntity<String> logout(HttpServletResponse response, @RequestBody LogoutRequest request) {
+
+        // Sanitizamos
+        Integer userId = request.getUserId();
+
         // Nos cargamos la cookie
         authService.logout(response, userId);
 

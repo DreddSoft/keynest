@@ -2,14 +2,21 @@ import React from 'react'
 
 function Footer() {
 
+  const userId = parseInt(localStorage.getItem("userId"));
+
   // Funcion para cerrar sesion
   const handleLogout = async () => {
 
     try {
 
       const response = await fetch("http://localhost:8080/auth/logout", {
-        method: "GET",
+        method: "POST",
         credentials: "include",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId:userId})
+
       });
 
       if (response.ok) {
