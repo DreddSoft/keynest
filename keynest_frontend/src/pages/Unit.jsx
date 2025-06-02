@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { FaArrowRightToBracket, FaBed, FaInfo, FaChartLine, FaClipboardUser, FaUserLarge, FaCashRegister } from "react-icons/fa6";
 
 function Unit() {
     const { unitId } = useParams();
     const [unit, setUnit] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const [step, setStep] = useState(1);
 
     const URL = `http://localhost:8080/api/unit/${unitId}`;
-    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const fetchUnit = async () => {
@@ -18,7 +19,6 @@ function Unit() {
                     credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
                     },
                 });
 
@@ -51,69 +51,129 @@ function Unit() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto mt-8 pb-6 bg-white shadow-2xl rounded-xl">
+        <div className="max-w-4xl mx-auto mt-8 pb-6 bg-white shadow-2xl rounded-xl min-h-96">
             {/* Botonera superior */}
             <div className="flex justify-between items-center mb-6 bg-gray-800 w-full p-4">
                 <div className="flex justify-center items-center bg-gray-800 w-full">
                     <button
                         onClick={() => navigate("/dashboard")}
-                        className="bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white"
+                        className="bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
                     >
-                        ← Volver al dashboard
+                        <FaArrowRightToBracket /> Volver
                     </button>
                     <button
-                        disabled
-                        className="bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white"
+                        className={step === 1
+                            ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
+                            : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
+                        }
+                        onClick={() => setStep(1)}
                     >
-                        ✏️ Editar
+                        <FaInfo /> Info
                     </button>
                     <button
-                        disabled
-                        className="bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white"
+                        className={step === 2
+                            ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
+                            : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
+                        }
+                        onClick={() => setStep(2)} 
                     >
-                        📅 Calendario
+                        <FaChartLine /> Estadísticas
                     </button>
                     <button
-                        disabled
-                        className="bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white"
+                        className={step === 3
+                            ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
+                            : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
+                        }
+                        onClick={() => setStep(3)} 
                     >
-                        🧾 Reservas
+                        <FaClipboardUser /> Reservas
+                    </button>
+                    <button
+                        className={step === 4
+                            ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
+                            : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
+                        }
+                        onClick={() => setStep(4)} 
+                    >
+                        <FaUserLarge /> Clientes
+                    </button>
+                    <button
+                        className={step === 5
+                            ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
+                            : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
+                        }
+                        onClick={() => setStep(5)} 
+                    >
+                        <FaCashRegister /> Facturación
+                    </button>
+                    <button
+                        className="bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
+                        onClick={() => navigate(`/BookingForm/${unitId}`)}
+                    >
+                        <FaBed /> Reservar
                     </button>
                 </div>
             </div>
-            <h2 className="text-3xl font-bold text-blue-900 mb-4">{unit.name}</h2>
+            {step === 1 && (
 
-            {/* Datos generales */}
-            <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Datos generales</h3>
-                <div className="grid grid-cols-2 gap-4 text-gray-700 text-sm">
-                    <p><strong>ID:</strong> {unit.id}</p>
-                    <p><strong>Tipo:</strong> {unit.type}</p>
-                    <p><strong>Área:</strong> {unit.areaM2} m²</p>
-                    <p><strong>Ocupación:</strong> {unit.minOccupancy} - {unit.maxOccupancy} personas</p>
-                    <p><strong>Baños:</strong> {unit.bathrooms}</p>
-                    <p><strong>Habitaciones:</strong> {unit.rooms}</p>
-                    <p><strong>Cocina:</strong> {unit.hasKitchen ? 'Sí' : 'No'}</p>
+                <div>
+                    <h2 className="text-3xl font-bold text-blue-900 mb-4">{unit.name}</h2>
+
+                    {/* Datos generales */}
+                    <div className="mb-6">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Datos generales</h3>
+                        <div className="grid grid-cols-2 gap-4 text-gray-700 text-sm">
+                            <p><strong>ID:</strong> {unit.id}</p>
+                            <p><strong>Tipo:</strong> {unit.type}</p>
+                            <p><strong>Área:</strong> {unit.areaM2} m²</p>
+                            <p><strong>Ocupación:</strong> {unit.minOccupancy} - {unit.maxOccupancy} personas</p>
+                            <p><strong>Baños:</strong> {unit.bathrooms}</p>
+                            <p><strong>Habitaciones:</strong> {unit.rooms}</p>
+                            <p><strong>Cocina:</strong> {unit.hasKitchen ? 'Sí' : 'No'}</p>
+                        </div>
+                    </div>
+
+                    {/* Descripción */}
+                    <div className="mb-6">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Descripción</h3>
+                        <p className="text-gray-700 text-sm">{unit.description || 'Sin descripción disponible.'}</p>
+                    </div>
+
+                    {/* Ubicación */}
+                    <div>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Ubicación</h3>
+                        <div className="grid grid-cols-2 gap-4 text-gray-700 text-sm">
+                            <p><strong>Dirección:</strong> {unit.address}</p>
+                            <p><strong>Código Postal:</strong> {unit.postalCode}</p>
+                            <p><strong>Localidad:</strong> {unit.localityName}</p>
+                            <p><strong>Provincia:</strong> {unit.provinceName}</p>
+                            <p><strong>País:</strong> {unit.countryName}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* Descripción */}
-            <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Descripción</h3>
-                <p className="text-gray-700 text-sm">{unit.description || 'Sin descripción disponible.'}</p>
-            </div>
-
-            {/* Ubicación */}
-            <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Ubicación</h3>
-                <div className="grid grid-cols-2 gap-4 text-gray-700 text-sm">
-                    <p><strong>Dirección:</strong> {unit.address}</p>
-                    <p><strong>Código Postal:</strong> {unit.postalCode}</p>
-                    <p><strong>Localidad:</strong> {unit.localityName}</p>
-                    <p><strong>Provincia:</strong> {unit.provinceName}</p>
-                    <p><strong>País:</strong> {unit.countryName}</p>
+            )}
+            {step === 2 && (
+                <div>
+                    Esto es Estadísticas
                 </div>
-            </div>
+            )}
+            {step === 3 && (
+                <div>
+                    Esto es Reservas
+                </div>
+            )}
+            {step === 4 && (
+                <div>
+                    Esto es Clientes
+                </div>
+            )}
+            {step === 5 && (
+                <div>
+                    Esto es Facturación
+                </div>
+            )}
+
         </div>
     );
 }

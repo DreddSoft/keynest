@@ -49,9 +49,7 @@ public class BookingService {
                 .notes(request.getNotes())
                 // Auditoria
                 .createdAt(LocalDateTime.now())
-                .createdBy(creator)
                 .updatedAt(LocalDateTime.now())
-                .updatedBy(creator)
                 .isActive(true)
                 .status(0)
                 .build();

@@ -88,7 +88,7 @@ function UnitDashboard() {
             <header className="flex justify-between items-center bg-white p-4 rounded-xl shadow mb-4">
                 <img src={LogoText} alt="Texto Logo de Keynest" className="w-32" />
                 <Avatar>
-                    <AvatarImage src="https://i.pravatar.cc/300" alt="avatar usuario" />
+                    <AvatarImage src="" alt="avatar usuario" />
                     <AvatarFallback>{firstname?.[0]}{lastname?.[0]}</AvatarFallback>
                 </Avatar>
             </header>

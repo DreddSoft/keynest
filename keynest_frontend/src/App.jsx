@@ -6,6 +6,7 @@ import UnitDashboard from './pages/UnitDashboard.jsx'
 import Unit from './pages/Unit.jsx'
 import InLayout from './layout/InLayout.jsx'
 import OutLayout from './layout/OutLayout.jsx'
+import BookingForm from './pages/BookingForm.jsx'
 
 function App() {
   // Estados para el usuario autenticado o no
@@ -79,6 +80,15 @@ function App() {
             : <Navigate to="/login" />
         }
       />
+      {/* - Ruta para el formulario de reserva */ }
+      {/*<Route
+        path="/bookingForm/:unitId"
+        element={
+          isAuthenticated
+            ? <InLayout><BookingForm /></InLayout>
+            : <Navigate to="/login" />
+        }
+      />*/}
       <Route
         path="/*"
         element={<Navigate to="/login" />}

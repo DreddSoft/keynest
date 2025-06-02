@@ -46,14 +46,8 @@ public class Booking {
     //* Auditoria
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by", referencedColumnName = "id")
-    private User updatedBy;
 
     //* Status
     @Column(name = "is_active")
