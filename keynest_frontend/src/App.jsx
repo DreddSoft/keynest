@@ -21,7 +21,7 @@ function App() {
           method: "GET",
           credentials: "include",
           headers: {
-            'Content-Type':'application/json'
+            'Content-Type': 'application/json'
           }
         });
 
@@ -43,55 +43,49 @@ function App() {
     checkAuth();
   }, []);
 
-  return (
-    <Routes>
+  // Pantalla de carga
+  if (isAuthenticated == null) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center text-gray-700 text-lg">
+        Verificando autenticación...
+      </div>
+    );
+  }
 
-      {/* Ruta de Login */}
+  return (
+
+    <Routes>
       <Route
         path="/login"
         element={
           isAuthenticated
             ? <Navigate to="/dashboard" />
             : <OutLayout><Login setIsAuthenticated={setIsAuthenticated} /></OutLayout>
-
         }
       />
-
-      {/* Ruta del dashboard */}
       <Route
         path="/dashboard"
         element={
           isAuthenticated
-            ? <InLayout>
-              <UnitDashboard />
-            </InLayout>
-
+            ? <InLayout><UnitDashboard /></InLayout>
             : <Navigate to="/login" />
         }
       />
-
-      {/* Ruta del unit */}
       <Route
         path="/unit/:unitId"
         element={
-        isAuthenticated
-         ? <InLayout><Unit /></InLayout>
-        : <Navigate to="/login" />
+          isAuthenticated
+            ? <InLayout><Unit /></InLayout>
+            : <Navigate to="/login" />
         }
       />
-
-      {/* Ruta por fectto */}
       <Route
         path="/*"
         element={<Navigate to="/login" />}
       />
-
     </Routes>
 
-
-  )
-
-
+  );
 }
 
 

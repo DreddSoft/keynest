@@ -31,4 +31,15 @@ public class BookingController {
         return ResponseEntity.ok(response);
 
     }
+
+    /**
+     * Endpoint para obtener la proxima o actual reserva de una unidad
+     * @PathVarialbe Integer unitId ==> El id de la unidad por parametro GET
+     */
+    @GetMapping(value = "getNext/{unitId}")
+    public ResponseEntity<BookingLiteDTO> getNextBooking (@PathVariable Integer unitId) {
+
+        return ResponseEntity.ok(bookingService.getNextBooking(unitId));
+
+    }
 }

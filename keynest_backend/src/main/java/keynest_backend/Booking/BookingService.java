@@ -8,10 +8,12 @@ import keynest_backend.Repositories.UserRepository;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +76,35 @@ public class BookingService {
         System.out.println("Fecha de fin: " + endOfTheYear);
 
         return bookingRepository.sumNightsByUserIdAndDateRange(userId, startOfTheYear, endOfTheYear);
+
+    }
+
+    // Metodo para obtener la proxima reserva de la unidad
+    public BookingLiteDTO getNextBooking (Integer unitId) {
+
+        // Sacar la proxima reserva o nulo usando stream
+        Booking booking = bookingRepository
+                .findNextOrCurrentBookings(unitId)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (booking == null) {
+            return null;
+        }
+
+        // Formateamos las fechas a tipo ESP
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate checkIn = LocalDate.parse(booking.getCheckIn().toString(), formatter);
+        LocalDate checkOut = LocalDate.parse(booking.getCheckOut().toString(), formatter);
+
+        // Construimos el LiteDTO
+        return BookingLiteDTO
+                .builder()
+                .checkIn(checkIn)
+                .checkOut(checkOut)
+                .nights(booking.getNights())
+                .build();
 
     }
 
