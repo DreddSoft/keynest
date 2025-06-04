@@ -149,4 +149,23 @@ public class AuthService {
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
     }
+
+    /**
+     * Método para comprobar si un usuario es admin
+     * @param userId - Id del usuario
+     */
+    public AuthAdminResponse isAdmin(Integer userId) {
+
+        // Sacamos el usuario
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("AuthService | isAdmin | No se encuentra el usuario."));
+
+        boolean isAdmin = false;
+
+        if (user.getRole() == Role.ADMIN) {
+            isAdmin = true;
+        }
+
+        return AuthAdminResponse.builder().admin(isAdmin).build();
+
+    }
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { LogOut } from "lucide-react";
 
 function Footer() {
 
@@ -44,9 +45,9 @@ function Footer() {
 
       <button
         onClick={handleLogout}
-        className="text-sm text-gray-700 border border-gray-400 px-3 py-1 rounded-lg hover:bg-pink-900 hover:text-white transition-colors duration-200 hover:cursor-pointer"
+        className="flex flex-row justify-center items-center border-b-1 border-transparent hover:border-red-600 p-2 text-sm text-red-600 cursor-pointer transition duration-300 gap-1"
       >
-        Logout
+       <LogOut/> Salir
       </button>
     </footer>
   )

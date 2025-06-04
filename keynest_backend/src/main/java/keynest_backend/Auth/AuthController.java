@@ -104,9 +104,10 @@ public class AuthController {
      * Si no es correcto devolvera un 403 o 401 porque no esta autorizado, esto lo controlamos en el frontend
      * Si es correcto, devuelve 200 y continuamos autenticados
      */
-    @GetMapping("check")
-    public ResponseEntity<?> checkAuthentication() {
-        return ResponseEntity.ok().build();
+    @GetMapping("check/{userId}")
+    public ResponseEntity<AuthAdminResponse> checkAuthentication(@PathVariable Integer userId) {
+
+        return ResponseEntity.ok(authService.isAdmin(userId));
     }
 
 
