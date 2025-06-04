@@ -2,6 +2,7 @@ package keynest_backend.Repositories;
 
 import keynest_backend.Availability.AvailabilityDTO;
 import keynest_backend.Model.Availability;
+import keynest_backend.Model.Unit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,14 +23,27 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
                 a.minStay, 
                 a.isAvailable
                 ) FROM Availability a
-                WHERE a.unit.id = :unitId
+                WHERE a.unit = :unit
                 AND a.dateAvailable BETWEEN :startDate AND :endDate
             """)
     List<AvailabilityDTO> findAvailabilityByUnitAndDateRange(
-            @Param("unitId") Integer unitId,
+            @Param("unit") Unit unit,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("""
+            DELETE FROM Availability a
+            WHERE a.unit = :unit
+            AND a.dateAvailable BETWEEN :startDate AND :endDate
+            """)
+    void brutDeleteAvailabilityPerUnit (
+            @Param("unit") Unit unit,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+
 
 
 }
