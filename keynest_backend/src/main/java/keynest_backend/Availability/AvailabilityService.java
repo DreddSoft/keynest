@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,7 +24,7 @@ public class AvailabilityService {
     // 2. Actualizar dispo de una unidad
 
     // 1. Ver dispo de una unidad en base a unas fechas
-    public List<Availability> getAvailabilityForUnit(Integer unitId, LocalDate starDate, LocalDate endDate) {
+    public List<AvailabilityDTO> getAvailabilityForUnit(Integer unitId, LocalDate starDate, LocalDate endDate) {
 
         if (starDate == null || endDate == null || unitId == null) {
             throw new IllegalArgumentException("Unidad y fecha son requeridas.");
@@ -87,6 +88,13 @@ public class AvailabilityService {
         availabilityRepository.save(entry);
 
         return "OK | Disponiblidad actualizada.";
+
+    }
+
+    // Metodo para sacar la dispo entre dos fechas
+    public List<AvailabilityDTO> checkAvailability (CheckAvailabilityRequest request) {
+
+        return availabilityRepository.findAvailabilityByUnitAndDateRange(request.getUnitId(), request.getCheckIn(), request.getCheckOut());
 
     }
 

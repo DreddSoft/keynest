@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { FaArrowRightToBracket, FaBed, FaInfo, FaChartLine, FaClipboardUser, FaUserLarge, FaCashRegister } from "react-icons/fa6";
+import { Loader2 } from "lucide-react";
 
 function Unit() {
     const { unitId } = useParams();
@@ -8,11 +9,13 @@ function Unit() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
+    const [loading, setLoading] = useState(true);
 
     const URL = `http://localhost:8080/api/unit/${unitId}`;
 
     useEffect(() => {
         const fetchUnit = async () => {
+
             try {
                 const response = await fetch(URL, {
                     method: "GET",
@@ -33,7 +36,9 @@ function Unit() {
             }
         };
 
+        setLoading(true)
         fetchUnit();
+        setLoading(false);
     }, [unitId]);
 
     if (error) {
@@ -50,8 +55,18 @@ function Unit() {
         );
     }
 
+
+
     return (
         <div className="max-w-4xl mx-auto mt-8 pb-6 bg-white shadow-2xl rounded-xl min-h-96">
+            {/* Loading */}
+            {loading && (
+                <div className="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-gray-800" />
+                </div>
+            )}
+
+
             {/* Botonera superior */}
             <div className="flex justify-between items-center mb-6 bg-gray-800 w-full p-4">
                 <div className="flex justify-center items-center bg-gray-800 w-full">
@@ -75,7 +90,7 @@ function Unit() {
                             ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
                             : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
                         }
-                        onClick={() => setStep(2)} 
+                        onClick={() => setStep(2)}
                     >
                         <FaChartLine /> Estadísticas
                     </button>
@@ -84,7 +99,7 @@ function Unit() {
                             ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
                             : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
                         }
-                        onClick={() => setStep(3)} 
+                        onClick={() => setStep(3)}
                     >
                         <FaClipboardUser /> Reservas
                     </button>
@@ -93,7 +108,7 @@ function Unit() {
                             ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
                             : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
                         }
-                        onClick={() => setStep(4)} 
+                        onClick={() => setStep(4)}
                     >
                         <FaUserLarge /> Clientes
                     </button>
@@ -102,7 +117,7 @@ function Unit() {
                             ? "text-white px-4 py-2 rounded border-b-2 bg-gray-700 transition hover:cursor-pointer border-b-white flex flex-row justify-center items-center gap-1"
                             : "bg-gray-800 text-white px-4 py-2 rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
                         }
-                        onClick={() => setStep(5)} 
+                        onClick={() => setStep(5)}
                     >
                         <FaCashRegister /> Facturación
                     </button>

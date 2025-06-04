@@ -11,13 +11,10 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AvailabilityDTO {
+public class CheckAvailabilityRequest {
 
-
-    private LocalDate date;
-    private double price;
-    private int minStay;
-    private boolean isAvailable;
-
-
+    Integer unitId;
+    LocalDate checkIn;
+    LocalDate checkOut;
 }
+

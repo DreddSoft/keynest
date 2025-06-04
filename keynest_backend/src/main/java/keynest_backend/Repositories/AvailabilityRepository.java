@@ -1,5 +1,6 @@
 package keynest_backend.Repositories;
 
+import keynest_backend.Availability.AvailabilityDTO;
 import keynest_backend.Model.Availability;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,11 +16,16 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
     Optional<Availability> findById(Integer integer);
 
     @Query("""
-                SELECT a FROM Availability a
+                SELECT new keynest_backend.Availability.AvailabilityDTO(
+                a.dateAvailable, 
+                a.pricePerNight, 
+                a.minStay, 
+                a.isAvailable
+                ) FROM Availability a
                 WHERE a.unit.id = :unitId
                 AND a.dateAvailable BETWEEN :startDate AND :endDate
             """)
-    List<Availability> findAvailabilityByUnitAndDateRange(
+    List<AvailabilityDTO> findAvailabilityByUnitAndDateRange(
             @Param("unitId") Integer unitId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate

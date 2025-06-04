@@ -4,6 +4,7 @@ import keynest_backend.Model.Availability;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.NativeQuery;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public class AvailabilityController {
     private final AvailabilityService availabilityService;
 
     @GetMapping("/{unitId}")
-    public List<Availability> getAvailabilityForUnit(
+    public List<AvailabilityDTO> getAvailabilityForUnit(
             @PathVariable Integer unitId,
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
@@ -39,6 +40,18 @@ public class AvailabilityController {
     public String updateAvailability(@RequestBody AvailabilityUpdateRequest request) {
 
         return availabilityService.updateAvailability(request);
+
+    }
+
+    @PostMapping("check")
+    public ResponseEntity<List<AvailabilityDTO>> checkAvailability (@RequestBody CheckAvailabilityRequest request) {
+
+        List<AvailabilityDTO> dates = availabilityService.checkAvailability(request);
+
+        if (dates == null)
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(dates);
 
     }
 

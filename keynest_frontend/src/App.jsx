@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Navigate, Router, Routes, Route } from 'react-router-dom'
+import { Loader2 } from "lucide-react";
 
 import Login from './pages/Login.jsx'
 import UnitDashboard from './pages/UnitDashboard.jsx'
@@ -7,6 +8,7 @@ import Unit from './pages/Unit.jsx'
 import InLayout from './layout/InLayout.jsx'
 import OutLayout from './layout/OutLayout.jsx'
 import BookingForm from './pages/BookingForm.jsx'
+
 
 function App() {
   // Estados para el usuario autenticado o no
@@ -48,7 +50,7 @@ function App() {
   if (isAuthenticated == null) {
     return (
       <div className="h-screen w-full flex items-center justify-center text-gray-700 text-lg">
-        Verificando autenticación...
+        <Loader2 className="h-5 w-5 animate-spin" />
       </div>
     );
   }
@@ -80,15 +82,15 @@ function App() {
             : <Navigate to="/login" />
         }
       />
-      {/* - Ruta para el formulario de reserva */ }
-      {/*<Route
+      {/* - Ruta para el formulario de reserva */}
+      <Route
         path="/bookingForm/:unitId"
         element={
           isAuthenticated
             ? <InLayout><BookingForm /></InLayout>
             : <Navigate to="/login" />
         }
-      />*/}
+      />
       <Route
         path="/*"
         element={<Navigate to="/login" />}
