@@ -31,12 +31,15 @@ public class AvailabilityService {
 
         }
 
+        // SAcamos la unidad
+        Unit unit = unitRepository.findById(unitId).orElseThrow(() -> new IllegalArgumentException("No se puede encontrar la unidad."));
+
         if (endDate.isBefore(starDate)) {
             throw new IllegalArgumentException("La fecha fin no puede ser anterior a la fecha inicio.");
 
         }
 
-        return availabilityRepository.findAvailabilityByUnitAndDateRange(unitId, starDate, endDate);
+        return availabilityRepository.findAvailabilityByUnitAndDateRange(unit, starDate, endDate);
     }
 
     //2. Crear una dispo
@@ -94,14 +97,71 @@ public class AvailabilityService {
     // Metodo para sacar la dispo entre dos fechas
     public List<AvailabilityDTO> checkAvailability (CheckAvailabilityRequest request) {
 
-        return availabilityRepository.findAvailabilityByUnitAndDateRange(request.getUnitId(), request.getCheckIn(), request.getCheckOut());
+        // Sacamos unidad
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada."));
+
+        return availabilityRepository.findAvailabilityByUnitAndDateRange(unit, request.getCheckIn(), request.getCheckOut());
 
     }
+
+    /**
+     * Metodo para crear disponibilidad entre varias fechas, y asi actualizar la dispo de una unidad de golpe
+     * @param request |
+     */
+    public AvailabilityResponse createBrutAvailabilityPerUnit(CreateAvailabilityRequest request) {
+
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("La unidad no existe."));
+
+        // No hace falta eliminar los registros, porque esto sera siempre en fechas que no esten creadas
+        // Hay que crear disponibilidad por disponibilidad y guardarlo
+        // Crearlas todas hasta la final, sin contarla
+        for (LocalDate date = request.getStartDate(); date.isBefore(request.getEndDate()); date = date.plusDays(1)) {
+
+            // Obtener la unidad
+
+            Availability intro = Availability.builder()
+                    .unit(unit)
+                    .dateAvailable(date)
+                    .pricePerNight(request.getPrice())
+                    .minStay(request.getMinStay())
+                    .isAvailable(true)
+                    .build();
+
+            // un check de si es null error
+            if (intro == null)
+                throw new IllegalArgumentException("No se ha creado la disponibilidad correctamente.");
+
+            availabilityRepository.save(intro);
+
+        }
+
+        // La ultima fecha
+        Availability last = Availability.builder()
+                .unit(unit)
+                .dateAvailable(request.getEndDate())
+                .pricePerNight(request.getPrice())
+                .minStay(request.getMinStay())
+                .isAvailable(true)
+                .build();
+        // Misma comprobacion
+        if (last == null)
+            throw new IllegalArgumentException("No se ha creado la disponibilidad correctamente.");
+
+        availabilityRepository.save(last);
+
+        return AvailabilityResponse.builder()
+                .message("Disponibilidad creada con exito.")
+                .build();
+
+    }
+
 
 
     //* Metodos auxiliares
     private boolean isNotEmpty(String value) {
         return value != null && !value.trim().isEmpty();
     }
+
+
 
 }

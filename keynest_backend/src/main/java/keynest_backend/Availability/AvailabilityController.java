@@ -55,4 +55,11 @@ public class AvailabilityController {
 
     }
 
+    @PostMapping("bruteCreate")
+    public ResponseEntity<AvailabilityResponse> createBrutAvailability (@RequestBody CreateAvailabilityRequest request) {
+
+        return ResponseEntity.ok(availabilityService.createBrutAvailabilityPerUnit(request));
+
+    }
+
 }
