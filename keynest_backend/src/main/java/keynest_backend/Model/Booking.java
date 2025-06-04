@@ -55,6 +55,13 @@ public class Booking {
     @Column(name = "status")
     private int status;
 
+    // 0 - cancelada
+    // 1 - confirmada
+    // 2 - precheckin (que ya esta hecho el precheckin
+    // 3 - checkin (que ya esta hecho el checkin)
+    // 4 - facturada (que ya ha facturado)
+    // 5 - checkout (fuera)
+
     //* Aniadido despues
     @Column(name = "nights")
     private int nights;

@@ -13,6 +13,7 @@ import BookingForm from './pages/BookingForm.jsx'
 function App() {
   // Estados para el usuario autenticado o no
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
 

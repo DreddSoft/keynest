@@ -4,6 +4,7 @@ import { FaArrowRightToBracket, FaBed, FaInfo, FaChartLine, FaClipboardUser, FaU
 import ContactForm from "@/components/ContactForm.jsx";
 import { Loader2 } from "lucide-react";
 import PersonalizedButton from "../components/PersonalizedButton.jsx";
+import BookingList from "@/subpages/BookingList.jsx";
 
 function Unit() {
     const { unitId } = useParams();
@@ -261,12 +262,14 @@ function Unit() {
                 </div>
             )}
             {step === 3 && (
-                <div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Reservas</h3>
+                <div className="p-2">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Reservas Futuras</h3>
                     <div>
-                        {/* FOTOS */}
                         <div>
                             {/* Aqui se muestra una tabla con las proximas reservas */}
+                            <BookingList 
+                            unitId={unitId}
+                             />
                         </div>
                         {/* PARTE BAJA */}
                         <div>

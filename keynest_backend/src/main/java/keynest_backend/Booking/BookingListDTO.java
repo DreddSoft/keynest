@@ -1,4 +1,4 @@
-package keynest_backend.Availability;
+package keynest_backend.Booking;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +11,14 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateAvailabilityRequest {
+public class BookingListDTO {
 
-    Integer unitId;
-    LocalDate startDate;
-    LocalDate endDate;
-    double price;
-    int minStay;
+    Integer id;
+    LocalDate checkIn;
+    LocalDate checkOut;
+    int noches;
+    String name;
+    double total;
+    int guests;
 
 }

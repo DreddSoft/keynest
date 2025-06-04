@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/booking")
 @RequiredArgsConstructor
@@ -40,6 +42,30 @@ public class BookingController {
     public ResponseEntity<BookingLiteDTO> getNextBooking (@PathVariable Integer unitId) {
 
         return ResponseEntity.ok(bookingService.getNextBooking(unitId));
+
+    }
+
+
+    /**
+     * Endpoint para obtener las proximas reservas por los 3 siguientes meses
+     * @PathVariable Integer unitId ==> El id de la unidad
+     */
+    @GetMapping(value = "futureBooking/{unitId}")
+    public ResponseEntity<List<BookingListDTO>> getFutureBookingsFromUnit (@PathVariable Integer unitId) {
+
+        return ResponseEntity.ok(bookingService.getFutureBookingsForUnit(unitId));
+
+    }
+
+    /**
+     * Endpoint para obtener una reserva con diferentes datos
+     * @PathVariable Integer bookingId ==> El id de la reserva
+     * Esta funcion esta pensada para el apartado Reservas del USER
+     */
+    @GetMapping(value = "{bookingId}")
+    public ResponseEntity<BookingDTO> getBooking (@PathVariable Integer bookingId) {
+
+        return ResponseEntity.ok(bookingService.getBooking(bookingId));
 
     }
 }
