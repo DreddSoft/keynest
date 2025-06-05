@@ -33,5 +33,11 @@ public class UserController {
 
     }
 
+    @PostMapping(value = "search")
+    public ResponseEntity<UserAdminDTO> searchUser (@RequestBody UserSearchRequest request) {
+
+        return ResponseEntity.ok(userService.searchUser(request));
+    }
+
 
 }

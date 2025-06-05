@@ -2,6 +2,7 @@ package keynest_backend.User;
 
 import jakarta.transaction.Transactional;
 import keynest_backend.Model.Locality;
+import keynest_backend.Model.Province;
 import keynest_backend.Repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final LocalityRepository localityRepository;
     private final PasswordEncoder passwordEncoder; // Inyeccion de dependencias, Spring se encarga de crear la instancia
+    private final ProvinceRepository provinceRepository;
+    private final CountryRepository countryRepository;
 
     // Este metodo corresponde a la funcion modificar por parte del usuario (USER)
     @Transactional
@@ -82,6 +85,44 @@ public class UserService {
         }
 
         return null;
+    }
+
+    /**
+     * Metodo para buscar un usuario desde el panel de adminstracion en base al id o el nombre y el apellido
+     * @return userAdminDTO | Devuelve un DTO con los datos del usuario para imprimirlos por pantalla
+     */
+    public UserAdminDTO searchUser (UserSearchRequest request) {
+
+        User base = null;
+
+        // Primer checkeamos que este el id o no
+        if (request.getId() != null) {
+            // Si es diferente de null
+            // Hacemos la busqueda por ID
+            base = userRepository.findById(request.getId()).orElseThrow(() -> new IllegalArgumentException("UserService | searchUser | No se ha encontrado el usuario."));
+        } else { // hacemos la busqueda por email
+            base = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("UserService | searchUser | No se ha encontrado el usuario."));
+        }
+
+
+
+        // Devolvemos el DTO
+        return UserAdminDTO.builder()
+                .id(base.getId())
+                .email(base.getEmail())
+                .role(base.getRole().toString())
+                .firstname(base.getFirstname())
+                .lastname(base.getLastname())
+                .birthDate(base.getBirthDate())
+                .phone(base.getPhone())
+                .profilePictureUrl(base.getProfilePictureUrl())
+                .locality(base.getLocality().getName())
+                .province(base.getLocality().getProvince().getName())
+                .country(base.getLocality().getProvince().getCountry().getName())
+                .address(base.getAddress())
+                .postalCode(base.getPostalCode())
+                .build();
+
     }
 
 
