@@ -20,7 +20,6 @@ public class UserRequest {
 
     //* Data principal
     String email;
-    String password;
 
     //* Informacion personal
     String firstname;
@@ -30,7 +29,7 @@ public class UserRequest {
     String profilePictureUrl;
 
     //* GEO Data
-    int localityId;
+    Integer localityId;
     String address;
     String postalCode;
 

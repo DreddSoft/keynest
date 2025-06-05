@@ -26,7 +26,6 @@ public class UserService {
 
         // Sacar el usuario a modificar
         User user = userRepository.findById(userRequest.getId()).orElse(null);
-        Locality locality = localityRepository.findById(userRequest.getLocalityId()).orElse(null);
         if (user == null) return new UserResponse("Usuario no encontrado.");
         if (!user.isActive()) return new UserResponse("Usuario inactivo. Si quiere editarlo, activelo primero.");
 
@@ -34,8 +33,6 @@ public class UserService {
         //* Autenticacion
         if (isNotEmpty(userRequest.getEmail()))
             user.setEmail(userRequest.getEmail());
-        if (isNotEmpty(userRequest.getPassword()))
-            user.setPassword(userRequest.getPassword());
 
         //* Data
         if (isNotEmpty(userRequest.getFirstname()))
@@ -50,8 +47,12 @@ public class UserService {
             user.setProfilePictureUrl(userRequest.getProfilePictureUrl());
 
         //* GEO
-        if (locality != null)
+        if (userRequest.getLocalityId() != null) {
+            // Sacamos locality
+            Locality locality = localityRepository.findById(userRequest.getLocalityId()).orElseThrow(() -> new IllegalArgumentException("UserService | updateUser | no se encuentra localidad."));
             user.setLocality(locality);
+        }
+
         if(isNotEmpty(userRequest.getAddress()))
             user.setAddress(user.getAddress());
         if(isNotEmpty(userRequest.getPostalCode()))
@@ -122,6 +123,44 @@ public class UserService {
                 .address(base.getAddress())
                 .postalCode(base.getPostalCode())
                 .build();
+
+    }
+
+    /**
+     * Metodo para elimiar un usuario
+     * @param userId - El id del usuario
+     * @return userResponse
+     */
+    public UserResponse deleteUser (Integer userId) {
+
+        // Buscamos al usuario
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserService | deleteUser | No se ha encontrado el usuario."));
+
+        // Nos cargamos el usuario
+        userRepository.delete(user);
+
+        return UserResponse.builder()
+                .message("Usuario " + userId + " eliminado correctamente.")
+                .build();
+
+    }
+
+    /**
+     * Método para cambiar la contraseña de un usuario
+     * @param request - clase request con el id de usuario y la nueva password.
+     * @return UserResponse
+     */
+    public UserResponse changePassword (UserChangePassRequest request) {
+
+        // Buscamos usuario
+        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new IllegalArgumentException("UserService | changePassword | No se ha encontrado el usuario."));
+
+        // Cambiamos password
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        userRepository.save(user);
+
+        return UserResponse.builder().message("Contraseña actualizada del usuario " + request.getUserId()).build();
 
     }
 

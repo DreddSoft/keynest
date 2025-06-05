@@ -39,5 +39,29 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUser(request));
     }
 
+    /**
+     * Endpoint para eliminar usuarios
+     * Verbo HTTP delete
+     *
+     */
+    @DeleteMapping()
+    public ResponseEntity<UserResponse> deleteuser (@RequestBody UserDeleteRequest request) {
+
+        return ResponseEntity.ok(userService.deleteUser(request.getId()));
+
+    }
+
+    /**
+     * Endpoint para cambiar la contraseña de un usuario
+     * @param request - Clase UserChangePassRequest que es una clase request especifica para cambiar la contraseña, contiene 2 atributos id de usuario y password
+     * @return userResponse - una clase respuesta con mensaje
+     */
+    @PatchMapping("pass")
+    public ResponseEntity<UserResponse> changePassword (@RequestBody UserChangePassRequest request) {
+
+        return ResponseEntity.ok(userService.changePassword(request));
+
+    }
+
 
 }

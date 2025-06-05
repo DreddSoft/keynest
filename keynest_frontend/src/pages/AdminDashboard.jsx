@@ -7,7 +7,7 @@ import UserControl from "@/subpages/UserControl";
 
 function AdminDashboard() {
 
-  const [step, setStep] = useState();
+  const [step, setStep] = useState(1);
 
   const ADMIN_ID = parseInt(localStorage.getItem("userId"));
 
@@ -22,14 +22,14 @@ function AdminDashboard() {
 
 
         {step === 1 && (
-          <div>
+          <div className="">
             <UserControl adminId={ADMIN_ID}
             />
           </div>
         )}
 
         {step === 2 && (
-          <div>
+          <div className="">
            <UnitControl />
 
           </div>
