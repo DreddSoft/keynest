@@ -168,19 +168,21 @@ public class UnitService {
 
     }
 
-    public Unit updateUnit(UnitUpdateRequest request) {
+    public UnitResponse updateUnit(UnitUpdateRequest request) {
+
+        Log.write(request.getUpdaterId(), "UnitService-updateUnit", "Obteniendo el usuario actualizador.");
 
         // Obtener el updater
         User updater = userRepository.findById(request.getUpdaterId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario modificador no encontrado."));
 
+        Log.write(request.getUpdaterId(), "UnitService-updateUnit", "Obteniendo la unidad.");
         // Obtener la unidad
         Unit unit = unitRepository.findById(request.getUnitId())
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada."));
 
-        if (unit == null)
-            return unit;
 
+        Log.write(request.getUpdaterId(), "UnitService-updateUnit", "Actualizando unidad.");
         // Comprobacion y modificacion
         if (isNotEmpty(request.getName()))
             unit.setName(request.getName());
@@ -248,22 +250,22 @@ public class UnitService {
         // Guardar cambios
         unitRepository.save(unit);
 
-        return unit;
+        Log.write(request.getUpdaterId(), "UnitService-updateUnit", "Actualizada la unidad " + request.getUnitId() + ".");
+
+        return UnitResponse.builder().message("Actualizada la unidad " + request.getUnitId() + ".").build();
 
     }
 
-    public UnitResponse deleteUnit(Integer unitId) {
+    public UnitResponse deleteUnit(UnitActivateRequest request) {
 
-        // Sacar la unidad
-        //TODO: Esto no es optimo en memoria, pero tengo que controlar el resultado
-        Unit unitTarget = unitRepository.findById(unitId).orElse(null);
-
-        if (unitTarget == null)
-            return new UnitResponse("ERROR | No se ha encontrado la unidad a eliminar.");
+        Unit unitTarget = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la unidad."));
 
         unitRepository.delete(unitTarget);
 
-        return new UnitResponse("OK | Unidad eliminada.");
+        // Log
+        Log.write(request.getUpdaterId(), "UnitService", "Se ha eliminado la unidad: " + request.getUnitId() + ".");
+
+        return new UnitResponse("Unidad" + request.getUnitId() + " eliminada.");
 
     }
 

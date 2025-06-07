@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { UserSearch, PencilRuler, Loader2, KeyRound, Hammer, Trash2, UserX, CircleX, CircleCheck, AwardIcon } from "lucide-react";
+import { Loader2, Hammer, Trash2, CircleX, CircleCheck, TriangleAlert, Check } from "lucide-react";
 import PersonalizedButton from "@/components/PersonalizedButton";
 
 function EditUnit({ adminId }) {
@@ -25,7 +25,6 @@ function EditUnit({ adminId }) {
     const [localityId, setLocalityId] = useState();
 
     // Datos de la unidad
-    const [userId, setUserId] = useState(null);
     const [name, setName] = useState(null);
     const [rooms, setRooms] = useState(null);
     const [bathrooms, setBathrooms] = useState(null);
@@ -43,6 +42,9 @@ function EditUnit({ adminId }) {
 
     // CONSTANTES INMUTABLES
     const URL_COUNTRIES = `http://localhost:8080/api/address/countries`;
+    const ULR_ACTIVATE = `http://localhost:8080/api/unit/activate`;
+    const URL_UNIT = `http://localhost:8080/api/unit`;
+
 
 
 
@@ -122,16 +124,19 @@ function EditUnit({ adminId }) {
 
         const value = document.getElementById("searchBar").value;
 
-        const URL_SEARCH_UNITS = `http://localhost:8080/api/unit/full/${unitId}`;
+        let idValue = null;
 
         setLoading(true);
         const REGEX = /^\d+$/;
         if (REGEX.test(value)) {
-            setUnitId(parseInt(value));
+            idValue = parseInt(value);
 
         } else {
             alert("El parámetro de búsqueda introducido no coincide con un ID de unidad.");
         }
+
+        const URL_SEARCH_UNITS = `http://localhost:8080/api/unit/full/${idValue}`;
+
         try {
             const response = await fetch(URL_SEARCH_UNITS, {
                 method: 'GET',
@@ -168,15 +173,14 @@ function EditUnit({ adminId }) {
 
         setLoading(true)
 
-        // Datos que hay que controlar
-        if (hasKitchen === 1) setHasKitchen(true);
-        else setHasKitchen(false);
+        console.log("cocina: " + hasKitchen);
+        console.log("unidad: " + unitId);
 
         //TODO: Aqui deberia llamar a una funcion que compruebe los campos
 
         try {
 
-            const response = await fetch(URL, {
+            const response = await fetch(URL_UNIT, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -189,17 +193,17 @@ function EditUnit({ adminId }) {
                     minOccupancy,
                     maxOccupancy,
                     description,
-                    areaM2:aream2,
-                    unitTypeOption:unitType,
+                    areaM2: aream2,
+                    unitTypeOption: unitType,
                     localityId,
                     address,
                     postalCode,
-                    UpdaterId:adminId
+                    UpdaterId: adminId
                 })
             });
 
             if (!response.ok) {
-                throw new Error("⚠️ No se pudo actualizar la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
+                throw new Error("No se pudo actualizar la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
             }
 
             const data = await response.json();
@@ -226,31 +230,85 @@ function EditUnit({ adminId }) {
 
         setLoading(true);
 
-
         try {
 
-            const response = await fetch(URL, {
+            const response = await fetch(ULR_ACTIVATE, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     unitId,
-                    updaterId:adminId
+                    updaterId: adminId
                 })
             });
-             
+
+            if (!response.ok) {
+                throw new Error("No se pudo actualizar la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
+
+            }
+
+            const data = await response.json();
+
+            // Para que vuelva buscar y cargar los resultados
+            handleSearch();
+
+
+            setMessageCreated(data.message);
+
         } catch (err) {
             setError(err.message);
-            
+
         } finally {
             setLoading(false);
         }
 
     }
 
+    const deleteUnit = async () => {
+
+        // Reiniciamos
+        setError(null);
+        setMessageCreated(null);
+
+        setLoading(true);
+
+
+        try {
+
+            const response = await fetch(URL_UNIT, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ unitId, updaterId: adminId })
+
+            });
+
+            if (!response.ok) {
+                throw new Error("No se pudo ELIMINAR la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
+
+            }
+
+            const data = await response.json();
+
+            // Para que vuelva buscar y cargar los resultados
+            handleSearch();
+
+
+            setMessageCreated(data.message);
+
+        } catch (err) {
+            setError(err.message);
+
+        } finally {
+            setLoading(false);
+        }
+
+
+    }
+
     return (
 
-        <div className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 mt-6">
+        <div className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 my-6">
             {loading && (
                 <div className="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center">
                     <Loader2 className="h-10 w-10 animate-spin text-gray-800" />
@@ -277,14 +335,14 @@ function EditUnit({ adminId }) {
 
             {error && (
                 <div className="flex justify-baseline items-center gap-2 border border-red-500 bg-red-50 text-red-700 rounded-md p-3 mt-2">
-                    <UserX className="mt-0.5" />
+                    <TriangleAlert className="mt-0.5" />
                     <p className="text-sm text-center">{error}</p>
                 </div>
             )}
 
             {messageCreated && (
                 <div className="flex justify-baseline items-center gap-2 border border-green-500 bg-green-50 text-green-700 rounded-md p-3 mt-2">
-                    <UserCheck className="mt-0.5" />
+                    <Check className="mt-0.5" />
                     <p className="text-sm text-center">{messageCreated}</p>
                 </div>
 
@@ -369,15 +427,15 @@ function EditUnit({ adminId }) {
                                 ? "flex flex-col text-sm text-gray-700"
                                 : "hidden"
                             }>
-                                Cocina:
+                                Tiene Cocina:
                                 <select
                                     onChange={(e) => setHasKitchen(e.target.value)}
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                     id="iptKitchen"
                                 >
-                                    <option value="" disabled>Selecciona un país...</option>
-                                    <option value="1" disabled>SI</option>
-                                    <option value="0" disabled>NO</option>
+                                    <option value="" disabled>Tiene Cocina...</option>
+                                    <option value={true}>SI</option>
+                                    <option value={false}>NO</option>
                                 </select>
                             </label>
                             <label className="flex flex-col text-sm text-gray-700">
@@ -608,6 +666,7 @@ function EditUnit({ adminId }) {
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-gray-500 text-gray-700  cursor-not-allowed"
                                     }
                                     disabled={!results}
+                                    onClick={activateUnit}
                                 >
                                     <CircleX size={16} />
                                     Desactivar
@@ -622,6 +681,7 @@ function EditUnit({ adminId }) {
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-green-500 text-green-700  cursor-not-allowed"
                                     }
                                     disabled={!results}
+                                    onClick={activateUnit}
                                 >
                                     <CircleCheck size={16} />
                                     Reactivar
@@ -632,6 +692,7 @@ function EditUnit({ adminId }) {
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-red-500 text-red-700  cursor-not-allowed"
                                     }
                                     disabled={!results}
+                                    onClick={deleteUnit}
                                 >
                                     <Trash2 size={16} />
                                     Eliminar

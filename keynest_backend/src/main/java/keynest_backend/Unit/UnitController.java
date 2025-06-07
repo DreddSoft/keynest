@@ -1,5 +1,6 @@
 package keynest_backend.Unit;
 
+import keynest_backend.Logs.Log;
 import keynest_backend.Model.Unit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -81,25 +82,23 @@ public class UnitController {
     @PutMapping()
     public ResponseEntity<UnitResponse> updateUnit(@RequestBody UnitUpdateRequest request) {
 
-        Unit unit = unitService.updateUnit(request);
+        Log.write(request.getUpdaterId(), "UnitController-updateUnit", "El usuario accede al endpoint updateUnit");
 
-        if (unit == null)
-            return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(new UnitResponse("Unidad actualizada con exito."));
+        return ResponseEntity.ok(unitService.updateUnit(request));
 
     }
 
     /**
      * Endpoint para eliminar una unidad. Solo accesible desde el panel de administrador.
      *
-     * @param id - El identificador de la unidad
-     * @return response - Objeto UnitResponse con un mensaje personalizado.
+     * @param request- Objeto de la clase UnitActivateRequest (reutilizada) que contiene la informacion necesaria
+     * @return response - ResponseEntity con un objeto UnitResponse con un mensaje personalizado
      */
-    @DeleteMapping(value = "{id}")
-    public UnitResponse deleteUnit(@PathVariable Integer id) {
+    @DeleteMapping()
+    public ResponseEntity<UnitResponse> deleteUnit(@RequestBody UnitActivateRequest request) {
 
-       return unitService.deleteUnit(id);
+        Log.write(request.getUpdaterId(), "UnitController", "El usuario ha accedido al endpoint deleteUnit.");
+       return ResponseEntity.ok(unitService.deleteUnit(request));
 
     }
 
@@ -112,6 +111,7 @@ public class UnitController {
     @PostMapping(value = "activate")
     public ResponseEntity<UnitResponse> activateUnit (@RequestBody UnitActivateRequest request) {
 
+        Log.write(request.getUpdaterId(), "UnitController", "Accede al endpoint activateUnit.");
         return ResponseEntity.ok(unitService.activateUnit(request));
 
     }

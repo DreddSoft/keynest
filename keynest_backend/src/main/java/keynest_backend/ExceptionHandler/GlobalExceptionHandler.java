@@ -1,6 +1,7 @@
 package keynest_backend.ExceptionHandler;
 
 import keynest_backend.Exceptions.ErrorGeoDataException;
+import keynest_backend.Logs.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,8 @@ public class GlobalExceptionHandler {
                 .message("Error: " + exception.getMessage())
                 .build();
 
+        Log.write(000, "ExceptionHandler", response.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
     }
@@ -55,6 +58,8 @@ public class GlobalExceptionHandler {
                 .message("Error: " + exception.getMessage())
                 .build();
 
+        Log.write(000, "ExceptionHandler", response.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.BAD_GATEWAY);
 
     }
@@ -74,6 +79,8 @@ public class GlobalExceptionHandler {
                 .type(exception.getClass().toString())
                 .message("Error: " + exception.getMessage())
                 .build();
+
+        Log.write(000, "ExceptionHandler", response.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
@@ -95,6 +102,8 @@ public class GlobalExceptionHandler {
                 .type(exception.getClass().toString())
                 .message("Error: " + exception.getMessage())
                 .build();
+
+        Log.write(000, "ExceptionHandler", response.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
