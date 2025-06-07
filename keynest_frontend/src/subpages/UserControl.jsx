@@ -3,9 +3,8 @@ import React, { useEffect } from "react";
 import { UserSearch, PencilRuler, UserX, Loader2, UserCheck, UserMinus, UserRoundPen, KeyRound } from "lucide-react";
 import { useState } from "react";
 import PersonalizedButton from "@/components/PersonalizedButton";
-import { add } from "date-fns";
 
-function UserControl({ adminId }) {
+function UserControl() {
 
     const [step, setStep] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,8 +32,6 @@ function UserControl({ adminId }) {
     const [messageCreated, setMessageCreated] = useState(null);
     const [modify, setModify] = useState(false);
 
-
-    const idAdmin = adminId;
     const URL_SEARCH = `http://localhost:8080/api/users/search`;
     const URL_COUNTRIES = `http://localhost:8080/api/address/countries`;
     const URL_REGISTER = "http://localhost:8080/auth/register";
@@ -118,11 +115,11 @@ function UserControl({ adminId }) {
         if (!value.trim()) return;
         setLoading(true);
         const REGEX = /^\d+$/;
-        if (REGEX.test(value)) {
-            setId(parseInt(value));
+        if (REGEX.test(searchTerm)) {
+            setId(parseInt(searchTerm));
             setEmail(null);
         } else {
-            setEmail(value);
+            setEmail(searchTerm);
             setId(null);
         }
         try {

@@ -1,10 +1,12 @@
 package keynest_backend.Unit;
 
+import keynest_backend.Logs.Log;
 import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
 import keynest_backend.Model.Province;
 import keynest_backend.Model.Unit;
 import keynest_backend.Repositories.*;
+import keynest_backend.User.Role;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -112,13 +114,46 @@ public class UnitService {
                 .maxOccupancy(unit.getMaxOccupancy())
                 .areaM2(unit.getAreaM2())
                 .description(unit.getDescription())
-                .type(unit.getType())
+                .type(unit.getType().toString())
                 //* GEO Data
                 .countryName(country.getName())
                 .provinceName(province.getName())
                 .localityName(locality.getName())
                 .address(unit.getAddress())
                 .postalCode(unit.getPostalCode())
+                .build();
+
+    }
+
+    /**
+     * Método para obtener todos los datos de una unidad, accesible desde el panel de administrador
+     * @param unitId
+     * @return unitFullDTO | Clase DTO con todos los datos "traducidos"
+     */
+    public UnitFullDTO getFullUnit (Integer unitId) {
+
+        // Capturamos unidad
+        Unit base = unitRepository.findById(unitId).orElseThrow(() -> new IllegalArgumentException("UnitService | getFullUnit | Error al capturar la unidad."));
+
+        // Construimos y retornamos el DTO
+        return UnitFullDTO.builder()
+                .id(base.getId())
+                .userId(base.getUser().getId())
+                .name(base.getName())
+                .rooms(base.getRooms())
+                .bathrooms(base.getBathrooms())
+                .hasKitchen(base.isHasKitchen())
+                .minOccupancy(base.getMinOccupancy())
+                .maxOccupancy(base.getMaxOccupancy())
+                .areaM2(base.getAreaM2())
+                .description(base.getDescription())
+                .unitType(base.getType().name())
+                .country(base.getLocality().getProvince().getCountry().getName())
+                .province(base.getLocality().getProvince().getName())
+                .locality(base.getLocality().getName())
+                .address(base.getAddress())
+                .postalCode(base.getPostalCode())
+                .isActive(base.isActive())
                 .build();
 
     }
@@ -229,6 +264,45 @@ public class UnitService {
         unitRepository.delete(unitTarget);
 
         return new UnitResponse("OK | Unidad eliminada.");
+
+    }
+
+    /**
+     * Método de servicio para reactivar una unidad.
+     * Sólo se puede usar desde el panel de administrador.
+     * Debe comprobar que el usuario actualizador sea ADMIN.
+     * @param request - un objeto de la clase UnitActivateRequest con la informacion necesaria.
+     * @return
+     */
+    public UnitResponse activateUnit (UnitActivateRequest request) {
+
+        // Sacamos el usuario actualizador
+        User admin = userRepository.findById(request.getUpdaterId()).orElseThrow(() -> new IllegalArgumentException("Error: El usuario modificador no ha sido encontrado."));
+
+        if (admin.getRole() != Role.ADMIN) {
+            Log.write(request.getUpdaterId(), "UnitService", "No se puede activar porque el usuario modificador no tiene permisos.");
+            throw  new IllegalArgumentException("El usuario modificador no tiene permisos.");
+        }
+
+        // Sacamos la unidad y la activamos
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("Error: La unidad no ha sido encontrada por el id."));
+
+        // Si esta activa desactivamos
+        if (unit.isActive() == true) {
+            Log.write(request.getUpdaterId(), "UnitService", "Activa, se procede a desactivar la unidad: " + request.getUnitId() + ".");
+            unit.setActive(false);
+
+
+        } else { // Si no, activamos
+
+            Log.write(request.getUpdaterId(), "UnitService", "Desactiva, se procede a activar la unidad: " + request.getUnitId() + ".");
+            unit.setActive(true);
+
+        }
+
+        unitRepository.save(unit);
+
+        return UnitResponse.builder().message("Unidad: " + request.unitId + " actualizada correctamente.").build();
 
     }
 

@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class UnitDTO {
-
     //* Identificación y autenticación
     private Integer id;
 
@@ -23,7 +22,7 @@ public class UnitDTO {
     private int maxOccupancy;
     private double areaM2;
     private String description;
-    private UnitType type;
+    private String type;
 
     //* GEO Data
     private String countryName;
@@ -31,5 +30,8 @@ public class UnitDTO {
     private String localityName;
     private String address;
     private String postalCode;
+
+    //* Audit
+    private boolean isActive;
 
 }
