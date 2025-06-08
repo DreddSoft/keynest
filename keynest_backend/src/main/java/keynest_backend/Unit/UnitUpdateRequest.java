@@ -31,6 +31,6 @@ public class UnitUpdateRequest {
     String postalCode;
 
     //* Auditoria
-    Integer UpdaterId;
+    Integer updaterId;
 
 }

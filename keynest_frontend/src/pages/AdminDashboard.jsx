@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { LogOut, BedSingle, Users, Calendar, Settings, Hotel } from "lucide-react";
-import UnitControl from "@/subpages/UnitControl";
 import AdminHeader from "@/components/AdminHeader";
 import UnitPanel from "@/subpages/UnitPanel";
 import UserControl from "@/subpages/UserControl";

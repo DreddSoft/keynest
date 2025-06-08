@@ -170,6 +170,8 @@ public class UnitService {
 
     public UnitResponse updateUnit(UnitUpdateRequest request) {
 
+        System.out.println("Entra en updateUnit en UnitService");
+        System.out.println("El id del updater es: " + request.getUpdaterId());
         Log.write(request.getUpdaterId(), "UnitService-updateUnit", "Obteniendo el usuario actualizador.");
 
         // Obtener el updater
@@ -222,26 +224,30 @@ public class UnitService {
         }
 
         // UnitType es un enum, y el parametro se recibe siempre, se cambie o no
-        switch (request.getUnitTypeOption()) {
+        System.out.println("El tipo de unidad: " + request.getUnitTypeOption());
+        if (request.getUnitTypeOption() != null) {
 
-            case 1:
-                unit.setType(UnitType.HOUSE);
-                break;
+            switch (request.getUnitTypeOption()) {
 
-            case 2:
-                unit.setType(UnitType.STUDIO);
-                break;
-            case 3:
-                unit.setType(UnitType.COUNTRY_HOUSE);
-                break;
+                case 1:
+                    unit.setType(UnitType.HOUSE);
+                    break;
+
+                case 2:
+                    unit.setType(UnitType.STUDIO);
+                    break;
+                case 3:
+                    unit.setType(UnitType.COUNTRY_HOUSE);
+                    break;
 
                 // Por defecto siempre apartamentos
-            default:
-                unit.setType(UnitType.APARTMENT);
-                break;
+                default:
+                    unit.setType(UnitType.APARTMENT);
+                    break;
+
+            }
 
         }
-
 
         // Auditoría
         unit.setUpdatedAt(LocalDateTime.now());

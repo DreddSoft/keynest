@@ -173,8 +173,7 @@ function EditUnit({ adminId }) {
 
         setLoading(true)
 
-        console.log("cocina: " + hasKitchen);
-        console.log("unidad: " + unitId);
+        console.log("Tipo unidad: " + unitType);
 
         //TODO: Aqui deberia llamar a una funcion que compruebe los campos
 
@@ -198,7 +197,7 @@ function EditUnit({ adminId }) {
                     localityId,
                     address,
                     postalCode,
-                    UpdaterId: adminId
+                    updaterId: adminId
                 })
             });
 
@@ -429,7 +428,7 @@ function EditUnit({ adminId }) {
                             }>
                                 Tiene Cocina:
                                 <select
-                                    onChange={(e) => setHasKitchen(e.target.value)}
+                                    onChange={(e) => setHasKitchen(e.target.value === "true")}
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                     id="iptKitchen"
                                 >
@@ -488,7 +487,7 @@ function EditUnit({ adminId }) {
                             }>
                                 Tipo de Unidad:
                                 <select
-                                    onChange={(e) => setUnitType(e.target.value)}
+                                    onChange={(e) => setUnitType(parseInt(e.target.value))}
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                     id="iptKitchen"
                                 >
