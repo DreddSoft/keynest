@@ -19,7 +19,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "clients", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "{id}")
+        @UniqueConstraint(columnNames = "{id}"),
+        @UniqueConstraint(columnNames = "{email}")
+
 })
 public class Client {
     //* Identificación

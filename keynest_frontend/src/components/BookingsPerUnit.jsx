@@ -4,19 +4,19 @@ import PersonalizedButton from "@/components/PersonalizedButton";
 import { Navigate, useNavigate } from "react-router";
 
 function BookingsPerUnit() {
-    const [userId, setUserId] = useState("");
-    const [units, setUnits] = useState([]);
+    const [unitId, setUnitId] = useState("");
+    const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [touched, setTouched] = useState(false);
 
-    const isValidUserId = /^\d+$/.test(userId);
+    const isValidUnitId = /^\d+$/.test(unitId);
     const navigate = useNavigate();
 
     const fetchBookings = async () => {
 
         setTouched(true);
-        if (!isValidUserId) return;
+        if (!isValidUnitId) return;
 
         // Reinicar 
         setLoading(true);
@@ -24,24 +24,24 @@ function BookingsPerUnit() {
 
         try {
 
-            const response = await fetch(`http://localhost:8080/api/unit/${userId}/units`, {
+            const response = await fetch(`http://localhost:8080/api/futureBooking/${unitId}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
             });
 
-            console.log(response);
+            // console.log(response);
 
             if (!response.ok) throw new Error("No se pudo obtener la información.");
 
             const data = await response.json();
 
-            setUnits(data);
+            setBookings(data);
 
         } catch (err) {
 
             setError(err.message);
-            setUnits([]);
+            setBookings([]);
 
         } finally {
 
@@ -49,7 +49,7 @@ function BookingsPerUnit() {
         }
     };
 
-    function openUnit(selectedUnitId) {
+    function openBooking(selectedUnitId) {
 
         const id = parseInt(selectedUnitId);
 
@@ -67,8 +67,7 @@ function BookingsPerUnit() {
                     type="text"
                     className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-800"
                     placeholder="Introduce ID de unidad"
-                    value={userId}
-                    onChange={(e) => setUserId(parseInt(e.target.value))}
+                    onChange={(e) => setUnitId(parseInt(e.target.value))}
                     onBlur={() => setTouched(true)}
                 />
                 <div className="w-full sm:w-32">
@@ -81,7 +80,7 @@ function BookingsPerUnit() {
                 </div>
             </div>
 
-            {touched && !isValidUserId && (
+            {touched && !isValidUnitId && (
                 <p className="text-red-600 text-sm flex items-center gap-1 mb-4">
                     <TriangleAlert className="w-4 h-4" /> Por favor, introduce un ID numérico válido.
                 </p>
@@ -100,28 +99,32 @@ function BookingsPerUnit() {
                 </div>
             )}
 
-            {!loading && units.length > 0 && (
+            {!loading && bookings.length > 0 && (
                 <div className="overflow-x-auto mt-4">
                     <table className="min-w-full border border-gray-200">
                         <thead className="bg-gray-100 text-gray-700">
                             <tr>
                                 <th className="py-2 px-4 border-b">ID</th>
-                                <th className="py-2 px-4 border-b">Nombre</th>
-                                <th className="py-2 px-4 border-b">Tipo</th>
-                                <th className="py-2 px-4 border-b">Dirección</th>
-                                <th className="py-2 px-4 border-b">Localidad</th>
+                                <th className="py-2 px-4 border-b">Check In</th>
+                                <th className="py-2 px-4 border-b">Check Out</th>
+                                <th className="py-2 px-4 border-b">Noches</th>
+                                <th className="py-2 px-4 border-b">Cliente</th>
+                                <th className="py-2 px-4 border-b">Total</th>
+                                <th className="py-2 px-4 border-b">Num. Huéspedes</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {units.map((unit) => (
-                                <tr key={unit.id} className="hover:bg-gray-50 cursor-pointer"
-                                onDoubleClick={() => openUnit(unit.id)}
+                            {bookings.map((booking) => (
+                                <tr key={booking.id} className="hover:bg-gray-50 cursor-pointer"
+                                onDoubleClick={() => openBooking(booking.id)}
                                 >
-                                    <td className="py-2 px-4 border-b">{unit.id}</td>
-                                    <td className="py-2 px-4 border-b">{unit.name}</td>
-                                    <td className="py-2 px-4 border-b">{unit.type}</td>
-                                    <td className="py-2 px-4 border-b">{unit.address}</td>
-                                    <td className="py-2 px-4 border-b">{unit.localityName}</td>
+                                    <td className="py-2 px-4 border-b">{booking.id}</td>
+                                    <td className="py-2 px-4 border-b">{booking.checkIn}</td>
+                                    <td className="py-2 px-4 border-b">{booking.checkOut}</td>
+                                    <td className="py-2 px-4 border-b">{booking.noches}</td>
+                                    <td className="py-2 px-4 border-b">{booking.name}</td>
+                                    <td className="py-2 px-4 border-b">{booking.total}</td>
+                                    <td className="py-2 px-4 border-b">{booking.guests}</td>
                                 </tr>
                             ))}
                         </tbody>

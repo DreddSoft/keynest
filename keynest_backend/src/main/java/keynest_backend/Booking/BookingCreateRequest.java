@@ -1,6 +1,5 @@
 package keynest_backend.Booking;
 
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,17 +13,31 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookingCreateRequest {
 
-    //* Relacion
-    private Integer unitId;
+    //* Datos de la reserva
+    Integer unitId;
+    LocalDate checkIn;
+    LocalDate checkOut;
+    double totalPrice;
+    int numGuests;
+    String notes;
+    Integer creatorId;
 
-    //* Datos
-    private LocalDate checkIn;
-    private LocalDate checkOut;
-    private double totalPrice;
-    private int numGuests;
-    private String notes;
-
-    private Integer creatorId;
+    //* Datos del cliente
+    String name;
+    String lastname;
+    int genderPick;
+    LocalDate birthday;
+    String nationality;
+    int docTypePick;
+    String docNumber;
+    String docSupportNumber;
+    LocalDate docIssueDate;
+    LocalDate docExpirationDate;
+    int localityId;
+    String address;
+    String postalCode;
+    String email;
+    String phone;
 
 
 }

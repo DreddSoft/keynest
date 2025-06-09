@@ -2,6 +2,7 @@ import Button2 from "@/components/Button2";
 import { House, HousePlus, Loader2, Search, CalendarCog } from "lucide-react";
 import { useState } from "react";
 import BookingsPerUnit from "@/components/BookingsPerUnit";
+import EditBooking from "@/components/EditBooking";
 
 function BookingsPanel({ adminId }) {
 
@@ -53,7 +54,7 @@ function BookingsPanel({ adminId }) {
 
                 {step === 2 && (
 
-                    <p>Aquí iría editar una reserva</p>
+                    <EditBooking adminId={adminId} />
                 )}
             </main >
         </div >

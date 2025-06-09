@@ -68,4 +68,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getBooking(bookingId));
 
     }
+
+    @PostMapping()
+    public ResponseEntity<BookingResponse> createBooking(@RequestBody BookingCreateRequest request) {
+
+        return ResponseEntity.ok(bookingService.createBooking(request));
+
+    }
 }

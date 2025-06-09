@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, Integer> {
@@ -13,5 +14,13 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     @Override
     Optional<Client> findById(Integer clientId);
 
-    // Query propia para buscar todos los clientes por una unidad
+    // Buscar cliente por número de documento
+    @Query("SELECT c FROM Client c WHERE c.docNumber = :docNumber")
+    Client findByDocNumber(@Param("docNumber") String docNumber);
+
+    // Buscar cliente por email
+    @Query("SELECT c FROM Client c WHERE c.email = :email")
+    Client findByEmail(@Param("email") String email);
+
+
 }

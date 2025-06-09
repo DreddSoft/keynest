@@ -1,8 +1,9 @@
 package keynest_backend.Booking;
 
-import keynest_backend.Model.Booking;
-import keynest_backend.Model.Client;
-import keynest_backend.Model.Unit;
+import keynest_backend.Client.DocumentTypes;
+import keynest_backend.Client.Gender;
+import keynest_backend.Logs.Log;
+import keynest_backend.Model.*;
 import keynest_backend.Repositories.*;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -24,10 +26,22 @@ public class BookingService {
     private final UserRepository userRepository;
     private final BookingClientRepository bookingClientRepository;
     private final ClientRepository clientRepository;
+    private final LocalityRepository localityRepository;
 
 
-    // Metodo para crear una Reserva
-    public String createBooking(BookingCreateRequest request) {
+
+    /**
+     * Método de servicio para crear una reserva
+     * Este método será accesible desde el motor de reservas del cliente
+     * @param request - Clase BookingCreateRequest que contiene todos los datos necesarios para crear una reserva.
+     * @return
+     */
+    public BookingResponse createBooking(BookingCreateRequest request) {
+
+        // Al crear una reserva, el sistema tiene que
+        // - Crear la reserva
+        // - Crear el cliente principal
+        // - Relacionar ambos
 
         // Sacamos la unidad
         Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("createBooking - Unidad no encontrada."));
@@ -35,9 +49,15 @@ public class BookingService {
         // Sacamos al creador
         User creator = userRepository.findById(request.getCreatorId()).orElseThrow(() -> new IllegalArgumentException("createBooking - Usuario Creador no encontrado."));
 
-        // Obtener el status
+        // Sacamos las noches
+        int nights = (int) ChronoUnit.DAYS.between(request.getCheckIn(), request.getCheckOut());
 
+        // Si el checkOut es antes del checkIn
+        if (!request.getCheckOut().isAfter(request.getCheckIn())) {
+            throw new IllegalArgumentException("La fecha de salida debe ser posterior a la de entrada.");
+        }
 
+        Log.write(request.getCreatorId(), "BookingService", "Se procede a crear la reserva.");
 
         Booking bk = Booking.builder()
                 // Relacion
@@ -53,14 +73,116 @@ public class BookingService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .isActive(true)
-                .status(0)
+                .status(1)
+                .nights(nights)
                 .build();
 
-        if (bk == null) {
-            return "Error al crear la reserva.";
+        // Guardamos las reserva
+        bookingRepository.save(bk);
+
+        // Crear el cliente principal
+        // Primero buscar si el cliente existe, por número de documento y luego por email
+        Log.write(request.getCreatorId(), "BookingService", "Buscando el cliente por número de documento.");
+        Client c = clientRepository.findByDocNumber(request.getDocNumber());
+
+        // Si no lo encuentra por número de documento
+        if (c == null) {
+            Log.write(request.getCreatorId(), "BookingService", "Cliente no encontrado. Buscando cliente por email.");
+            c = clientRepository.findByEmail(request.getEmail());
         }
 
-        return "Reserva " + bk.getId() + " creada correctamente.";
+        // Si aún así es nulo, lo creamos
+        if (c == null) {
+
+            Log.write(request.getCreatorId(), "BookingService", "No encontrado. Creando cliente.");
+
+            // Género
+            Gender gender;
+
+            // Sacar el genero
+            switch (request.getGenderPick()) {
+                case 0:
+                    gender = Gender.MALE;
+                    break;
+                case 1:
+                    gender = Gender.FEMALE;
+                    break;
+                case 2:
+                    gender = Gender.OTHER;
+                    break;
+                default:
+                    gender = Gender.UNSPECIFIED;
+                    break;
+
+            }
+
+            // Sacar el tipo de documento
+            DocumentTypes docType;
+            switch (request.getDocTypePick()) {
+                case 0:
+                    docType = DocumentTypes.DNI;
+                    break;
+                case 1:
+                    docType = DocumentTypes.NIE;
+                    break;
+                default:
+                    docType = DocumentTypes.PASSPORT;
+                    break;
+
+            }
+
+            // Localidad
+            Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la localidad."));
+
+            c = Client.builder()
+                    .name(request.getName())
+                    .lastname(request.getLastname())
+                    .gender(gender)
+                    .birthday(request.getBirthday())
+                    .nationality(request.getNationality())
+                    .docType(docType)
+                    .docNumber(request.getDocNumber())
+                    .docSupportNumber(request.getDocSupportNumber())
+                    .docIssueDate(request.getDocIssueDate())
+                    .docExpirationDate(request.getDocExpirationDate())
+                    .locality(locality)
+                    .address(request.getAddress())
+                    .postalCode(request.getPostalCode())
+                    .email(request.getEmail())
+                    .phone(request.getPhone())
+                    .createdBy(creator)
+                    .createdAt(LocalDateTime.now())
+                    .updatedBy(creator)
+                    .updatedAt(LocalDateTime.now())
+                    .isActive(true)
+                    .build();
+
+            // Guardamos cliente
+            clientRepository.save(c);
+
+        }
+
+        // Relacionar reserva y cliente
+        BookingClient bc = BookingClient.builder()
+                .booking(bk)
+                .client(c)
+                .isMainGuest(true)
+                .registeredInPolice(false)
+                .notes(null)
+                .build();
+
+        Log.write(request.getCreatorId(), "BookingService", "Relacionando Reserva con Cliente principal.");
+        bookingClientRepository.save(bc);
+
+       String response;
+
+        if (bk == null) {
+            response = "Error al crear la reserva.";
+        }
+
+        response = "Reserva " + bk.getId() + " creada correctamente.";
+
+        return BookingResponse.builder().message(response).build();
 
     }
 
