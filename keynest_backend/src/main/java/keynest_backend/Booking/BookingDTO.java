@@ -16,9 +16,12 @@ public class BookingDTO {
     // DAtos de la reserva
     LocalDate checkIn;
     LocalDate checkOut;
+    double price;
     boolean isPaid;
+    int numGuests;
     String notes;
     int status;
+    int nights;
 
     // Datos del cliente princiapl
     String name;

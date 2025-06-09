@@ -1,358 +1,95 @@
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import { Loader2, Hammer, Trash2, CircleX, CircleCheck, TriangleAlert, Check, ArrowLeftToLine } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, TriangleAlert, Check, Pencil, Ban } from "lucide-react";
 import PersonalizedButton from "@/components/PersonalizedButton";
-import { useParams } from "react-router";
-import { useNavigate } from "react-router";
 
 function EditBooking({ adminId }) {
-
-    // Utilidades
-    const [error, setError] = useState(null);
-    const [messageCreated, setMessageCreated] = useState(null);
+    const [bookingId, setBookingId] = useState("");
+    const [bookingData, setBookingData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [unitId, setUnitId] = useState(null);
-    const [modify, setModify] = useState(null);
-    const { selectedUnitId } = useParams();
-    const navigate = useNavigate();
+    const [error, setError] = useState(null);
+    const [message, setMessage] = useState(null);
+    const [modify, setModify] = useState(false);
+    const REGEX = /^[0-9]+$/;
+    const isValidId = REGEX.test(bookingId);
+    const [touched, setTouched] = useState(false);
 
-    // Para El tema direcciones, localidades, paises, provincias
-    const [results, setResults] = useState(null);
-    const [countries, setCountries] = useState([]);
-    const [provinces, setProvinces] = useState([]);
-    const [localities, setLocalities] = useState([]);
-    const [selectedCountry, setSelectedCountry] = useState("");
-    const [selectedProvince, setSelectedProvince] = useState("");
-    const [provinceEnabled, setProvinceEnabled] = useState(false);
-    const [localityEnabled, setLocalityEnabled] = useState(false);
-    const [localityId, setLocalityId] = useState();
-
-    // Datos de la unidad
+    // Datos de la reserva para modificar
+    const [checkIn, setCheckIn] = useState(null);
+    const [checkOut, setCheckOut] = useState(null);
+    const [price, setPrice] = useState(null);
+    const [isPaid, setIsPaid] = useState(null);
+    const [numGuests, setNumGuests] = useState(null);
+    const [notes, setNotes] = useState(null);
+    const [status, setStatus] = useState(null);
+    const [nights, setNights] = useState(null);
     const [name, setName] = useState(null);
-    const [rooms, setRooms] = useState(null);
-    const [bathrooms, setBathrooms] = useState(null);
-    const [hasKitchen, setHasKitchen] = useState(null);
-    const [minOccupancy, setMinOccupancy] = useState(null);
-    const [maxOccupancy, setMaxOccupancy] = useState(null);
-    const [aream2, setAream2] = useState(null);
-    const [description, setDescription] = useState(null);
-    const [unitType, setUnitType] = useState(null);
-    const [address, setAddress] = useState(null);
-    const [postalCode, setPostalCode] = useState(null);
-    const [isActive, setIsActive] = useState(null);
+    const [lastname, setLastname] = useState(null);
+    const [email, setEmail] = useState(null);
 
-
-
-    // CONSTANTES INMUTABLES
-    const URL_COUNTRIES = `http://localhost:8080/api/address/countries`;
-    const ULR_ACTIVATE = `http://localhost:8080/api/unit/activate`;
-    const URL_UNIT = `http://localhost:8080/api/unit`;
-
-
-
-
-    useEffect(() => {
-        const fetchCountries = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(URL_COUNTRIES, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" }
-                });
-                if (!response.ok) throw new Error("Error al capturar los países.");
-                const data = await response.json();
-                setCountries(data);
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCountries();
-
-        const automaticSearch = async () => {
-
-            // Reiniciar
-            setError(null);
-            setMessageCreated(null);
-            setResults(null);
-
-            if (!selectedUnitId) {
-                return;
-            }
-
-            let idValue = selectedUnitId;
-
-            const URL_SEARCH_UNITS = `http://localhost:8080/api/unit/full/${idValue}`;
-
-            try {
-                const response = await fetch(URL_SEARCH_UNITS, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' }
-
-                });
-
-                if (!response.ok) throw new Error("No se pudo obtener la información de la Unidad.");
-
-                const data = await response.json();
-
-                setUnitId(data.id);
-                setResults(data);
-                setIsActive(data.active)
-                setError(null);
-            } catch (err) {
-                setError("Error: " + err.message);
-                setResults([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        automaticSearch();
-
-    }, []);
-
-    const handleCountryChange = async (countryId) => {
-        setSelectedCountry(countryId);
-        setProvinces([]);
-        setLocalities([]);
-        setProvinceEnabled(false);
-        setLocalityEnabled(false);
-        if (!countryId) return;
-        const URL = `http://localhost:8080/api/address/provinces/${countryId}`;
-        setLoading(true);
-        try {
-            const res = await fetch(URL, { method: "GET", credentials: "include" });
-            if (!res.ok) throw new Error("Error al capturar las provincias");
-            const data = await res.json();
-            setProvinces(data);
-            setProvinceEnabled(true);
-            setError(null);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleProvinceChange = async (provinceId) => {
-        setSelectedProvince(provinceId);
-        setLocalities([]);
-        setLocalityEnabled(false);
-        if (!provinceId) return;
-        const URL = `http://localhost:8080/api/address/localities/${provinceId}`;
-        setLoading(true);
-        try {
-            const res = await fetch(URL, { method: "GET", credentials: "include" });
-            if (!res.ok) throw new Error("Error al capturar las localidades");
-            const data = await res.json();
-            setLocalities(data);
-            setLocalityEnabled(true);
-            setError(null);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSearch = async () => {
-
-        // Reiniciar
         setError(null);
-        setMessageCreated(null);
-        setResults(null);
-        setUnitId(null);
-
-        const value = document.getElementById("searchBar").value;
-
-        let idValue = null;
-
+        setMessage(null);
         setLoading(true);
-        const REGEX = /^\d+$/;
-        if (REGEX.test(value)) {
-            idValue = parseInt(value);
 
-        } else {
-            alert("El parámetro de búsqueda introducido no coincide con un ID de unidad.");
-        }
+        // Si el id no es valid
+        if (!isValidId) return;
 
-        const URL_SEARCH_UNITS = `http://localhost:8080/api/unit/full/${idValue}`;
 
         try {
-            const response = await fetch(URL_SEARCH_UNITS, {
+            const response = await fetch(`http://localhost:8080/api/booking/${bookingId}`, {
                 method: 'GET',
                 credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-
+                headers: { 'Content-Type': 'application/json' },
             });
 
-            if (!response.ok) throw new Error("No se pudo obtener la información de la Unidad.");
+            if (!response.ok) throw new Error("No se pudo obtener la reserva.");
 
             const data = await response.json();
-
-            setUnitId(data.id);
-            setResults(data);
-            setIsActive(data.active)
-            setError(null);
+            setBookingData(data);
         } catch (err) {
-            setError("Error: " + err.message);
-            setResults([]);
+            setError(err.message);
+            setBookingData(null);
         } finally {
             setLoading(false);
         }
     };
 
-    const modifyUnit = async () => {
-
-        // Reinicio
+    const modifyBooking = async () => {
         setError(null);
-        setMessageCreated(null);
-
-        setLoading(true)
-
-        //TODO: Aqui deberia llamar a una funcion que compruebe los campos
+        setMessage(null);
+        setLoading(true);
 
         try {
-
-            const response = await fetch(URL_UNIT, {
+            const response = await fetch(`http://localhost:8080/api/booking/${bookingId}`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    unitId,
-                    name,
-                    rooms,
-                    bathrooms,
-                    hasKitchen,
-                    minOccupancy,
-                    maxOccupancy,
-                    description,
-                    areaM2: aream2,
-                    unitTypeOption: unitType,
-                    localityId,
-                    address,
-                    postalCode,
-                    updaterId: adminId
-                })
+                body: JSON.stringify(bookingData)
             });
 
-            if (!response.ok) {
-                throw new Error("No se pudo actualizar la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
-            }
-
-            const data = await response.json();
-
-            setMessageCreated(data.message)
-
+            if (!response.ok) throw new Error("Error al actualizar la reserva.");
+            setMessage("Reserva actualizada con éxito.");
+            setModify(false);
         } catch (err) {
-
             setError(err.message);
-
         } finally {
             setLoading(false);
         }
-
-
-
     };
 
-    const activateUnit = async () => {
+    const activateBooking = async () => {
 
-        // Reiniciamos
-        setError(null);
-        setMessageCreated(null);
-
-        setLoading(true);
-
-        try {
-
-            const response = await fetch(ULR_ACTIVATE, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    unitId,
-                    updaterId: adminId
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error("No se pudo actualizar la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
-
-            }
-
-            const data = await response.json();
-
-            // Para que vuelva buscar y cargar los resultados
-            handleSearch();
-
-
-            setMessageCreated(data.message);
-
-        } catch (err) {
-            setError(err.message);
-
-        } finally {
-            setLoading(false);
-        }
+        console.log("ACTIVAR/ DESACTIVAR")
 
     }
 
-    const deleteUnit = async () => {
+    const deleteBooking = async () => {
 
-        // Reiniciamos
-        setError(null);
-        setMessageCreated(null);
-
-        setLoading(true);
-
-
-        try {
-
-            const response = await fetch(URL_UNIT, {
-                method: 'DELETE',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ unitId, updaterId: adminId })
-
-            });
-
-            if (!response.ok) {
-                throw new Error("No se pudo ELIMINAR la unidad. Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.");
-
-            }
-
-            const data = await response.json();
-
-            // Para que vuelva buscar y cargar los resultados
-            handleSearch();
-
-
-            setMessageCreated(data.message);
-
-        } catch (err) {
-            setError(err.message);
-
-        } finally {
-            setLoading(false);
-        }
-
-
-    }
-
-    function goBack() {
-
-        navigate(`/admin`);
-
+        console.log("ELIMINAR");
     }
 
     return (
-
         <div className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 my-6">
             {loading && (
                 <div className="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center">
@@ -360,29 +97,14 @@ function EditBooking({ adminId }) {
                 </div>
             )}
 
-            {selectedUnitId && (
-                <div className="w-full flex flex-row justify-center items-center">
-                    <button
-                        className={results
-                            ? "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-blue-500 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
-                            : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-blue-500 text-blue-700  cursor-not-allowed"
-                        }
-                        onClick={goBack}
-                    >
-                        <ArrowLeftToLine size={16} />
-                        Volver
-                    </button>
-                </div>
-
-            )}
-
             <h2 className="text-lg font-semibold text-gray-800">Buscar Unidad</h2>
 
             <div className="flex items-center space-x-2">
                 <input
                     type="text"
-                    placeholder="ID de la unidad"
+                    placeholder="ID de la reserva"
                     className="flex-1 px-4 py-2 border border-gray-300 rounded text-sm w-3/4"
+                    onBlur={() => setTouched(true)}
                     id="searchBar"
                 />
                 <div className="w-1/4">
@@ -395,6 +117,14 @@ function EditBooking({ adminId }) {
 
             </div>
 
+            {touched && !isValidId && (
+                <div className="flex justify-baseline items-center gap-2 border border-red-500 bg-red-50 text-red-700 rounded-md p-3 mt-2">
+                    <Ban className="mt-0.5" />
+                    <p className="text-sm text-center">El id introducido no es correcto, recuerde que solo admite dígitos.</p>
+                </div>
+
+            )}
+
             {error && (
                 <div className="flex justify-baseline items-center gap-2 border border-red-500 bg-red-50 text-red-700 rounded-md p-3 mt-2">
                     <TriangleAlert className="mt-0.5" />
@@ -402,10 +132,10 @@ function EditBooking({ adminId }) {
                 </div>
             )}
 
-            {messageCreated && (
+            {message && (
                 <div className="flex justify-baseline items-center gap-2 border border-green-500 bg-green-50 text-green-700 rounded-md p-3 mt-2">
                     <Check className="mt-0.5" />
-                    <p className="text-sm text-center">{messageCreated}</p>
+                    <p className="text-sm text-center">{message}</p>
                 </div>
 
             )}
@@ -413,25 +143,46 @@ function EditBooking({ adminId }) {
 
             <div className="space-y-8 p-6 bg-white text-black rounded-xl shadow-md max-w-4xl mx-auto">
                 <div>
-                    <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Información de la Unidad</h4>
+                    <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Información de la Reserva</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <label className="flex flex-col text-sm text-gray-700">
                             ID:
                             <input
                                 type="text"
-                                value={(results)
-                                    ? results.id
+                                value={(bookingData)
+                                    ? bookingData.id
                                     : ""}
                                 disabled
                                 className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                             />
                         </label>
                         <label className="flex flex-col text-sm text-gray-700">
-                            UserID:
+                            Email:
+                            <input
+                                type="email"
+                                value={modify ? email : (bookingData ? bookingData.email : "")}
+                                disabled={!modify}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                            />
+                        </label>
+                        <label className="flex flex-col text-sm text-gray-700">
+                            Nombre cliente:
                             <input
                                 type="text"
-                                value={(results)
-                                    ? results.userId
+                                value={(bookingData)
+                                    ? bookingData.name
+                                    : ""}
+                                disabled
+                                className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                            />
+                        </label>
+                        <label className="flex flex-col text-sm text-gray-700">
+                            Apellidos cliente:
+                            <input
+                                type="text"
+                                value={(bookingData)
+                                    ? bookingData.lastname
                                     : ""}
                                 disabled
                                 className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
@@ -440,35 +191,35 @@ function EditBooking({ adminId }) {
                     </div>
 
                     <div>
-                        <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Datos de la Unidad</h4>
+                        <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Datos de la Reserva</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <label className="flex flex-col text-sm text-gray-700">
-                                Nombre:
+                                Check-In:
                                 <input
-                                    type="text"
-                                    value={modify ? name : (results ? results.name : "")}
+                                    type="date"
+                                    value={modify ? checkIn : (bookingData ? bookingData.checkIn : "")}
                                     disabled={!modify}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => setCheckIn(e.target.value)}
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
                             <label className="flex flex-col text-sm text-gray-700">
-                                Rooms:
+                                Check-Out:
                                 <input
-                                    type="number"
-                                    value={modify ? rooms : (results ? results.rooms : "")}
+                                    type="date"
+                                    value={modify ? checkOut : (bookingData ? bookingData.checkOut : "")}
                                     disabled={!modify}
-                                    onChange={(e) => setRooms(e.target.value)}
+                                    onChange={(e) => setCheckOut(e.target.value)}
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
                             <label className="flex flex-col text-sm text-gray-700">
-                                Baños:
+                                Precio:
                                 <input
                                     type="number"
-                                    value={modify ? bathrooms : (results ? results.bathrooms : "")}
+                                    value={modify ? price : (bookingData ? bookingData.price : "")}
                                     disabled={!modify}
-                                    onChange={(e) => setBathrooms(e.target.value)}
+                                    onChange={(e) => setPrice(parseFloat(e.target.value))}
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
@@ -476,10 +227,10 @@ function EditBooking({ adminId }) {
                                 ? "hidden"
                                 : "flex flex-col text-sm text-gray-700"
                             }>
-                                Tiene cocina:
+                                Pagado:
                                 <input
                                     type="text"
-                                    value={results ? (results.hasKitchen ? "SI" : "NO") : ""}
+                                    value={bookingData ? (bookingData.isPaid ? "SI" : "NO") : ""}
                                     disabled
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
@@ -489,232 +240,82 @@ function EditBooking({ adminId }) {
                                 ? "flex flex-col text-sm text-gray-700"
                                 : "hidden"
                             }>
-                                Tiene Cocina:
+                                Pagado:
                                 <select
-                                    onChange={(e) => setHasKitchen(e.target.value === "true")}
+                                    onChange={(e) => setIsPaid(e.target.value === "true")}
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                    id="iptKitchen"
                                 >
-                                    <option value="" disabled>Tiene Cocina...</option>
+                                    <option value="" disabled selected>Esta pagada...</option>
                                     <option value={true}>SI</option>
                                     <option value={false}>NO</option>
                                 </select>
                             </label>
-                            <label className="flex flex-col text-sm text-gray-700">
-                                Ocupación mínima:
-                                <input
-                                    type="number"
-                                    value={modify ? minOccupancy : (results ? results.minOccupancy : "")}
-                                    disabled={!modify}
-                                    onChange={(e) => setMinOccupancy(e.target.value)}
-                                    className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                />
-                            </label>
-                            <label className="flex flex-col text-sm text-gray-700">
-                                Ocupación máxima:
-                                <input
-                                    type="number"
-                                    value={modify ? maxOccupancy : (results ? results.maxOccupancy : "")}
-                                    disabled={!modify}
-                                    onChange={(e) => setMaxOccupancy(e.target.value)}
-                                    className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                />
-                            </label>
-
 
                             <label className="flex flex-col text-sm text-gray-700">
-                                Área:
-                                <input
-                                    type="number"
-                                    value={modify ? aream2 : (results ? results.areaM2 : "")}
-                                    disabled={!modify}
-                                    onChange={(e) => setAream2(e.target.value)}
-                                    className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                />
-                            </label>
-                            <label className={modify
-                                ? "hidden"
-                                : "flex flex-col text-sm text-gray-700"
-                            }>
-                                Tipo de Unidad:
-                                <input
-                                    type="text"
-                                    value={results ? results.unitType : ""}
-                                    disabled
-                                    className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                />
-                            </label>
-                            <label className={modify
-                                ? "flex flex-col text-sm text-gray-700"
-                                : "hidden"
-                            }>
-                                Tipo de Unidad:
+                                Status:
                                 <select
-                                    onChange={(e) => setUnitType(parseInt(e.target.value))}
+                                    onChange={(e) => setStatus(parseInt(e.target.value))}
+                                    value={modify ? status : (bookingData ? bookingData.status : 6)}
+                                    disabled={!modify}
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                    id="iptKitchen"
                                 >
-                                    <option value="" disabled>Selecciona el tipo de unidad...</option>
-                                    <option value="0">APARTMENT</option>
-                                    <option value="1">HOUSE</option>
-                                    <option value="2">STUDIO</option>
-                                    <option value="3">COUNTRY_HOUSE</option>
+                                    <option value="0" >CANCELADA</option>
+                                    <option value="1">CONFIRMADA</option>
+                                    <option value="2">PRE-CHECK-IN</option>
+                                    <option value="3">CHECK-IN</option>
+                                    <option value="4">FACTURADA</option>
+                                    <option value="5">CHECK-OUT</option>
+                                    <option value="6"></option>
                                 </select>
                             </label>
-                            <label className="flex flex-col text-sm text-gray-700 md:col-span-2">
-                                Descripción:
+
+                            <label className="flex flex-col text-sm text-gray-700">
+                                Número de huéspedes:
                                 <input
-                                    type="text"
-                                    value={modify ? description : (results ? results.description : "")}
+                                    type="number"
+                                    value={modify ? numGuests : (bookingData ? bookingData.numGuests : "")}
                                     disabled={!modify}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    onChange={(e) => setNumGuests(parseInt(e.target.value))}
+                                    className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                />
+                            </label>
+                            <label className="flex flex-col text-sm text-gray-700">
+                                Noches:
+                                <input
+                                    type="number"
+                                    value={modify ? nights : (bookingData ? bookingData.nights : "")}
+                                    disabled={!modify}
+                                    onChange={(e) => setNights(parseInt(e.target.value))}
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
 
+                            <label className="flex flex-col md:col-span-2 col-span-1 text-sm text-gray-700">
+                                Notas:
+                                <textarea
+                                    value={modify ? notes : (bookingData ? bookingData.notes : "")}
+                                    disabled={!modify}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                />
+                            </label>
                         </div>
                     </div>
 
-                    <div>
-                        <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Dirección</h4>
-                        <div className="">
-                            <div className={modify
-                                ? "hidden"
-                                : "grid grid-cols-1 md:grid-cols-2 gap-4"
-                            }>
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    País:
-                                    <input
-                                        type="text"
-                                        value={(results)
-                                            ? results.country
-                                            : ""}
-                                        disabled
-                                        className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                    />
-                                </label>
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    Provincia:
-                                    <input
-                                        type="text"
-                                        value={(results)
-                                            ? results.province
-                                            : ""}
-                                        disabled
-                                        className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                    />
-                                </label>
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    Localidad:
-                                    <input
-                                        type="text"
-                                        value={(results)
-                                            ? results.locality
-                                            : ""}
-                                        disabled
-                                        className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                    />
-                                </label>
-                            </div>
-                            <div className={modify
-                                ? "grid grid-cols-1 md:grid-cols-2 gap-4"
-                                : "hidden"
-                            }>
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    País:
-                                    <select
-                                        value={selectedCountry}
-                                        onChange={(e) => handleCountryChange(e.target.value)}
-                                        className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                        id="iptCountry"
-                                    >
-                                        <option value="" disabled>Selecciona un país...</option>
-                                        {countries.map((country) => (
-                                            <option key={country.id} value={country.id}>
-                                                {country.initials} - {country.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    Provincia:
-                                    <select
-                                        value={selectedProvince}
-                                        onChange={(e) => handleProvinceChange(e.target.value)}
-                                        disabled={!provinceEnabled}
-                                        className={`mt-1 p-2 border rounded-md bg-white text-gray-800 ${provinceEnabled ? "border-gray-300" : "border-gray-200 text-gray-400"
-                                            }`}
-                                        id="iptProvince"
-                                    >
-                                        <option value="" disabled>Selecciona una provincia...</option>
-                                        {provinces.map((province) => (
-                                            <option key={province.id} value={province.id}>
-                                                {province.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    Localidad:
-                                    <select
-                                        disabled={!localityEnabled}
-                                        className={`mt-1 p-2 border rounded-md bg-white text-gray-800 ${localityEnabled ? "border-gray-300" : "border-gray-200 text-gray-400"
-                                            }`}
-                                        id="iptLocality"
-                                        onChange={(e) => setLocalityId(e.target.value)}
-                                    >
-                                        <option value="" disabled>Selecciona una localidad...</option>
-                                        {localities.map((locality) => (
-                                            <option key={locality.id} value={locality.id}>
-                                                {locality.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-
-                            </div>
-                            <div
-                                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                            >
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    Dirección:
-                                    <input
-                                        type="text"
-                                        value={modify ? address : (results ? results.address : "")}
-                                        disabled={!modify}
-                                        onChange={(e) => setAddress(e.target.value)}
-                                        className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                    />
-                                </label>
-                                <label className="flex flex-col text-sm text-gray-700">
-                                    Código Postal:
-                                    <input
-                                        type="text"
-                                        value={modify ? postalCode : (results ? results.postalCode : "")}
-                                        disabled={!modify}
-                                        onChange={(e) => setPostalCode(e.target.value)}
-                                        className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
-                                    />
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                     <div
                         className={modify
                             ? "hidden"
                             : "flex flex-row justify-center items-center gap-4 mt-4"
                         }>
 
-                        {results && isActive && (
+                        {bookingData && bookingData.status !== 0 && (
                             <>
                                 <button
-                                    className={results
+                                    className={bookingData
                                         ? "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-yellow-500 text-yellow-700 hover:bg-yellow-100 transition-colors cursor-pointer"
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-yellow-500 text-yellow-700  cursor-not-allowed"
                                     }
-                                    disabled={!results}
+                                    disabled={!bookingData}
                                     onClick={() => setModify(true)}
                                 >
 
@@ -723,38 +324,38 @@ function EditBooking({ adminId }) {
                                 </button>
 
                                 <button
-                                    className={results
+                                    className={bookingData
                                         ? "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-gray-500 text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-gray-500 text-gray-700  cursor-not-allowed"
                                     }
-                                    disabled={!results}
-                                    onClick={activateUnit}
+                                    disabled={!bookingData}
+                                    onClick={activateBooking}
                                 >
                                     <CircleX size={16} />
                                     Desactivar
                                 </button>
                             </>
                         )}
-                        {results && !isActive && (
+                        {bookingData && bookingData.status !== 0 && (
                             <>
                                 <button
-                                    className={results
+                                    className={bookingData
                                         ? "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-green-500 text-green-700 hover:bg-green-100 transition-colors cursor-pointer"
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-green-500 text-green-700  cursor-not-allowed"
                                     }
-                                    disabled={!results}
-                                    onClick={activateUnit}
+                                    disabled={!bookingData}
+                                    onClick={activateBooking}
                                 >
                                     <CircleCheck size={16} />
                                     Reactivar
                                 </button>
                                 <button
-                                    className={results
+                                    className={bookingData
                                         ? "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-red-500 text-red-700 hover:bg-red-100 transition-colors cursor-pointer"
                                         : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-red-500 text-red-700  cursor-not-allowed"
                                     }
-                                    disabled={!results}
-                                    onClick={deleteUnit}
+                                    disabled={!bookingData}
+                                    onClick={deleteBooking}
                                 >
                                     <Trash2 size={16} />
                                     Eliminar
@@ -770,7 +371,7 @@ function EditBooking({ adminId }) {
                         }>
                         <button
                             className="px-4 py-2 text-sm border-y border-green-600 text-green-700 hover:bg-green-100 transition-colors cursor-pointer"
-                            onClick={modifyUnit}
+                            onClick={modifyBooking}
 
                         >
                             Aceptar
@@ -788,9 +389,7 @@ function EditBooking({ adminId }) {
 
             </div>
         </div>
-    )
-
+    );
 }
 
-
-export default EditBooking
+export default EditBooking;

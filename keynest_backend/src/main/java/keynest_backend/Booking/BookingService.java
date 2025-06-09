@@ -257,21 +257,24 @@ public class BookingService {
     public BookingDTO getBooking(Integer bookingId) {
 
         // 1. Sacar la reserva
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new IllegalArgumentException("BookingService | getBooking | Error al capturar al reserva."));
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new IllegalArgumentException("La reserva con Id " + bookingId + " no existe o no ha podido ser encontrada."));
 
         // 2. Obtener el id del cliente principal
         Integer clientId = bookingClientRepository.findMainClientIdByBookingId(bookingId);
 
         // 3. Obtener el cliente
-        Client client = clientRepository.findById(clientId).orElseThrow(() -> new IllegalArgumentException("BookingService | getBooking | Cliente principal no encontrado."));
+        Client client = clientRepository.findById(clientId).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado cliente con id " + clientId + "."));
 
         // 4 Creamos DTO
         return BookingDTO.builder()
                 .checkIn(booking.getCheckIn())
                 .checkOut(booking.getCheckOut())
+                .price(booking.getTotalPrice())
                 .isPaid(booking.isPaid())
+                .numGuests(booking.getNumGuests())
                 .notes(booking.getNotes())
                 .status(booking.getStatus())
+                .nights(booking.getNights())
                 .name(client.getName())
                 .lastname(client.getLastname())
                 .email(client.getEmail())
