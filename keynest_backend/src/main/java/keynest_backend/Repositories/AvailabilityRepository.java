@@ -43,6 +43,10 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
             @Param("endDate") LocalDate endDate
     );
 
+    @Query("SELECT MAX(a.dateAvailable) FROM Availability a WHERE a.unit.id = :unitId")
+    LocalDate findLastAvailableDateByUnitId(@Param("unitId") Integer unitId);
+
+
 
 
 

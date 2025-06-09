@@ -25,7 +25,12 @@ public class UnitService {
     private final ProvinceRepository provinceRepository;
     private final LocalityRepository localityRepository;
 
-    // Metodos de servicio para usar el repositorio
+    /**
+     * Método de servicio que permite crear una unidad.
+     * Crea una instancia de unidad y la guarda en la base de datos.
+     * @param request - Objeto de la clase UnitCreateRequest, clase específica para recibir parámetros para crear
+     * @return response - Objeto de la clase UnitResponse.
+     */
     public UnitResponse createUnit(UnitCreateRequest request) {
 
         // Hay que sacar datos de modelos con los repositorios
@@ -54,6 +59,12 @@ public class UnitService {
 
         }
 
+        // El parametro kitchen se recibe como entero
+        boolean hasKitchen = false;
+        if (request.getKitchen() == 1) {
+            hasKitchen = true;
+        }
+
         // Creamos una unidad
         Unit unit = Unit.builder()
                 //* Relacion
@@ -62,7 +73,7 @@ public class UnitService {
                 .name(request.getName())
                 .rooms(request.getRooms())
                 .bathrooms(request.getBathrooms())
-                .hasKitchen(request.isHasKitchen())
+                .hasKitchen(hasKitchen)
                 .minOccupancy(request.getMinOccupancy())
                 .maxOccupancy(request.getMaxOccupancy())
                 .areaM2(request.getAreaM2())
@@ -168,6 +179,12 @@ public class UnitService {
 
     }
 
+    /**
+     * Método de servicio para actualizar una unidad.
+     * Comprueba cada campo, y si tiene un valor diferente de nulo, lo actualiza usando Hibernate.
+     * @param request - Objeto de la clase UnitUpdateRequest, clase específica para enviar la información de actualización
+     * @return response - Objeto de la clase UnitResponse, que representa una clase que envía un mensaje con un código de estado
+     */
     public UnitResponse updateUnit(UnitUpdateRequest request) {
 
         System.out.println("Entra en updateUnit en UnitService");

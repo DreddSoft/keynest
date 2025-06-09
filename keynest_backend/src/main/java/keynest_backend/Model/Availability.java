@@ -35,7 +35,7 @@ public class Availability {
     private int minStay;
 
     //* Campos añadidos despues
-    @Column(name = "occupied", nullable = false)
+    @Column(name = "is_available", nullable = false)
     private boolean isAvailable = true;
 
 }

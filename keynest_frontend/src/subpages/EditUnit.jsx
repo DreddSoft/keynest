@@ -1,8 +1,10 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Loader2, Hammer, Trash2, CircleX, CircleCheck, TriangleAlert, Check } from "lucide-react";
+import { Loader2, Hammer, Trash2, CircleX, CircleCheck, TriangleAlert, Check, ArrowLeftToLine } from "lucide-react";
 import PersonalizedButton from "@/components/PersonalizedButton";
+import { useParams } from "react-router";
+import { useNavigate } from "react-router";
 
 function EditUnit({ adminId }) {
 
@@ -12,6 +14,8 @@ function EditUnit({ adminId }) {
     const [loading, setLoading] = useState(false);
     const [unitId, setUnitId] = useState(null);
     const [modify, setModify] = useState(null);
+    const { selectedUnitId } = useParams();
+    const navigate = useNavigate();
 
     // Para El tema direcciones, localidades, paises, provincias
     const [results, setResults] = useState(null);
@@ -68,6 +72,48 @@ function EditUnit({ adminId }) {
             }
         };
         fetchCountries();
+
+        const automaticSearch = async () => {
+
+            // Reiniciar
+            setError(null);
+            setMessageCreated(null);
+            setResults(null);
+
+            if (!selectedUnitId) {
+                return;
+            }
+
+            let idValue = selectedUnitId;
+
+            const URL_SEARCH_UNITS = `http://localhost:8080/api/unit/full/${idValue}`;
+
+            try {
+                const response = await fetch(URL_SEARCH_UNITS, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+
+                });
+
+                if (!response.ok) throw new Error("No se pudo obtener la información de la Unidad.");
+
+                const data = await response.json();
+
+                setUnitId(data.id);
+                setResults(data);
+                setIsActive(data.active)
+                setError(null);
+            } catch (err) {
+                setError("Error: " + err.message);
+                setResults([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        automaticSearch();
+
     }, []);
 
     const handleCountryChange = async (countryId) => {
@@ -149,10 +195,6 @@ function EditUnit({ adminId }) {
 
             const data = await response.json();
 
-
-            console.log(data);
-            console.log("Esta activa: " + data.active)
-
             setUnitId(data.id);
             setResults(data);
             setIsActive(data.active)
@@ -172,8 +214,6 @@ function EditUnit({ adminId }) {
         setMessageCreated(null);
 
         setLoading(true)
-
-        console.log("Tipo unidad: " + unitType);
 
         //TODO: Aqui deberia llamar a una funcion que compruebe los campos
 
@@ -305,6 +345,12 @@ function EditUnit({ adminId }) {
 
     }
 
+    function goBack() {
+
+        navigate(`/admin`);
+
+    }
+
     return (
 
         <div className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 my-6">
@@ -313,6 +359,23 @@ function EditUnit({ adminId }) {
                     <Loader2 className="h-10 w-10 animate-spin text-gray-800" />
                 </div>
             )}
+
+            {selectedUnitId && (
+                <div className="w-full flex flex-row justify-center items-center">
+                    <button
+                        className={results
+                            ? "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-blue-500 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
+                            : "flex flex-row justify-center items-center gap-1 px-4 py-2 text-sm border-y border-blue-500 text-blue-700  cursor-not-allowed"
+                        }
+                        onClick={goBack}
+                    >
+                        <ArrowLeftToLine size={16} />
+                        Volver
+                    </button>
+                </div>
+
+            )}
+
             <h2 className="text-lg font-semibold text-gray-800">Buscar Unidad</h2>
 
             <div className="flex items-center space-x-2">

@@ -1,13 +1,9 @@
 import Button2 from "@/components/Button2";
 import { House, HousePlus, Loader2, Search, CalendarCog } from "lucide-react";
 import { useState } from "react";
-import EditUnit from "./EditUnit";
-import CreateUnit from "./CreateUnit";
-import UnitsPerUser from "./UnitsPerUser";
-import GenerateAvailability from "./GenerateAvailability"; 
+import BookingsPerUnit from "@/components/BookingsPerUnit";
 
-
-function UnitPanel({ adminId }) {
+function BookingsPanel({ adminId }) {
 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -34,31 +30,17 @@ function UnitPanel({ adminId }) {
                 <nav className="flex flex-col w-full justify-center items-center md:flex-row bg-gray-700 px-4">
                     <Button2
                         icon={<House size={16} />}
-                        buttonName={"Buscar"}
+                        buttonName={"Reservas por Unidad"}
                         buttonFunction={() => changeStep(1)}
                         step={step}
                         valueStep={1}
                     />
                     <Button2
                         icon={<HousePlus size={16} />}
-                        buttonName={"Crear"}
+                        buttonName={"Editar Reserva"}
                         buttonFunction={() => changeStep(2)}
                         step={step}
                         valueStep={2}
-                    />
-                    <Button2
-                        icon={<Search size={16} />}
-                        buttonName={"Unidades Por Usuario"}
-                        buttonFunction={() => changeStep(3)}
-                        step={step}
-                        valueStep={3}
-                    />
-                    <Button2
-                        icon={<CalendarCog size={16} />}
-                        buttonName={"Generar Disponiblidad"}
-                        buttonFunction={() => changeStep(4)}
-                        step={step}
-                        valueStep={4}
                     />
                 </nav>
 
@@ -66,27 +48,17 @@ function UnitPanel({ adminId }) {
 
             <main>
                 {step === 1 && (
-                    <EditUnit adminId={adminId} />
+                    <BookingsPerUnit />
                 )}
 
                 {step === 2 && (
 
-                    <CreateUnit adminId={adminId} />
+                    <p>Aquí iría editar una reserva</p>
                 )}
-
-                {step === 3 && (
-                    <UnitsPerUser />
-
-                )}
-
-                {step === 4 && (
-                    <GenerateAvailability />
-                )}
-
             </main >
         </div >
     )
 
 }
 
-export default UnitPanel;
+export default BookingsPanel;

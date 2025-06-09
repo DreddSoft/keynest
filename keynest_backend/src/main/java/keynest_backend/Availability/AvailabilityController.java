@@ -55,8 +55,14 @@ public class AvailabilityController {
 
     }
 
+    /**
+     * Endpoint para crear disponibilidad de una unidad.
+     *
+     * @param request - Objeto CreateBrutAvailaRequest, que contiene los parametros para crear disponibilidad
+     * @return
+     */
     @PostMapping("bruteCreate")
-    public ResponseEntity<AvailabilityResponse> createBrutAvailability (@RequestBody CreateAvailabilityRequest request) {
+    public ResponseEntity<AvailabilityResponse> createBrutAvailability (@RequestBody CreateBrutAvailaRequest request) {
 
         return ResponseEntity.ok(availabilityService.createBrutAvailabilityPerUnit(request));
 

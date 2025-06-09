@@ -18,7 +18,7 @@ public class UnitCreateRequest {
     String name;
     Integer rooms;
     Integer bathrooms;
-    boolean hasKitchen;
+    int kitchen;
     Integer minOccupancy;
     Integer maxOccupancy;
     double areaM2;

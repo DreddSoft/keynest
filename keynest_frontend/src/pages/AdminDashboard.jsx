@@ -4,6 +4,7 @@ import { LogOut, BedSingle, Users, Calendar, Settings, Hotel } from "lucide-reac
 import AdminHeader from "@/components/AdminHeader";
 import UnitPanel from "@/subpages/UnitPanel";
 import UserControl from "@/subpages/UserControl";
+import BookingsPanel from "@/subpages/BookingsPanel";
 
 function AdminDashboard() {
 
@@ -36,7 +37,7 @@ function AdminDashboard() {
         )}
         {step === 3 && (
           <div>
-            Paso 3
+            <BookingsPanel adminId={ADMIN_ID} />
           </div>
         )}
         {step === 4 && (

@@ -108,15 +108,22 @@ public class AvailabilityService {
      * Metodo para crear disponibilidad entre varias fechas, y asi actualizar la dispo de una unidad de golpe
      * @param request |
      */
-    public AvailabilityResponse createBrutAvailabilityPerUnit(CreateAvailabilityRequest request) {
+    public AvailabilityResponse createBrutAvailabilityPerUnit(CreateBrutAvailaRequest request) {
 
         Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("La unidad no existe."));
+
+        // Sacar la última fecha disponible de esa unidad
+        LocalDate lastDate = availabilityRepository.findLastAvailableDateByUnitId(unit.getId());
+
+        // Si es nulo, no hay, pues hoy
+        if (lastDate == null) {
+            lastDate = LocalDate.now();
+        }
 
         // No hace falta eliminar los registros, porque esto sera siempre en fechas que no esten creadas
         // Hay que crear disponibilidad por disponibilidad y guardarlo
         // Crearlas todas hasta la final, sin contarla
-        for (LocalDate date = request.getStartDate(); date.isBefore(request.getEndDate()); date = date.plusDays(1)) {
-
+        for (LocalDate date = lastDate; date.isBefore(request.getEndDate()); date = date.plusDays(1)) {
             // Obtener la unidad
 
             Availability intro = Availability.builder()
@@ -127,27 +134,9 @@ public class AvailabilityService {
                     .isAvailable(true)
                     .build();
 
-            // un check de si es null error
-            if (intro == null)
-                throw new IllegalArgumentException("No se ha creado la disponibilidad correctamente.");
-
             availabilityRepository.save(intro);
 
         }
-
-        // La ultima fecha
-        Availability last = Availability.builder()
-                .unit(unit)
-                .dateAvailable(request.getEndDate())
-                .pricePerNight(request.getPrice())
-                .minStay(request.getMinStay())
-                .isAvailable(true)
-                .build();
-        // Misma comprobacion
-        if (last == null)
-            throw new IllegalArgumentException("No se ha creado la disponibilidad correctamente.");
-
-        availabilityRepository.save(last);
 
         return AvailabilityResponse.builder()
                 .message("Disponibilidad creada con exito.")

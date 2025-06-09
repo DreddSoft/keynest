@@ -109,25 +109,33 @@ function UserControl() {
         // Reiniciar mensajes
         setError(null);
         setMessageCreated(null);
+        // setSearchTerm(null);
 
-        const value = document.getElementById("searchBar").value;
-        setSearchTerm(value);
-        if (!value.trim()) return;
+        // const value = document.getElementById("searchBar").value;
+        // setSearchTerm(value);
+        // if (!value.trim()) return;
         setLoading(true);
+
         const REGEX = /^\d+$/;
+
+        // Separamos en variables diferentes para evitar el primer envío nulo
+        let idToSearch = null;
+        let emailToSearch = null;
+
+        // Comprobamos que sean dígitos y otra cosa
         if (REGEX.test(searchTerm)) {
-            setId(parseInt(searchTerm));
-            setEmail(null);
+            idToSearch = parseInt(searchTerm);
         } else {
-            setEmail(searchTerm);
-            setId(null);
+            emailToSearch = searchTerm;
         }
+
+
         try {
             const response = await fetch(URL_SEARCH, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, email })
+                body: JSON.stringify({ id: idToSearch, email: emailToSearch })
             });
 
             if (!response.ok) throw new Error("No se pudo obtener el usuario.");
@@ -324,16 +332,22 @@ function UserControl() {
                         icon={<UserSearch size={16} />}
                         buttonName={"Buscar"}
                         buttonFunction={() => changeStep(1)}
+                        step={step}
+                        valueStep={1}
                     />
                     <Button2
                         icon={<PencilRuler size={16} />}
                         buttonName={"Crear"}
                         buttonFunction={() => changeStep(2)}
+                        step={step}
+                        valueStep={2}
                     />
                     <Button2
                         icon={<KeyRound size={16} />}
                         buttonName={"New password"}
                         buttonFunction={() => changeStep(3)}
+                        step={step}
+                        valueStep={3}
                     />
                 </nav>
 
@@ -350,6 +364,7 @@ function UserControl() {
                                 placeholder="ID o Email"
                                 className="flex-1 px-4 py-2 border border-gray-300 rounded text-sm w-3/4"
                                 id="searchBar"
+                                onChange={(e) => setSearchTerm(e.target.value) }
                             />
                             <div className="w-1/4">
                                 <PersonalizedButton

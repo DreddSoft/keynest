@@ -9,6 +9,7 @@ import InLayout from './layout/InLayout.jsx'
 import OutLayout from './layout/OutLayout.jsx'
 import BookingForm from './pages/BookingForm.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx';
+import EditUnit from './subpages/EditUnit.jsx';
 
 
 function App() {
@@ -78,14 +79,24 @@ function App() {
 
       {/* Ruta para admin */}
       {isAuthenticated && admin && (
-        <Route
-          path="/admin"
-          element={
-            isAuthenticated
-              ? <InLayout><AdminDashboard /></InLayout>
-              : <Navigate to="/login" />
-          }
-        />
+        <>
+          <Route
+            path="/admin"
+            element={
+              isAuthenticated
+                ? <InLayout><AdminDashboard /></InLayout>
+                : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path='/editUnit/:selectedUnitId'
+            element={
+              isAuthenticated
+                ? <InLayout><EditUnit /></InLayout>
+                : <Navigate to="/login" />
+            }
+          />
+        </>
       )}
 
       {/* Rutas de usuarios */}

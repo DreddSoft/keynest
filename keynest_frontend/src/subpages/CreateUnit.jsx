@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Loader2, Hammer, Trash2, CircleX, CircleCheck, TriangleAlert, Check } from "lucide-react";
+import { Loader2, TriangleAlert, Check } from "lucide-react";
 import PersonalizedButton from "@/components/PersonalizedButton";
 
 function CreateUnit({ adminId }) {
@@ -26,8 +26,7 @@ function CreateUnit({ adminId }) {
     const [name, setName] = useState();
     const [rooms, setRooms] = useState();
     const [bathrooms, setBathrooms] = useState();
-    const [intKitchen, setIntKitchen] = useState();
-    const [hasKitchen, setHasKitchen] = useState();
+    const [kitchen, setKitchen] = useState();
     const [minOccupancy, setMinOccupancy] = useState();
     const [maxOccupancy, setMaxOccupancy] = useState();
     const [areaM2, setAreaM2] = useState();
@@ -124,18 +123,6 @@ function CreateUnit({ adminId }) {
         setMessageCreated(null);
         setError(null);
 
-        console.log("La cocina: " + intKitchen);
-
-        // Cocina
-        if (intKitchen === "1") {
-            setHasKitchen(true);
-        } else {
-            setHasKitchen(false);
-        }
-
-        console.log("La localidad: " + localityId);
-        console.log("La cocina: " + hasKitchen);
-
         // Cargando
         setLoading(true);
 
@@ -150,7 +137,7 @@ function CreateUnit({ adminId }) {
                     name,
                     rooms,
                     bathrooms,
-                    hasKitchen,
+                    kitchen,
                     minOccupancy,
                     maxOccupancy,
                     areaM2,
@@ -179,6 +166,42 @@ function CreateUnit({ adminId }) {
         }
 
     }
+
+    // function checkValidity() {
+
+    //     // Reiniciar Errores 
+    //     setError(null);
+
+    //     let errorMsj = "";
+
+    //     // Comprobar si el usuario tiene algo que no sean numer
+    //     const REGEX = /^\d+$/;
+    //     if (!REGEX.test(userId)) {
+    //         errorMsj += "El ID de usuario ha de ser dígitos, no puede contener letras.";
+    //     }
+
+    //     // Room
+    //     if (rooms < 0) {
+    //         errorMsj += "\nLas Habitaciones no permiten un valor por debajo de 0.";
+    //     }
+
+    //     // Bathrooms
+    //     if (bathrooms < 0) {
+    //         errorMsj += "\nLas Baños no permiten un valor por debajo de 0.";
+    //     }
+
+    //     // minOc
+    //     if (minOccupancy < 1) { 
+    //         errorMsj += "\nLa ocupación mínima no puede ser inferior a 0.";
+    //     }
+
+    //     if (errorMsj != "") {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+
+    // }
 
     return (
         <div className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 my-6">
@@ -237,29 +260,35 @@ function CreateUnit({ adminId }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                             <label className="flex flex-col text-sm text-gray-700">
-                                Rooms:
+                                Habitaciones:
                                 <input
                                     type="number"
+                                    required
                                     onChange={(e) => setRooms(parseInt(e.target.value))}
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                    min="0"
+                                    id="iptRooms"
                                 />
                             </label>
                             <label className="flex flex-col text-sm text-gray-700">
                                 Baños:
                                 <input
                                     type="number"
+                                    required
                                     onChange={(e) => setBathrooms(parseInt(e.target.value))}
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                    min="0"
                                 />
                             </label>
 
                             <label className="flex flex-col text-sm text-gray-700">
                                 Tiene Cocina:
                                 <select
-                                    onChange={(e) => setIntKitchen(e.target.value)}
+                                    onChange={(e) => setKitchen(parseInt(e.target.value))}
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                                    required
                                 >
-                                    <option value="" disabled>Tiene Cocina...</option>
+                                    <option value="" selected disabled>Tiene Cocina...</option>
                                     <option value="1">SI</option>
                                     <option value="0">NO</option>
                                 </select>
@@ -269,7 +298,9 @@ function CreateUnit({ adminId }) {
                                 <input
                                     type="number"
                                     onChange={(e) => setMinOccupancy(parseInt(e.target.value))}
+                                    required
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                    min="1"
                                 />
                             </label>
                             <label className="flex flex-col text-sm text-gray-700">
@@ -277,6 +308,7 @@ function CreateUnit({ adminId }) {
                                 <input
                                     type="number"
                                     onChange={(e) => setMaxOccupancy(parseInt(e.target.value))}
+                                    required
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
@@ -287,6 +319,7 @@ function CreateUnit({ adminId }) {
                                 <input
                                     type="number"
                                     onChange={(e) => setAreaM2(parseFloat(e.target.value))}
+                                    required
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
@@ -294,6 +327,7 @@ function CreateUnit({ adminId }) {
                                 Tipo de Unidad:
                                 <select
                                     onChange={(e) => setType(parseInt(e.target.value))}
+                                    required
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                 >
                                     <option value="" disabled>Selecciona el tipo de unidad...</option>
@@ -308,6 +342,7 @@ function CreateUnit({ adminId }) {
                                 <textarea
                                     type="text"
                                     onChange={(e) => setDescription(e.target.value)}
+                                    required
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center row-span-4"
                                 />
                             </label>
@@ -345,6 +380,7 @@ function CreateUnit({ adminId }) {
                                         className={`mt-1 p-2 border rounded-md bg-white text-gray-800 ${provinceEnabled ? "border-gray-300" : "border-gray-200 text-gray-400"
                                             }`}
                                         id="iptProvince"
+                                        required
                                     >
                                         <option value="" disabled>Selecciona una provincia...</option>
                                         {provinces.map((province) => (
@@ -383,6 +419,7 @@ function CreateUnit({ adminId }) {
                                         type="text"
                                         onChange={(e) => setAddress(e.target.value)}
                                         className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                        required
                                     />
                                 </label>
                                 <label className="flex flex-col text-sm text-gray-700">
@@ -391,6 +428,7 @@ function CreateUnit({ adminId }) {
                                         type="text"
                                         onChange={(e) => setPostalCode(e.target.value)}
                                         className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                                        required
                                     />
                                 </label>
                             </div>
