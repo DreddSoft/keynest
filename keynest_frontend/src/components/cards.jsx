@@ -1,53 +1,53 @@
 import { navigate } from "astro/virtual-modules/transitions-router.js";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FaHouseChimney, FaHotel } from "react-icons/fa6";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { FiCalendar } from "react-icons/fi";
 import PersonalizedButton from "../components/PersonalizedButton.jsx";
 
-function Card({ name, address, locality, id, type }) {
+function Card({ name, address, locality, id, type, checkIn, checkOut, nights, bookingId, bookingStatus }) {
     const fullAddress = `${address}, ${locality}.`;
-    const URL_NEXT_BOOKING = `http://localhost:8080/api/booking/getNext/${id}`
-    const [checkIn, setCheckIn] = useState(null);
-    const [checkOut, setCheckOut] = useState(null);
-    const [nights, setNights] = useState(null);
 
     const accessUnit = () => {
         navigate(`/unit/${id}`);
     };
 
-    useEffect(() => {
 
-        // Obtener la proxima reserva de la unidad
-        const fetchNextBooking = async () => {
-            try {
+    // Función para iniciar el precheckIn de una reserva
+    const preCheckIn = async () => {
+        console.log("Se inicia precheckin");
+    }
 
-                const response = await fetch(URL_NEXT_BOOKING, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                });
+    // Función para iniciar el checkIn de una reserva
+    const initCheckIn = async () => {
 
-                if (!response.ok) {
-                    throw new Error("Algo ha ocurrido al capturar la proxima reserva.");
+        // Realmente esta función sólo cambia el status de la reserva
+        const URL_CHECKIN = `http://localhost:8080/api/booking/checkIn/${bookingId}`;
+
+        // Si ya esta en checkIn, esto es una comprobación redundante.
+        if (bookingStatus === 2) return;
+
+        try {
+
+            const response = await fetch(URL_CHECKIN, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
+            });
 
-                const data = await response.json();
-
-                // Asignamos estados
-                setCheckIn(data.checkIn);
-                setCheckOut(data.checkOut);
-                setNights(data.nights);
-            } catch (err) {
-                console.error("Error: " + err.message);
+            if (!response.ok) {
+                throw new Error("No se ha podido hacer check-in en la reserva.");
             }
-        };
 
-        fetchNextBooking();
 
-    });
+
+        } catch (err) {
+            console.error(err.message);
+        }
+
+    }
 
     return (
         <div className="bg-white border border-gray-800 rounded-2xl shadow-lg overflow-hidden h-96 w-60 p-4 flex flex-col">
@@ -76,6 +76,27 @@ function Card({ name, address, locality, id, type }) {
                     <span>{fullAddress}</span>
                 </div>
             </div>
+            {bookingStatus === 1 && (
+                <div className="mt-auto pt-4">
+                    <PersonalizedButton
+                        buttonName={"Pre Check-In"}
+                        buttonId={"precheckin"}
+                        buttonFunction={preCheckIn}
+                        className="w-full"
+                    />
+                </div>
+            )}
+
+            {bookingStatus === 2 && (
+                <div className="mt-auto pt-4">
+                    <PersonalizedButton
+                        buttonName={"Check-In"}
+                        buttonId={"precheckin"}
+                        buttonFunction={initCheckIn}
+                        className="w-full"
+                    />
+                </div>
+            )}
 
             {/* Botón inferior fijo */}
             <div className="mt-auto pt-4">

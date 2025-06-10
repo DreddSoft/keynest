@@ -1,10 +1,7 @@
 package keynest_backend.Unit;
 
 import keynest_backend.Logs.Log;
-import keynest_backend.Model.Country;
-import keynest_backend.Model.Locality;
-import keynest_backend.Model.Province;
-import keynest_backend.Model.Unit;
+import keynest_backend.Model.*;
 import keynest_backend.Repositories.*;
 import keynest_backend.User.Role;
 import keynest_backend.User.User;
@@ -12,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +19,7 @@ public class UnitService {
 
     private final UnitRepository unitRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final CountryRepository countryRepository;
     private final ProvinceRepository provinceRepository;
     private final LocalityRepository localityRepository;
@@ -175,8 +174,38 @@ public class UnitService {
             return Collections.emptyList();
         }
 
-        return unitRepository.findAllByUser(userId);
+        // Capturamos todas las unidades del usuario
+        List<Unit> units = unitRepository.findAllByUser(userId);
 
+        // Lista vacia de cardDTOs
+        List<UnitCardDTO> unitsDTOs = new ArrayList<>();
+
+        // Recorremos todas las unidades
+        for (Unit unit: units) {
+
+            // Sacar la proxima reserva de la unidad
+            Booking nextBooking = bookingRepository.findBookingThatChecksInToday(unit.getId()).orElse(null);
+
+            // Creamos DTO
+            UnitCardDTO card = UnitCardDTO.builder()
+                    .id(unit.getId())
+                    .name(unit.getName())
+                    .type(unit.getType().toString())
+                    .address(unit.getAddress())
+                    .localityName(unit.getLocality().getName())
+                    .checkIn((nextBooking == null) ? null : nextBooking.getCheckIn())
+                    .checkOut((nextBooking == null) ? null : nextBooking.getCheckOut())
+                    .nights((nextBooking == null) ? null : nextBooking.getNights())
+                    .bookingId((nextBooking == null) ? null : nextBooking.getId())
+                    .bookingStatus((nextBooking == null) ? null : nextBooking.getStatus())
+                    .build();
+
+            // Insertar en lista
+            unitsDTOs.add(card);
+
+        }
+
+        return unitsDTOs;
     }
 
     /**

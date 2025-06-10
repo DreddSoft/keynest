@@ -106,6 +106,11 @@ function UnitDashboard() {
                             locality={unit.localityName}
                             id={unit.id}
                             type={unit.type}
+                            checkIn={unit.checkIn}
+                            checkOut={unit.checkOut}
+                            nights={unit.nights}
+                            bookingId={unit.bookingId}
+                            bookingStatus={unit.bookingStatus}
                         />
                     ))}
                 </section>

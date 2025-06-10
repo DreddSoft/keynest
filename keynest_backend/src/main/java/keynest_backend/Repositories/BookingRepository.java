@@ -26,8 +26,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     Integer sumNightsByUserIdAndDateRange(
             @Param("userId") Integer userId,
             @Param("startDate") LocalDate startDate,
-            @Param("endDate")LocalDate endDate
-            );
+            @Param("endDate") LocalDate endDate
+    );
 
 
     @Query("""
@@ -39,6 +39,14 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findNextOrCurrentBookings(
             @Param("unitId") Integer unitId
     );
+
+    @Query("""
+                SELECT b FROM Booking b
+                WHERE b.unit.id = :unitId
+                  AND b.checkIn = CURRENT_DATE
+                ORDER BY b.checkIn ASC
+            """)
+    Optional<Booking> findBookingThatChecksInToday(@Param("unitId") Integer unitId);
 
     @Query("""
             SELECT new keynest_backend.Booking.BookingListDTO(

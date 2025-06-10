@@ -19,19 +19,13 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
     List<Unit> findAll();
 
     @Query("""
-                SELECT new keynest_backend.Unit.UnitCardDTO(
-                    u.id,
-                    u.name,
-                    CAST(u.type AS string),
-                    u.address,
-                    l.name
-                )
+                SELECT u
                 FROM Unit u
                 JOIN u.locality l
                 WHERE u.user.id = :userId
                 AND u.isActive = true
                 ORDER BY u.id
             """)
-    List<UnitCardDTO> findAllByUser(@Param("userId") Integer userId);
+    List<Unit> findAllByUser(@Param("userId") Integer userId);
 
 }

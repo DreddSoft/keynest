@@ -75,4 +75,17 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(request));
 
     }
+
+    /**
+     * Endpoint para hacer el checkIn de una reserva.
+     *
+     * @param bookingId -- Integer con el id de la reserva.
+     * @return responseBooking -- objeto de la clase BookingResponse que contiene un mensaje informativo, que se envía junto a un código 200.
+     */
+    @GetMapping
+    public ResponseEntity<BookingResponse> checkIn (@PathVariable Integer bookingId) {
+
+        return ResponseEntity.ok(bookingService.checkIn(bookingId));
+
+    }
 }

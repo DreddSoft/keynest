@@ -282,4 +282,27 @@ public class BookingService {
 
     }
 
+    /**
+     * Método de servicio para establecer el status de una reserva a checkIn, indicando que el cliente ha entrado ya en la unidad y se ha realizado el pre-checkIn.
+     *
+     * @param bookingId - Integer con el id de la reserva.
+     * @return bookingResponse - Objeto de la clase BookingResponse que envía un mensaje informativo.
+     */
+    public BookingResponse checkIn (Integer bookingId) {
+
+        // Buscar la reserva
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+
+        if (booking == null) {
+            return BookingResponse.builder().message("No se ha encontrado la unidad.").build();
+        }
+
+        // Se cambia el status a 3 - checkin (que ya esta hecho el checkin)
+        booking.setStatus(3);
+        bookingRepository.save(booking);
+
+        return BookingResponse.builder().message("Se ha hecho el Check-In de la reserva: " + bookingId + ".").build();
+
+    }
+
 }
