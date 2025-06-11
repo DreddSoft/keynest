@@ -47,7 +47,7 @@ function UnitSettings({ unit }) {
                     credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
-                    },
+                    }
                 });
 
                 if (!response.ok) {

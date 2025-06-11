@@ -47,9 +47,6 @@ public class BookingService {
         // Sacamos la unidad
         Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("createBooking - Unidad no encontrada."));
 
-        // Sacamos al creador
-        User creator = userRepository.findById(request.getCreatorId()).orElseThrow(() -> new IllegalArgumentException("createBooking - Usuario Creador no encontrado."));
-
         // Sacamos las noches
         int nights = (int) ChronoUnit.DAYS.between(request.getCheckIn(), request.getCheckOut());
 
@@ -58,7 +55,7 @@ public class BookingService {
             throw new IllegalArgumentException("La fecha de salida debe ser posterior a la de entrada.");
         }
 
-        Log.write(request.getCreatorId(), "BookingService", "Se procede a crear la reserva.");
+        Log.write(unit.getUser().getId(), "BookingService", "Se procede a crear la reserva.");
 
         Booking bk = Booking.builder()
                 // Relacion
@@ -83,19 +80,19 @@ public class BookingService {
 
         // Crear el cliente principal
         // Primero buscar si el cliente existe, por número de documento y luego por email
-        Log.write(request.getCreatorId(), "BookingService", "Buscando el cliente por número de documento.");
+        Log.write(unit.getUser().getId(), "BookingService", "Buscando el cliente por número de documento.");
         Client c = clientRepository.findByDocNumber(request.getDocNumber());
 
         // Si no lo encuentra por número de documento
         if (c == null) {
-            Log.write(request.getCreatorId(), "BookingService", "Cliente no encontrado. Buscando cliente por email.");
+            Log.write(unit.getUser().getId(), "BookingService", "Cliente no encontrado. Buscando cliente por email.");
             c = clientRepository.findByEmail(request.getEmail());
         }
 
         // Si aún así es nulo, lo creamos
         if (c == null) {
 
-            Log.write(request.getCreatorId(), "BookingService", "No encontrado. Creando cliente.");
+            Log.write(unit.getUser().getId(), "BookingService", "No encontrado. Creando cliente.");
 
             // Género
             Gender gender;
@@ -151,9 +148,7 @@ public class BookingService {
                     .postalCode(request.getPostalCode())
                     .email(request.getEmail())
                     .phone(request.getPhone())
-                    .createdBy(creator)
                     .createdAt(LocalDateTime.now())
-                    .updatedBy(creator)
                     .updatedAt(LocalDateTime.now())
                     .isActive(true)
                     .build();
@@ -172,7 +167,7 @@ public class BookingService {
                 .notes(null)
                 .build();
 
-        Log.write(request.getCreatorId(), "BookingService", "Relacionando Reserva con Cliente principal.");
+        Log.write(unit.getUser().getId(), "BookingService", "Relacionando Reserva con Cliente principal.");
         bookingClientRepository.save(bc);
 
        String response;

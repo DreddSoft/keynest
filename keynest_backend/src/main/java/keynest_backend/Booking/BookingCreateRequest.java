@@ -17,23 +17,22 @@ public class BookingCreateRequest {
     Integer unitId;
     LocalDate checkIn;
     LocalDate checkOut;
-    double totalPrice;
-    int numGuests;
+    Double totalPrice;
+    Integer numGuests;
     String notes;
-    Integer creatorId;
 
     //* Datos del cliente
     String name;
     String lastname;
-    int genderPick;
+    Integer genderPick;
     LocalDate birthday;
     String nationality;
-    int docTypePick;
+    Integer docTypePick;
     String docNumber;
     String docSupportNumber;
     LocalDate docIssueDate;
     LocalDate docExpirationDate;
-    int localityId;
+    Integer localityId;
     String address;
     String postalCode;
     String email;

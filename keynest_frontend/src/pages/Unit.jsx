@@ -5,6 +5,7 @@ import { Loader2, ArrowLeftToLine, BadgeInfo, Settings, BookUser, UserRound, Rec
 import BookingList from "@/subpages/BookingList.jsx";
 import UnitSettings from "@/subpages/UnitSettings.jsx";
 import UnitInfo from "@/subpages/UnitInfo.jsx";
+import UnitBilling from "@/subpages/UnitBilling";
 
 function Unit() {
     const { unitId } = useParams();
@@ -174,9 +175,7 @@ function Unit() {
                 </div>
             )}
             {step === 5 && (
-                <div>
-                    Esto es Facturación
-                </div>
+                <UnitBilling unit={unit} />
             )}
 
             {step === 6 && (

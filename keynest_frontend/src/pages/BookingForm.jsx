@@ -2,14 +2,19 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { DateRange } from "react-date-range";
 import { differenceInCalendarDays, format } from "date-fns";
+import { Loader2 } from "lucide-react";
+import Button3 from "@/components/Button3";
+import Button3Gray from "@/components/Button3Gray";
 
 function BookingForm() {
   const { unitId } = useParams();
   const [step, setStep] = useState(1);
   const [unit, setUnit] = useState();
   const [error, setError] = useState();
-  const [checkIn, setCheckIn] = useState();
-  const [checkOut, setCheckOut] = useState();
+  const [loading, setLoading] = useState(false);
+  const [cont, setCont] = useState(false);
+
+
   // Rango de fechas
   const [range, setRange] = useState([
     {
@@ -25,29 +30,43 @@ function BookingForm() {
       : 0;
 
   // Datos de reserva
+  const [totalPrice, setTotalPrice] = useState(null);
   const [numGuests, setNumGuests] = useState(1);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState(null);
 
   // Datos del cliente
-  const [name, setName] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [gender, setGender] = useState("");
-  const [birthday, setBirthday] = useState("");
-  const [nationality, setNationality] = useState("");
-  const [docType, setDocType] = useState("");
-  const [docNumber, setDocNumber] = useState("");
-  const [docSupportNumber, setDocSupportNumber] = useState("");
-  const [docIssueDate, setDocIssueDate] = useState("");
-  const [docExpirationDate, setDocExpirationDate] = useState("");
-  const [locality, setLocality] = useState("");
-  const [address, setAddress] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState(null);
+  const [lastname, setLastname] = useState(null);
+  const [gender, setGender] = useState(null);
+  const [birthday, setBirthday] = useState(null);
+  const [nationality, setNationality] = useState(null);
+  const [docType, setDocType] = useState(null);
+  const [docNumber, setDocNumber] = useState(null);
+  const [docSupportNumber, setDocSupportNumber] = useState(null);
+  const [docIssueDate, setDocIssueDate] = useState(null);
+  const [docExpirationDate, setDocExpirationDate] = useState(null);
+  const [localityId, setLocalityId] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [postalCode, setPostalCode] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [phone, setPhone] = useState(null);
+
+  // Para El tema direcciones, localidades, paises, provincias
+  const [countries, setCountries] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+  const [localities, setLocalities] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [provinceEnabled, setProvinceEnabled] = useState(false);
+  const [localityEnabled, setLocalityEnabled] = useState(false);
 
   // Del check availability
   const [availabilityError, setAvailabilityError] = useState(null);
-const [totalPrice, setTotalPrice] = useState(0);
+
+  // CONSTANTES INMUTABLES
+  const URL_COUNTRIES = `http://localhost:8080/api/address/countries`;
+  const URL_CREATE_BOOKING = `http://localhost:8080/api/address/countries`;
+
 
   useEffect(() => {
     const fetchUnit = async () => {
@@ -71,15 +90,82 @@ const [totalPrice, setTotalPrice] = useState(0);
       }
     };
 
+    const fetchCountries = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(URL_COUNTRIES, {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (!response.ok) throw new Error("Error al capturar los países.");
+        const data = await response.json();
+        setCountries(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchUnit();
+    fetchCountries();
   }, [unitId]);
+
+  const handleCountryChange = async (countryId) => {
+    setSelectedCountry(countryId);
+    setProvinces([]);
+    setLocalities([]);
+    setProvinceEnabled(false);
+    setLocalityEnabled(false);
+    if (!countryId) return;
+    const URL = `http://localhost:8080/api/address/provinces/${countryId}`;
+    setLoading(true);
+    try {
+      const res = await fetch(URL, { method: "GET", credentials: "include" });
+      if (!res.ok) throw new Error("Error al capturar las provincias");
+      const data = await res.json();
+      setProvinces(data);
+      setProvinceEnabled(true);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProvinceChange = async (provinceId) => {
+    setSelectedProvince(provinceId);
+    setLocalities([]);
+    setLocalityEnabled(false);
+    if (!provinceId) return;
+    const URL = `http://localhost:8080/api/address/localities/${provinceId}`;
+    setLoading(true);
+    try {
+      const res = await fetch(URL, { method: "GET", credentials: "include" });
+      if (!res.ok) throw new Error("Error al capturar las localidades");
+      const data = await res.json();
+      setLocalities(data);
+      setLocalityEnabled(true);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   function checkOccupancy(value) {
     // Si no tengo la unidad atras
     if (!unit) return;
+
+    setLoading(true);
+
     // Sacamos el minOccupancy y maxOccupancy del unit
     const { minOccupancy, maxOccupancy } = unit;
-    
+
     // Comprobamos y alerta
     if (value < minOccupancy || value > maxOccupancy) {
       alert("El número de huéspedes supera los límites del alojamiento.");
@@ -87,6 +173,8 @@ const [totalPrice, setTotalPrice] = useState(0);
     } else {
       setNumGuests(value);
     }
+
+    setLoading(false);
   }
 
 
@@ -95,13 +183,15 @@ const [totalPrice, setTotalPrice] = useState(0);
 
     const URL_CHECK_AVAILABILITY = `http://localhost:8080/api/availability/check`;
 
+
+
     // Esta funcion tiene que capturar la disponibilidad entre varios dias
     try {
       const response = await fetch(URL_CHECK_AVAILABILITY, {
         method: "POST",
-        credentials:"include",
+        credentials: "include",
         headers: {
-          'Content-Type':'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ unitId: parseInt(unitId), checkIn: startDate, checkOut: endDate })
       });
@@ -122,25 +212,96 @@ const [totalPrice, setTotalPrice] = useState(0);
         return;
       }
 
-      // 2. Si si hay dispo, calcular el precio sin contar la ultima noche
+      // 2. Si las noches es menos que las estancia minima del primer dia
+      if (nights < data[0].minStay) {
+        setAvailabilityError("Lo sentimos, la estancia mínima para las fechas seleccionadas es de: " + data[0].minStay);
+        setTotalPrice(0);
+        return;
+      }
+
+      // 3. Si si hay dispo, calcular el precio sin contar la ultima noche
       const total = data.slice(0, -1).reduce((sum, d) => sum + d.price, 0);
       setAvailabilityError(null);
       setTotalPrice(total);
 
-      // 3. Establecemos el checkIn, checkOut
+      // 4. Establecemos el checkIn, checkOut
       setCheckIn(startDate);
       setCheckOut(endDate);
 
       // 4. Pasamos al paso 2
-      setStep(2);
+      setCont(true);
 
     } catch (err) {
       console.error("Error: " + err.message);
       setAvailabilityError("Error al comprobar la disponibilidad.");
       setTotalPrice(0);
+      setCont(false);
+    } finally {
+      setLoading(false);
     }
-    
+  }
 
+  const confirmBooking = async () => {
+
+    resetMessages();
+
+    // Confirm
+    let ok = confirm("¿Desea confirmar la reserva?");
+
+    if (!ok) {
+      setStep(1);
+      return;
+    }
+
+    // Cargando
+    setLoading(true);
+
+    // Fetch
+    try {
+
+      const response = await fetch(URL_UNIT, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    name,
+                    rooms,
+                    bathrooms,
+                    kitchen,
+                    minOccupancy,
+                    maxOccupancy,
+                    areaM2,
+                    description,
+                    type,
+                    localityId,
+                    address,
+                    postalCode,
+                    creatorId: adminId
+                })
+            });
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+
+
+  }
+
+  function changeStep(step) {
+
+    setLoading(true);
+    setStep(step);
+    setLoading(false);
+
+  }
+
+  function resetMessages() {
+
+    setError(false);
+    setAvailabilityError(false);
     
   }
 
@@ -150,6 +311,11 @@ const [totalPrice, setTotalPrice] = useState(0);
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
+      {loading && (
+        <div className="flex justify-center items-center">
+          <Loader2 className="animate-spin w-6 h-6 text-blue-800" />
+        </div>
+      )}
       {step === 1 && (
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Paso 1: Selecciona las fechas</h2>
@@ -171,21 +337,32 @@ const [totalPrice, setTotalPrice] = useState(0);
 
           {availabilityError && (
             <div className="text-center p-4">
-              <p className="text-sm text-red-600 font-bold"></p>
+              <p className="text-sm text-red-600 font-bold">{availabilityError}</p>
             </div>
           )}
 
-          <div className="text-sm text-gray-900">
-              <p>Precio total estimado: <strong>{totalPrice.toFixed(2)} &eur;</strong></p>
-            </div>
+          <div className="text-sm text-grey-900">
+            <p>Precio total estimado: <strong className="text-red-600">{totalPrice.toFixed(2)} €</strong></p>
+          </div>
 
-          <button
-            disabled={nights <= 0}
-            onClick={() => checkAvailability(selection.startDate, selection.endDate)}
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-          >
-            Comprobar Disponibilidad
-          </button>
+          {!cont && (
+            < Button3
+              disabled={nights <= 0}
+              onClick={() => checkAvailability(selection.startDate, selection.endDate)}
+              children={"Comprobar Disponibilidad"}
+            />
+          )}
+
+          {cont && (
+            < Button3
+              onClick={() => {
+                changeStep(2);
+                setCont(false);
+              }}
+              children={"Continuar"}
+            />
+          )}
+
         </div>
       )}
 
@@ -215,20 +392,16 @@ const [totalPrice, setTotalPrice] = useState(0);
           </label>
 
           <div className="flex justify-between">
-            <button
+
+            <Button3Gray
               onClick={() => setStep(1)}
-              type="button"
-              className="px-4 py-2 bg-gray-300 rounded border-2 border-transparent hover:cursor-pointer hover:bg-gray-400 hover:border-gray-900 transition duration-200"
-            >
-              Volver
-            </button>
-            <button
-              type="button"
+              children={"Volver"}
+            />
+
+            <Button3
               onClick={() => setStep(3)}
-              className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer border-2 border-transparent hover:bg-blue-500 hover:border-blue-900 transition duration-200"
-            >
-              Continuar
-            </button>
+              children={"Continuar"}
+            />
           </div>
         </form>
       )}
@@ -238,70 +411,244 @@ const [totalPrice, setTotalPrice] = useState(0);
           <h2 className="text-lg font-semibold">Paso 3: Datos del cliente</h2>
 
           <div className="grid grid-cols-1 gap-3">
-            <input type="text" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} className="border rounded px-2 py-1" required />
-            <input type="text" placeholder="Apellidos" value={lastname} onChange={(e) => setLastname(e.target.value)} className="border rounded px-2 py-1" required />
-            <input type="text" placeholder="Género" value={gender} onChange={(e) => setGender(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="date" placeholder="Fecha de nacimiento" value={birthday} onChange={(e) => setBirthday(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="text" placeholder="Localidad" value={locality} onChange={(e) => setLocality(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="text" placeholder="Dirección" value={address} onChange={(e) => setAddress(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="text" placeholder="Código postal" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} className="border rounded px-2 py-1" required />
-            <input type="tel" placeholder="Teléfono" value={phone} onChange={(e) => setPhone(e.target.value)} className="border rounded px-2 py-1" required />
+            <label className="flex flex-col text-sm text-gray-700">
+              Nombre:
+              <input
+                value={name}
+                type="text"
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                required
+              />
+            </label>
+
+            <label className="flex flex-col text-sm text-gray-700">
+              Apellidos:
+              <input
+                value={lastname}
+                type="text"
+                onChange={(e) => setLastname(e.target.value)}
+                className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                required
+              />
+            </label>
+            <label className="flex flex-col text-sm text-gray-700">
+              Género:
+              <select
+                value={gender}
+                onChange={(e) => setGender(parseInt(e.target.value))}
+                className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                required
+
+              >
+                <option value="" disabled selected>Selecciona un género...</option>
+                <option value="0">MASCULINO</option>
+                <option value="1">FEMENINO</option>
+                <option value="2">OTROS</option>
+                <option value="3">SIN ESPECIFICAR</option>
+              </select>
+            </label>
+            <label className="flex flex-col text-sm text-gray-700">
+              Fecha de Nacimiento:
+              <input
+                value={birthday}
+                type="date"
+                onChange={(e) => setBirthday(e.target.value)}
+                className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                required
+              />
+            </label>
+
+            <div>
+              <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Dirección</h4>
+              <div className="">
+                <div className="grid grid-cols-1 gap-4">
+                  <label className="flex flex-col text-sm text-gray-700">
+                    País:
+                    <select
+                      value={selectedCountry}
+                      onChange={(e) => {
+                        handleCountryChange(e.target.value);
+                        setNationality(selectedCountry.name);
+                      }}
+                      className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                      id="iptCountry"
+                    >
+                      <option value="" disabled>Selecciona un país...</option>
+                      {countries.map((country) => (
+                        <option key={country.id} value={country.id}>
+                          {country.initials} - {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="flex flex-col text-sm text-gray-700">
+                    Provincia:
+                    <select
+                      value={selectedProvince}
+                      onChange={(e) => handleProvinceChange(e.target.value)}
+                      disabled={!provinceEnabled}
+                      className={`mt-1 p-2 border rounded-md bg-white text-gray-800 ${provinceEnabled ? "border-gray-300" : "border-gray-200 text-gray-400"
+                        }`}
+                      id="iptProvince"
+                      required
+                    >
+                      <option value="" disabled>Selecciona una provincia...</option>
+                      {provinces.map((province) => (
+                        <option key={province.id} value={province.id}>
+                          {province.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="flex flex-col text-sm text-gray-700">
+                    Localidad:
+                    <select
+                      disabled={!localityEnabled}
+                      className={`mt-1 p-2 border rounded-md bg-white text-gray-800 ${localityEnabled ? "border-gray-300" : "border-gray-200 text-gray-400"
+                        }`}
+                      id="iptLocality"
+                      onChange={(e) => setLocalityId(parseInt(e.target.value))}
+                    >
+                      <option value="" disabled>Selecciona una localidad...</option>
+                      {localities.map((locality) => (
+                        <option key={locality.id} value={locality.id}>
+                          {locality.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                </div>
+                <div
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <label className="flex flex-col text-sm text-gray-700">
+                    Dirección:
+                    <input
+                      type="text"
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                      required
+                    />
+                  </label>
+                  <label className="flex flex-col text-sm text-gray-700">
+                    Código Postal:
+                    <input
+                      type="text"
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                      required
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              {/* Documento */}
+              <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Documento</h4>
+
+              <label className="flex flex-col text-sm text-gray-700">
+                Tipo:
+                <select
+                  value={docType}
+                  onChange={(e) => setDocType(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                  required
+
+                >
+                  <option value="" disabled selected>Selecciona el tipo...</option>
+                  <option value="0">DNI</option>
+                  <option value="1">NIE</option>
+                  <option value="2">PASAPORTE</option>
+
+                </select>
+              </label>
+              <label className="flex flex-col text-sm text-gray-700">
+                Número:
+                <input
+                  value={docNumber}
+                  type="text"
+                  onChange={(e) => setDocNumber(e.target.value)}
+                  className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                  required
+                />
+              </label>
+              <label className="flex flex-col text-sm text-gray-700">
+                Número de Soporte:
+                <input
+                  value={docSupportNumber}
+                  type="text"
+                  onChange={(e) => setDocSupportNumber(e.target.value)}
+                  className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                  required
+                />
+              </label>
+              <label className="flex flex-col text-sm text-gray-700">
+                Fecha de expedición:
+                <input
+                  value={docIssueDate}
+                  type="date"
+                  onChange={(e) => setDocIssueDate(e.target.value)}
+                  className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                  required
+                />
+              </label>
+              <label className="flex flex-col text-sm text-gray-700">
+                Fecha de expiración:
+                <input
+                  value={docExpirationDate}
+                  type="date"
+                  onChange={(e) => setDocExpirationDate(e.target.value)}
+                  className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                  required
+                />
+              </label>
+            </div>
+            <div>
+              {/* otros datos */}
+              <h4 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4 text-gray-800">Contacto</h4>
+
+              <label className="flex flex-col text-sm text-gray-700">
+                Email:
+                <input
+                  value={email}
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                  required
+                />
+              </label>
+              <label className="flex flex-col text-sm text-gray-700">
+                Telf.:
+                <input
+                  value={phone}
+                  type="text"
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
+                  required
+                />
+              </label>
+
+            </div>
+
           </div>
 
           <div className="flex justify-between">
-            <button
+            <Button3Gray
               onClick={() => setStep(1)}
-              type="button"
-              className="px-4 py-2 bg-gray-300 rounded border-2 border-transparent hover:cursor-pointer hover:bg-gray-400 hover:border-gray-900 transition duration-200"
-            >
-              Volver
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep(4)}
-              className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer border-2 border-transparent hover:bg-blue-500 hover:border-blue-900 transition duration-200"
-            >
-              Continuar
-            </button>
+              children={"Volver"}
+            />
+            <Button3
+              onClick={() => setStep()}
+              children={"Confirmar Reserva"}
+            />
           </div>
         </form>
       )}
-
-      {step === 4 && (
-
-        <form className="space-y-4">
-          <h2 className="text-lg font-semibold">Paso 4: Datos del documento del huesped principal</h2>
-
-          <div className="grid grid-cols-1 gap-3">
-            <input type="text" placeholder="Nacionalidad" value={nationality} onChange={(e) => setNationality(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="text" placeholder="Tipo de documento" value={docType} onChange={(e) => setDocType(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="text" placeholder="Número de documento" value={docNumber} onChange={(e) => setDocNumber(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="text" placeholder="Número de soporte" value={docSupportNumber} onChange={(e) => setDocSupportNumber(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="date" placeholder="Fecha de expedición" value={docIssueDate} onChange={(e) => setDocIssueDate(e.target.value)} className="border rounded px-2 py-1" />
-            <input type="date" placeholder="Fecha de expiración" value={docExpirationDate} onChange={(e) => setDocExpirationDate(e.target.value)} className="border rounded px-2 py-1" />
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <button
-              onClick={() => setStep(2)}
-              type="button"
-              className="px-4 py-2 bg-gray-300 rounded border-2 border-transparent hover:cursor-pointer hover:bg-gray-400 hover:border-gray-900 transition duration-200"
-            >
-              Volver
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded border-2 border-transparent hover:bg-green-500 hover:border-green-900 transition duration-200 hover:cursor-pointer" 
-            
-            >
-              Confirmar reserva
-            </button>
-          </div>
-        </form>
-      )
-
-      }
     </div>
   );
 }
