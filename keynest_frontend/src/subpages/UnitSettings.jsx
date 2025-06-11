@@ -215,6 +215,14 @@ function UnitSettings({ unit }) {
                 </div>
             )}
 
+            {message && (
+                <div className="flex justify-baseline items-center gap-2 border border-green-500 bg-green-50 text-green-700 rounded-md p-3 mt-2">
+                    <Check className="mt-0.5" />
+                    <p className="text-sm text-center">{message}</p>
+                </div>
+
+            )}
+
             <h4>Reserva para hoy:</h4>
             {/* Aqui la data de si hay que hacer checkIn */}
             {booking && (

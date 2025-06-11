@@ -5,15 +5,15 @@ import keynest_backend.Model.Booking;
 import keynest_backend.Model.BookingClient;
 import keynest_backend.Model.Client;
 import keynest_backend.Model.Invoice;
-import keynest_backend.Repositories.BookingClientRepository;
-import keynest_backend.Repositories.BookingRepository;
-import keynest_backend.Repositories.InvoiceRepository;
-import keynest_backend.Repositories.UserRepository;
+import keynest_backend.Repositories.*;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,8 @@ public class InvoiceService {
     private final BookingRepository bookingRepository;
     private final InvoicePdfService invoicePdfService;
     private final BookingClientRepository bookingClientRepository;
+    private final UnitRepository unitRepository;
+    private final UserRepository userRepository;
 
 
     /**
@@ -33,7 +35,7 @@ public class InvoiceService {
      * @return InvoicePdfResponse - un objeto de la clase que contiene la url del PDF de la factura
      * @throws Exception
      */
-    public InvoicePDFUrlResponse createInvoice (InvoiceCreateRequest request) throws Exception {
+    public InvoicePDFUrlResponse createInvoice(InvoiceCreateRequest request) throws Exception {
 
         // Primero comprobar que existe la reserva
         Booking booking = bookingRepository.findById(request.getBookingId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la reserva."));
@@ -88,7 +90,6 @@ public class InvoiceService {
                 .build();
 
 
-
         Log.write(user.getId(), "InvoiceService | createInvoice", "Se crea la factura con número: " + invoice.getInvoiceNumber() + ".");
 
 
@@ -102,6 +103,70 @@ public class InvoiceService {
         invoiceRepository.save(invoice);
 
         return InvoicePDFUrlResponse.builder().url(urlPdfInvoice).build();
+
+    }
+
+    /**
+     * Método de servicio que recupera una lista de facturas asociadas a una unidad específica y las transforma en DTOs.
+     * Verifica que tanto la unidad como el usuario existen antes de proceder.
+     *
+     * @param unitId ID del unidad de alojamiento.
+     * @param userId ID del usuario propietario.
+     * @return Lista de objetos InvoiceDTO correspondientes a la unidad.
+     * @throws IllegalArgumentException si el usuario o la unidad no existen.
+     */
+    public List<InvoiceDTO> getInvoicesByUnit(Integer unitId, Integer userId) {
+
+        // Verificamos que la unidad y el usuario existen
+        if (!unitRepository.existsById(unitId) || !userRepository.existsById(userId)) {
+            Log.write(userId, "InvoiceService | getInvoicesByUnit",
+                    "No existen la unidad o el usuario informados.");
+            throw new IllegalArgumentException("No existen la unidad o el usuario informados.");
+        }
+
+        // Se obtiene la lista de facturas para la unidad
+        List<Invoice> invoices = invoiceRepository.findByUnitId(unitId);
+
+        // Si no hay facturas, se registra en el log y se devuelve una lista vacía
+        if (invoices.isEmpty()) {
+            Log.write(userId, "InvoiceService | getInvoicesByUnit",
+                    "No existen facturas para esta unidad: " + unitId);
+            return Collections.emptyList();
+        }
+
+        // Se transforma cada entidad Invoice a su DTO correspondiente
+        List<InvoiceDTO> invoiceDTOS = new ArrayList<>();
+
+        for (Invoice invoice : invoices) {
+            // Se obtiene el cliente principal de la reserva asociada a la factura
+            Client client = bookingClientRepository
+                    .findBookingMainClientByBooking(invoice.getBooking())
+                    .getClient();
+
+            // Se construye el DTO con los datos requeridos
+            InvoiceDTO dto = InvoiceDTO.builder()
+                    .id(invoice.getId())
+                    .bookingId(invoice.getBooking().getId())
+                    .receptorFullName(client.getName() + " " + client.getLastname())
+                    .receptorDocNumber(client.getDocNumber())
+                    .invoiceNumber(invoice.getInvoiceNumber())
+                    .issueDate(invoice.getIssueDate())
+                    .status(invoice.getStatus().name())
+                    .taxBase(invoice.getTaxBase())
+                    .taxType(invoice.getTaxType())
+                    .taxRate(invoice.getTaxRate())
+                    .taxAmount(invoice.getTaxAmount())
+                    .total(invoice.getTotal())
+                    .pdfUrl(invoice.getPdfUrl())
+                    .build();
+
+            invoiceDTOS.add(dto);
+        }
+
+        // Log final y retorno de la lista
+        Log.write(userId, "InvoiceService | getInvoicesByUnit",
+                "Se obtiene lista de facturas para la unidad: " + unitId);
+        return invoiceDTOS;
 
     }
 

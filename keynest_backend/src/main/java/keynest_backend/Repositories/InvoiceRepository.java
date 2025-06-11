@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
@@ -35,6 +36,13 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
                 WHERE i.series = keynest_backend.Invoice.Series.R
             """)
     Integer findMaxSeriesNumberR();
+
+    @Query("""
+                SELECT i FROM Invoice i
+                WHERE i.booking.unit.id = :unitId
+                ORDER BY i.issueDate
+            """)
+    List<Invoice> findByUnitId(@Param("unitId") Integer unitId);
 
 
 }
