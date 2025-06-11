@@ -37,7 +37,7 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
             WHERE a.unit = :unit
             AND a.dateAvailable BETWEEN :startDate AND :endDate
             """)
-    void brutDeleteAvailabilityPerUnit (
+    void brutDeleteAvailabilityPerUnit(
             @Param("unit") Unit unit,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
@@ -47,7 +47,15 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
     LocalDate findLastAvailableDateByUnitId(@Param("unitId") Integer unitId);
 
 
-
+    @Query("""
+                SELECT a FROM Availability a 
+                WHERE a.unit.id = :unitId 
+                  AND a.dateAvailable = :date
+            """)
+    Optional<Availability> findByUnitIdAndDate(
+            @Param("unitId") Integer unitId,
+            @Param("date") LocalDate date
+    );
 
 
 }

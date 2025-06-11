@@ -28,6 +28,7 @@ public class BookingService {
     private final ClientRepository clientRepository;
     private final LocalityRepository localityRepository;
     private final InvoiceRepository invoiceRepository;
+    private final AvailabilityRepository availabilityRepository;
 
 
 
@@ -77,6 +78,22 @@ public class BookingService {
 
         // Guardamos las reserva
         bookingRepository.save(bk);
+
+        // Ajustar la disponibilidad desde el checkIn hasta el checkOut
+        for (LocalDate start = request.getCheckIn(); start.isBefore(request.getCheckOut()); start = start.plusDays(1)) {
+
+            LocalDate finalStart = start;
+
+            Availability a = availabilityRepository.findByUnitIdAndDate(unit.getId(), start).orElseThrow(() -> new IllegalArgumentException(
+                    "No existe la disponibilidad para la undiad: " + unit.getId() + " en la fecha: " + finalStart));
+
+            // Marcamos como no disponible
+            a.setAvailable(false);
+
+            // Guardamos
+            availabilityRepository.save(a);
+
+        }
 
         // Crear el cliente principal
         // Primero buscar si el cliente existe, por número de documento y luego por email
@@ -137,7 +154,7 @@ public class BookingService {
                     .lastname(request.getLastname())
                     .gender(gender)
                     .birthday(request.getBirthday())
-                    .nationality(request.getNationality())
+                    .nationality(locality.getProvince().getCountry().getName())
                     .docType(docType)
                     .docNumber(request.getDocNumber())
                     .docSupportNumber(request.getDocSupportNumber())
@@ -149,7 +166,9 @@ public class BookingService {
                     .email(request.getEmail())
                     .phone(request.getPhone())
                     .createdAt(LocalDateTime.now())
+                    .createdBy(unit.getUser())
                     .updatedAt(LocalDateTime.now())
+                    .updatedBy(unit.getUser())
                     .isActive(true)
                     .build();
 
@@ -164,7 +183,7 @@ public class BookingService {
                 .client(c)
                 .isMainGuest(true)
                 .registeredInPolice(false)
-                .notes(null)
+                .notes(c.getNotes())
                 .build();
 
         Log.write(unit.getUser().getId(), "BookingService", "Relacionando Reserva con Cliente principal.");

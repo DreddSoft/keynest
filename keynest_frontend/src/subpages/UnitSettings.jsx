@@ -55,6 +55,8 @@ function UnitSettings({ unit }) {
                 }
 
                 const text = await response.text();
+
+                console.log(text);
                 if (text) {
                     const data = JSON.parse(text);
                     setBooking(data);

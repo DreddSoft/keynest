@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { DateRange } from "react-date-range";
 import { differenceInCalendarDays, format } from "date-fns";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 import Button3 from "@/components/Button3";
 import Button3Gray from "@/components/Button3Gray";
+
 
 function BookingForm() {
   const { unitId } = useParams();
@@ -13,6 +14,8 @@ function BookingForm() {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
   const [cont, setCont] = useState(false);
+  const [message, setMessage] = useState(null);
+  const navigate = useNavigate();
 
 
   // Rango de fechas
@@ -30,7 +33,7 @@ function BookingForm() {
       : 0;
 
   // Datos de reserva
-  const [totalPrice, setTotalPrice] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0);
   const [numGuests, setNumGuests] = useState(1);
   const [notes, setNotes] = useState(null);
 
@@ -65,7 +68,7 @@ function BookingForm() {
 
   // CONSTANTES INMUTABLES
   const URL_COUNTRIES = `http://localhost:8080/api/address/countries`;
-  const URL_CREATE_BOOKING = `http://localhost:8080/api/address/countries`;
+  const URL_CREATE_BOOKING = `http://localhost:8080/api/booking`;
 
 
   useEffect(() => {
@@ -224,10 +227,6 @@ function BookingForm() {
       setAvailabilityError(null);
       setTotalPrice(total);
 
-      // 4. Establecemos el checkIn, checkOut
-      setCheckIn(startDate);
-      setCheckOut(endDate);
-
       // 4. Pasamos al paso 2
       setCont(true);
 
@@ -259,27 +258,42 @@ function BookingForm() {
     // Fetch
     try {
 
-      const response = await fetch(URL_UNIT, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId,
-                    name,
-                    rooms,
-                    bathrooms,
-                    kitchen,
-                    minOccupancy,
-                    maxOccupancy,
-                    areaM2,
-                    description,
-                    type,
-                    localityId,
-                    address,
-                    postalCode,
-                    creatorId: adminId
-                })
-            });
+      const response = await fetch(URL_CREATE_BOOKING, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unitId,
+          checkIn: selection.startDate,
+          checkOut: selection.endDate,
+          totalPrice,
+          numGuests,
+          notes,
+          name,
+          lastname,
+          genderPick: gender,
+          birthday,
+          nationality,
+          docTypePick: docType,
+          docNumber,
+          docSupportNumber,
+          docIssueDate,
+          docExpirationDate,
+          localityId,
+          address,
+          postalCode,
+          email,
+          phone
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Algo ha ocurrido. No se ha podido crear la reserva.");
+      }
+
+      const text = await response.text();
+
+      setMessage(text);
 
     } catch (err) {
       setError(err.message);
@@ -302,7 +316,8 @@ function BookingForm() {
 
     setError(false);
     setAvailabilityError(false);
-    
+    setMessage(false);
+
   }
 
   if (error) {
@@ -319,6 +334,7 @@ function BookingForm() {
       {step === 1 && (
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Paso 1: Selecciona las fechas</h2>
+
           <DateRange
             editableDateInputs={true}
             onChange={(item) => setRange([item.selection])}
@@ -345,12 +361,27 @@ function BookingForm() {
             <p>Precio total estimado: <strong className="text-red-600">{totalPrice.toFixed(2)} €</strong></p>
           </div>
 
+          {message && (
+            <div className="flex justify-baseline items-center gap-2 border border-green-500 bg-green-50 text-green-700 rounded-md p-3 mt-2">
+              <Check className="mt-0.5" />
+              <p className="text-sm text-center">{message}</p>
+            </div>
+
+          )}
+
           {!cont && (
-            < Button3
-              disabled={nights <= 0}
-              onClick={() => checkAvailability(selection.startDate, selection.endDate)}
-              children={"Comprobar Disponibilidad"}
-            />
+            <div className="flex flex-row justify-center items-center gap-4">
+              <Button3Gray
+                onClick={() => navigate(`/unit/${unitId}`)}
+                children={"Volver"}
+              />
+              < Button3
+                disabled={nights <= 0}
+                onClick={() => checkAvailability(selection.startDate, selection.endDate)}
+                children={"Comprobar Disponibilidad"}
+              />
+
+            </div>
           )}
 
           {cont && (
@@ -636,14 +667,13 @@ function BookingForm() {
             </div>
 
           </div>
-
           <div className="flex justify-between">
             <Button3Gray
               onClick={() => setStep(1)}
               children={"Volver"}
             />
             <Button3
-              onClick={() => setStep()}
+              onClick={confirmBooking}
               children={"Confirmar Reserva"}
             />
           </div>
