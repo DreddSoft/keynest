@@ -114,6 +114,7 @@ public class AuthService {
                 .updatedAt(LocalDateTime.now()) // Por defecto la fecha de actualizacion es ahora
                 .lastLogin(null)
                 .isActive(true)
+                .dniNif(request.getDniNif())
                 .build();
 
         // Guardamos el usuario en la base de datos usando Hibernate y la interfaz UserRepository

@@ -72,6 +72,10 @@ public class User implements UserDetails {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
+    // Añadido extra
+    @Column(name = "dni_nif")
+    private String dniNif;
+
 
     // La interfaz nos obliga a implementar estos metodos, pero no los vamos a usar, porque la validacion la hacemos con JWT
     @Override

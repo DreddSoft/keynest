@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { FaArrowRightToBracket, FaBed, FaInfo, FaChartLine, FaClipboardUser, FaUserLarge, FaCashRegister, FaRegEnvelope } from "react-icons/fa6";
 import ContactForm from "@/components/ContactForm.jsx";
-import { Loader2 } from "lucide-react";
-import PersonalizedButton from "../components/PersonalizedButton.jsx";
+import { Loader2, ArrowLeftToLine, BadgeInfo, Settings, BookUser, UserRound, Receipt, Mail, Bed } from "lucide-react";
 import BookingList from "@/subpages/BookingList.jsx";
 import UnitSettings from "@/subpages/UnitSettings.jsx";
 import UnitInfo from "@/subpages/UnitInfo.jsx";
@@ -13,7 +11,7 @@ function Unit() {
     const [unit, setUnit] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
     const [loading, setLoading] = useState(true);
 
     const URL = `http://localhost:8080/api/unit/${unitId}`;
@@ -79,7 +77,7 @@ function Unit() {
                         onClick={() => navigate("/dashboard")}
                         className="bg-gray-800 text-white px-4 py-2 sm:w-auto w-full rounded border-b-2 border-transparent hover:bg-gray-700 transition hover:cursor-pointer hover:border-b-2 hover:border-b-white flex flex-row justify-center items-center gap-1"
                     >
-                        <FaArrowRightToBracket /> Volver
+                        <ArrowLeftToLine size={20} /> Volver
                     </button>
                     <button
                         className={step === 1
@@ -88,7 +86,7 @@ function Unit() {
                         }
                         onClick={() => setStep(1)}
                     >
-                        <FaInfo /> Info
+                        <BadgeInfo size={20}/> Info
                     </button>
                     <button
                         className={step === 2
@@ -97,7 +95,7 @@ function Unit() {
                         }
                         onClick={() => setStep(2)}
                     >
-                        <FaChartLine /> Settings
+                        <Settings size={20} /> Settings
                     </button>
                     <button
                         className={step === 3
@@ -106,7 +104,7 @@ function Unit() {
                         }
                         onClick={() => setStep(3)}
                     >
-                        <FaClipboardUser /> Reservas
+                        <BookUser size={20}/> Reservas
                     </button>
                     <button
                         className={step === 4
@@ -115,7 +113,7 @@ function Unit() {
                         }
                         onClick={() => setStep(4)}
                     >
-                        <FaUserLarge /> Clientes
+                        <UserRound size={20} /> Clientes
                     </button>
                     <button
                         className={step === 5
@@ -124,7 +122,7 @@ function Unit() {
                         }
                         onClick={() => setStep(5)}
                     >
-                        <FaCashRegister /> Facturación
+                        <Receipt size={20} /> Facturación
                     </button>
                     <button
                         className={step === 6
@@ -133,13 +131,13 @@ function Unit() {
                         }
                         onClick={() => setStep(6)}
                     >
-                        <FaRegEnvelope /> Contacto
+                        <Mail size={20} /> Contacto
                     </button>
                     <button
                         className="bg-yellow-400 text-black px-4 py-2 sm:w-auto w-full rounded-4xl border-b-2 border-transparent hover:bg-yellow-500 transition hover:cursor-pointer hover:border-b-2 flex flex-row justify-center items-center gap-1"
                         onClick={() => navigate(`/BookingForm/${unitId}`)}
                     >
-                        <FaBed /> Reservar
+                        <Bed size={20} /> Reservar
                     </button>
                 </div>
             </div>

@@ -1,6 +1,8 @@
 package keynest_backend.Model;
 
 import jakarta.persistence.*;
+import keynest_backend.Invoice.InvoiceStatus;
+import keynest_backend.Invoice.Series;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,12 +31,18 @@ public class Invoice {
     private Booking booking;
 
     //* Data
+    @Enumerated(EnumType.STRING)
+    @Column(name = "series", nullable = false)
+    private Series series;
+    @Column(name = "series_number", nullable = false)
+    private Integer seriesNumber;
     @Column(name = "invoice_number", nullable = false)
     private String invoiceNumber;
     @Column(name = "issue_date", nullable = false)
     private LocalDate issueDate;
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private InvoiceStatus status;
     @Column(name = "tax_base", nullable = false)
     private double taxBase;
     @Column(name = "tax_type", nullable = false)

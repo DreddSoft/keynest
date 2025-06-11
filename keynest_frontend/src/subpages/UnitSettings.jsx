@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PersonalizedButton from "@/components/PersonalizedButton";
 import { Lock, DollarSign, CalendarClock, Loader2, TriangleAlert, Mail, DoorOpen, DoorClosed, Receipt } from "lucide-react";
+import FloatingFormWrapper from "@/components/FloatingFormWrapper";
 
 function UnitSettings({ unit }) {
     const [loading, setLoading] = useState(false);
@@ -35,6 +36,8 @@ function UnitSettings({ unit }) {
 
             if (unit.id === null) return;
 
+            resetMessages();
+
             setLoading(true);
 
             try {
@@ -50,8 +53,14 @@ function UnitSettings({ unit }) {
                     throw new Error("Error al capturar la unidad.");
                 }
 
-                const data = await response.json();
-                setBooking(data);
+                const text = await response.text();
+                if (text) {
+                    const data = JSON.parse(text);
+                    setBooking(data);
+                } else {
+                    setBooking(null);
+                }
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -150,7 +159,7 @@ function UnitSettings({ unit }) {
 
         setError(null);
         setMessage(null);
-        
+
     }
 
 
@@ -245,8 +254,8 @@ function UnitSettings({ unit }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Bloqueo */}
-                <form className="bg-gray-50 shadow-lg rounded-lg p-4 border border-gray-200">
-                    <h3 className="font-semibold text-gray-800 mb-2">Bloquear Fechas</h3>
+
+                <FloatingFormWrapper title="Bloquear Fechas">
                     <label className="flex flex-col text-sm text-gray-700">
                         Fecha Inicio:
                         <input
@@ -272,11 +281,11 @@ function UnitSettings({ unit }) {
                     ) : (
                         <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>
                     )}
-                </form>
+                </FloatingFormWrapper>
 
                 {/* Cambiar Precio */}
-                <form className="bg-gray-50 shadow-lg rounded-lg p-4 border border-gray-200">
-                    <h3 className="font-semibold text-gray-800 mb-2">Cambiar Precio</h3>
+
+                <FloatingFormWrapper title="Cambiar Precio">
                     <label className="flex flex-col text-sm text-gray-700">
                         Fecha Inicio:
                         <input
@@ -311,11 +320,11 @@ function UnitSettings({ unit }) {
                     ) : (
                         <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>
                     )}
-                </form>
+                </FloatingFormWrapper>
+
 
                 {/* Cambiar Estancia Mínima */}
-                <form className="bg-gray-50 shadow-lg rounded-lg p-4 border border-gray-200">
-                    <h3 className="font-semibold text-gray-800 mb-2">Cambiar Estancia Mínima</h3>
+                <FloatingFormWrapper title="Cambiar Estancia Mínima">
                     <label className="flex flex-col text-sm text-gray-700">
                         Fecha Inicio:
                         <input
@@ -350,7 +359,7 @@ function UnitSettings({ unit }) {
                     ) : (
                         <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>
                     )}
-                </form>
+                </FloatingFormWrapper>
             </div>
         </div>
     );

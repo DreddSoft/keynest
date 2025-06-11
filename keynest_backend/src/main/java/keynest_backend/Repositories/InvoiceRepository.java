@@ -14,4 +14,27 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
                 WHERE i.booking.id = :bookingId
             """)
     Optional<Invoice> findByBookingId(@Param("bookingId") Integer bookingId);
+
+    @Query("""
+                SELECT MAX(i.seriesNumber)
+                FROM Invoice i
+                WHERE i.series = keynest_backend.Invoice.Series.F
+            """)
+    Integer findMaxSeriesNumberF();
+
+    @Query("""
+                SELECT MAX(i.seriesNumber)
+                FROM Invoice i
+                WHERE i.series = keynest_backend.Invoice.Series.A
+            """)
+    Integer findMaxSeriesNumberA();
+
+    @Query("""
+                SELECT MAX(i.seriesNumber)
+                FROM Invoice i
+                WHERE i.series = keynest_backend.Invoice.Series.R
+            """)
+    Integer findMaxSeriesNumberR();
+
+
 }

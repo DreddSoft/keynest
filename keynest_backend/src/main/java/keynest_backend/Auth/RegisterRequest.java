@@ -29,5 +29,6 @@ public class RegisterRequest {
     private int localityId;
     private String address;
     private String postalCode;
+    private String dniNif;
 
 }
