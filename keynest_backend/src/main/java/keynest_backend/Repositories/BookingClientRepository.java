@@ -1,5 +1,6 @@
 package keynest_backend.Repositories;
 
+import keynest_backend.Model.Booking;
 import keynest_backend.Model.BookingClient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,14 @@ public interface BookingClientRepository extends JpaRepository<BookingClient, In
     AND bc.isMainGuest = true
     """)
     Integer findMainClientIdByBookingId(@Param("bookingId") Integer bookingId);
+
+    @Query("""
+    SELECT bc
+    FROM BookingClient bc
+    WHERE bc.booking = :booking
+    AND bc.isMainGuest = true
+    """)
+    BookingClient findBookingMainClientByBooking(@Param("booking") Booking booking);
 
 
 }

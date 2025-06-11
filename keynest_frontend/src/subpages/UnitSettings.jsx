@@ -30,6 +30,7 @@ function UnitSettings({ unit }) {
 
     // URLS
     const URL_NEXT_BOOKING = `http://localhost:8080/api/booking/getNext/${unit.id}`;
+    const URL_INVOICE = `http://localhost:8080/api/invoices`;
 
     useEffect(() => {
         const getNextBooking = async () => {
@@ -116,8 +117,44 @@ function UnitSettings({ unit }) {
     // Funcion para facturar
     //TODO: Implementar metodo facturar
     const generateInvoice = async () => {
-        console.log("SE COBRA");
-    }
+        resetMessages();
+        setLoading(true);
+
+        try {
+            const response = await fetch(URL_INVOICE, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    bookingId: booking.bookingId,
+                    total: booking.total,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(
+                    `No se pudo generar la factura. Detalles: ${errorMessage}`
+                );
+            }
+
+            const data = await response.json();
+
+            if (!data.url) {
+                throw new Error("La respuesta no contiene una URL válida para el PDF.");
+            }
+
+            window.open(data.url, '_blank');
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     //TODO: Implementar metodo checkOut
     const initCheckOut = async () => {

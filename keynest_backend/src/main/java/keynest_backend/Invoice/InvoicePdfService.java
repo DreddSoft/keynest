@@ -52,9 +52,9 @@ public class InvoicePdfService {
             document.add(new Paragraph("Telf.: " + user.getPhone()));
         } else {
             document.add(new Paragraph("Nombre:" + user.getFirstname() + " " + user.getLastname()));
-            document.add(new Paragraph("DNI/CIF: " + user));
-            document.add(new Paragraph("Dirección: " + company.getAddress() + " " + company.getPostalCode() + " " + company.getLocality().getName() + ", " + company.getLocality().getProvince().getName() + " (" + company.getLocality().getProvince().getCountry().getName() + ")"));
-            document.add(new Paragraph("Email: " + company.getEmail()));
+            document.add(new Paragraph("DNI/CIF: " + user.getDniNif()));
+            document.add(new Paragraph("Dirección: " + user.getAddress() + " " + user.getPostalCode() + " " + user.getLocality().getName() + ", " + user.getLocality().getProvince().getName() + " (" + user.getLocality().getProvince().getCountry().getName() + ")"));
+            document.add(new Paragraph("Email: " + user.getEmail()));
             document.add(new Paragraph("Telf.: " + user.getPhone()));
         }
 

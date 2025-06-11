@@ -18,5 +18,6 @@ public class BookingLiteDTO {
     LocalDate checkOut;
     Integer status;
     Integer nights;
+    Double total;
 
 }

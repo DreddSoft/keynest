@@ -14,7 +14,6 @@ import java.time.LocalDate;
 public class InvoiceCreateRequest {
 
     Integer bookingId;
-    LocalDate issueDate;
     double total;
 
 }

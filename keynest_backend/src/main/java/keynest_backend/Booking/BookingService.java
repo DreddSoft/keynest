@@ -225,6 +225,7 @@ public class BookingService {
                 .checkOut(checkOut)
                 .status(booking.getStatus())
                 .nights(booking.getNights())
+                .total(booking.getTotalPrice())
                 .build();
 
     }
