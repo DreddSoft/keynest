@@ -82,10 +82,23 @@ public class BookingController {
      * @param bookingId -- Integer con el id de la reserva.
      * @return responseBooking -- objeto de la clase BookingResponse que contiene un mensaje informativo, que se envía junto a un código 200.
      */
-    @GetMapping
+    @GetMapping(value = "checkIn/{bookingId}")
     public ResponseEntity<BookingResponse> checkIn (@PathVariable Integer bookingId) {
 
         return ResponseEntity.ok(bookingService.checkIn(bookingId));
 
     }
+
+    /**
+     * Endpoint para realizar el checkout de una reserva
+     * @param bookingId
+     * @return response - Objeto de la clase BookingResponse que contiene un mensaje informativo, que se envía junto a un código 200.
+     */
+    @GetMapping(value = "checkOut/{bookingId}")
+    public ResponseEntity<BookingResponse> checkOut (@PathVariable Integer bookingId) {
+
+        return ResponseEntity.ok(bookingService.checkOut(bookingId));
+    }
+
+
 }

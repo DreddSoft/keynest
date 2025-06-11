@@ -5,6 +5,8 @@ import ContactForm from "@/components/ContactForm.jsx";
 import { Loader2 } from "lucide-react";
 import PersonalizedButton from "../components/PersonalizedButton.jsx";
 import BookingList from "@/subpages/BookingList.jsx";
+import UnitSettings from "@/subpages/UnitSettings.jsx";
+import UnitInfo from "@/subpages/UnitInfo.jsx";
 
 function Unit() {
     const { unitId } = useParams();
@@ -95,7 +97,7 @@ function Unit() {
                         }
                         onClick={() => setStep(2)}
                     >
-                        <FaChartLine /> Estadísticas
+                        <FaChartLine /> Settings
                     </button>
                     <button
                         className={step === 3
@@ -143,123 +145,10 @@ function Unit() {
             </div>
             {step === 1 && (
 
-                <div>
-                    <h2 className="text-3xl font-bold text-blue-900 mb-4">{unit.name}</h2>
-                    <div className="p-4">
-                        {/* Datos generales */}
-                        <fieldset className="mb-6 p-2 border-1 rounded-2xl border-gray-400 flex flex-col justify-center items-center">
-                            <legend className="text-xl font-semibold text-gray-800 mb-2 px-2">Datos generales</legend>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 my-6">
-                                <div className="flex flex-col">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">ID</label>
-                                    <input
-                                        type="text"
-                                        value={unit.id}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Tipo</label>
-                                    <input
-                                        type="text"
-                                        value={unit.type}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Área (m²)</label>
-                                    <input
-                                        type="text"
-                                        value={`${unit.areaM2} m²`}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Habitaciones</label>
-                                    <input
-                                        type="text"
-                                        value={unit.rooms}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Baños</label>
-                                    <input
-                                        type="text"
-                                        value={unit.bathrooms}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Cocina</label>
-                                    <input
-                                        type="text"
-                                        value={unit.hasKitchen ? 'Sí' : 'No'}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col col-span-2 md:col-span-1">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Ocupación mínima</label>
-                                    <input
-                                        type="text"
-                                        value={`${unit.minOccupancy} personas`}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-                                <div className="flex flex-col col-span-2 md:col-span-1">
-                                    <label className="text-gray-700 font-semibold text-sm mb-1">Ocupación máxima</label>
-                                    <input
-                                        type="text"
-                                        value={`${unit.maxOccupancy} personas`}
-                                        disabled
-                                        className="bg-gray-100 text-gray-800 px-3 py-2 rounded border border-gray-300 text-center"
-                                    />
-                                </div>
-
-                            </div>
-
-
-                        </fieldset>
-
-                        
-
-                        <div className="flex flex-col md:flex-row gap-6 mt-6">
-                            {/* Descripción */}
-                            <div className="flex-1 bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                                <h3 className="text-xl font-semibold text-gray-800 mb-3">Descripción</h3>
-                                <p className="text-gray-700 text-sm">
-                                    {unit.description || 'Sin descripción disponible.'}
-                                </p>
-                            </div>
-
-                            {/* Ubicación */}
-                            <div className="flex-1 bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                                <h3 className="text-xl font-semibold text-gray-800 mb-3">Ubicación</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 text-sm">
-                                    <p><strong>Dirección:</strong> {unit.address}</p>
-                                    <p><strong>Código Postal:</strong> {unit.postalCode}</p>
-                                    <p><strong>Localidad:</strong> {unit.localityName}</p>
-                                    <p><strong>Provincia:</strong> {unit.provinceName}</p>
-                                    <p><strong>País:</strong> {unit.countryName}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
+                <UnitInfo unit={unit} />
             )}
             {step === 2 && (
-                <div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Estadísticas</h3>
-                </div>
+                <UnitSettings unit={unit} />
             )}
             {step === 3 && (
                 <div className="p-2">

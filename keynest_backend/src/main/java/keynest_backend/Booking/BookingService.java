@@ -27,6 +27,7 @@ public class BookingService {
     private final BookingClientRepository bookingClientRepository;
     private final ClientRepository clientRepository;
     private final LocalityRepository localityRepository;
+    private final InvoiceRepository invoiceRepository;
 
 
 
@@ -204,12 +205,8 @@ public class BookingService {
     // Metodo para obtener la proxima reserva de la unidad
     public BookingLiteDTO getNextBooking (Integer unitId) {
 
-        // Sacar la proxima reserva o nulo usando stream
-        Booking booking = bookingRepository
-                .findNextOrCurrentBookings(unitId)
-                .stream()
-                .findFirst()
-                .orElse(null);
+        // Sacamos reserva si hay hoy
+        Booking booking = bookingRepository.findBookingThatChecksInToday(unitId).orElse(null);
 
         if (booking == null) {
             return null;
@@ -223,8 +220,10 @@ public class BookingService {
         // Construimos el LiteDTO
         return BookingLiteDTO
                 .builder()
+                .bookingId(booking.getId())
                 .checkIn(checkIn)
                 .checkOut(checkOut)
+                .status(booking.getStatus())
                 .nights(booking.getNights())
                 .build();
 
@@ -294,6 +293,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElse(null);
 
         if (booking == null) {
+            Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "No se puede realizar el check-In, porque no se encuentra la unidad.");
             return BookingResponse.builder().message("No se ha encontrado la unidad.").build();
         }
 
@@ -301,7 +301,53 @@ public class BookingService {
         booking.setStatus(3);
         bookingRepository.save(booking);
 
+        Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "Se realiza el check-In de la reserva " + booking.getId() + ".");
         return BookingResponse.builder().message("Se ha hecho el Check-In de la reserva: " + bookingId + ".").build();
+
+    }
+
+    /**
+     * Método de servicio para realizar el checkOut de la reserva.
+     * Requiere que la reserva este en status === 4 - Facturada
+     * Requiere que exista una factura para esa reserva
+     *
+     * @param bookingId
+     * @return response - Objeto Clase BookingResponse con un mensaje
+     */
+    public BookingResponse checkOut (Integer bookingId) {
+
+        // Buscar la reserva
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+
+        Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "Se inicia el checkOut de la reserva " + booking.getId() + ".");
+
+        if (booking == null) {
+            Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "No se puede realizar el check-Out, porque no se encuentra la unidad.");
+            return BookingResponse.builder().message("No se ha encontrado la unidad.").build();
+        }
+
+        // Sacamos la factura
+        Invoice invoice = invoiceRepository.findByBookingId(booking.getId()).orElse(null);
+
+        if (invoice == null) {
+            Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "No se puede realizar el check-Out, porque la reserva no se ha facturado.");
+            return BookingResponse.builder().message("La reserva no ha sido facturada, no se puede hacer el check-Out.").build();
+        }
+
+        // Para que se pueda hacer el checkOut la reserva tiene que estar facturada para eso se tiene que dar:
+        // status === 4 && facturaExiste
+        if (booking.getStatus() == 4) {
+            // Establecemos el estado en checkOut
+            booking.setStatus(5);
+            bookingRepository.save(booking);
+
+            Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "Se realiza el checkOut de la reserva " + booking.getId() + ".");
+            return BookingResponse.builder().message("Se ha realizado el check-Out.").build();
+
+        }
+
+        Log.write(booking.getUnit().getUser().getId(), "BookingService | checkOut", "No se ha podido realizar el checkOut de la reserva " + booking.getId() + ". El estado no es 4.");
+        return BookingResponse.builder().message("Algo ha ocurrido, no se ha realizado el check-Out.").build();
 
     }
 

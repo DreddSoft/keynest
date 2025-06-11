@@ -13,8 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookingLiteDTO {
 
+    Integer bookingId;
     LocalDate checkIn;
     LocalDate checkOut;
-    int nights;
+    Integer status;
+    Integer nights;
 
 }

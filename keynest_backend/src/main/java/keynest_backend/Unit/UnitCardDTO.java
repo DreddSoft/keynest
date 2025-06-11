@@ -25,8 +25,8 @@ public class UnitCardDTO {
     // Valores que pueden ser nulos
     LocalDate checkIn;
     LocalDate checkOut;
-    int nights;
+    Integer nights;
     Integer bookingId;
-    int bookingStatus;
+    Integer bookingStatus;
 
 }
