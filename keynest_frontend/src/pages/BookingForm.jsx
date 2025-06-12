@@ -206,8 +206,12 @@ function BookingForm() {
       // Sacamos las fechas
       const data = await response.json();
 
+      // console.log(data);
+
       // 1. Comprobamos si hay alguna fecha que no este disponible
-      const unavailableDates = data.filter(d => d.isAvailable === false);
+      const unavailableDates = data.filter(d => d.available === false);
+
+      // console.log(unavailableDates);
 
       if (unavailableDates.length > 0) {
         setAvailabilityError("Lo sentimos, las fechas seleccionadas no están disponibles.");
@@ -219,6 +223,7 @@ function BookingForm() {
       if (nights < data[0].minStay) {
         setAvailabilityError("Lo sentimos, la estancia mínima para las fechas seleccionadas es de: " + data[0].minStay);
         setTotalPrice(0);
+        setCont(false);
         return;
       }
 
@@ -337,7 +342,11 @@ function BookingForm() {
 
           <DateRange
             editableDateInputs={true}
-            onChange={(item) => setRange([item.selection])}
+            onChange={(item) => {
+              setRange([item.selection]);
+              setCont(false);
+            }
+            }
             moveRangeOnFirstSelection={false}
             ranges={range}
             rangeColors={["#2563eb"]}

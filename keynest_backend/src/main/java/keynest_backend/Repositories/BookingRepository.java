@@ -43,10 +43,10 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     @Query("""
                 SELECT b FROM Booking b
                 WHERE b.unit.id = :unitId
-                  AND b.checkIn = CURRENT_DATE
+                  AND b.checkOut >= CURRENT_DATE
                 ORDER BY b.checkIn ASC
             """)
-    Optional<Booking> findBookingThatChecksInToday(@Param("unitId") Integer unitId);
+    List<Booking> findNextBooking(@Param("unitId") Integer unitId);
 
     @Query("""
             SELECT new keynest_backend.Booking.BookingListDTO(

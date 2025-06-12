@@ -56,7 +56,6 @@ function UnitSettings({ unit }) {
 
                 const text = await response.text();
 
-                console.log(text);
                 if (text) {
                     const data = JSON.parse(text);
                     setBooking(data);
@@ -75,8 +74,38 @@ function UnitSettings({ unit }) {
     }, [unit.id]);
 
     // Funcion PreCheckIn
-    const preCheckIn = async () => {
-        console.log("Se inicia precheckin");
+    const preCheckIn = async (bId) => {
+
+        resetMessages();
+
+        if (booking.status !== 1) {
+            setError("El estado de la reserva no permite hacer el precheckIn.");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/booking/sendPreCheckInEmail/${bId}`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("No se pudo enviar el email de precheckIn.");
+            }
+
+            const data = await response.text();
+            setMessage(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+
     }
 
     // Función para iniciar el checkIn de una reserva
@@ -228,74 +257,77 @@ function UnitSettings({ unit }) {
             <h4>Reserva para hoy:</h4>
             {/* Aqui la data de si hay que hacer checkIn */}
             {booking && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:mx-32 ">
+                    <div className=" bg-gray-50 shadow-lg rounded-lg p-4 border border-gray-200">
 
-                    {/* Informacion de la reserva */}
-                    <div>
-                        <label className="flex flex-col text-sm text-gray-700 mt-2">
-                            ID:
-                            <input
-                                type="text"
-                                value={booking.bookingId}
-                                disabled
-                                className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
-                            />
-                        </label>
-                        <label className="flex flex-col text-sm text-gray-700 mt-2">
-                            Check-In:
-                            <input
-                                type="date"
-                                value={booking.checkIn}
-                                disabled
-                                className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
-                            />
-                        </label>
-                        <label className="flex flex-col text-sm text-gray-700 mt-2">
-                            Check-Out:
-                            <input
-                                type="date"
-                                value={booking.checkOut}
-                                disabled
-                                className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
-                            />
-                        </label>
+                        {/* Informacion de la reserva */}
+                        <div>
+                            <label className="flex flex-col text-sm text-gray-700 mt-2">
+                                ID:
+                                <input
+                                    type="text"
+                                    value={booking.bookingId}
+                                    disabled
+                                    className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800 text-center"
+                                />
+                            </label>
+                            <label className="flex flex-col text-sm text-gray-700 mt-2">
+                                Check-In:
+                                <input
+                                    type="date"
+                                    value={booking.checkIn}
+                                    disabled
+                                    className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
+                                />
+                            </label>
+                            <label className="flex flex-col text-sm text-gray-700 mt-2">
+                                Check-Out:
+                                <input
+                                    type="date"
+                                    value={booking.checkOut}
+                                    disabled
+                                    className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
+                                />
+                            </label>
 
-                    </div>
-                    <div>
-                        {/* Controles */}
-                        {booking.status === 1 && (
-                            <PersonalizedButton
-                                buttonName="Pre Check-In"
-                                buttonIcon={<Mail />}
-                                buttonFunction={preCheckIn}
-                            />
-                        )}
-                        {booking.status === 2 && (
-                            <PersonalizedButton
-                                buttonName="Check-In"
-                                buttonIcon={<DoorOpen />}
-                                buttonFunction={initCheckIn}
-                            />
-                        )}
+                        </div>
+                        <div className="mt-6">
+                            {/* Controles */}
+                            {booking.status === 1 && (
+                                <PersonalizedButton
+                                    buttonName="Pre Check-In"
+                                    buttonIcon={<Mail />}
+                                    buttonFunction={() => preCheckIn(parseInt(booking.bookingId))}
+                                />
+                            )}
+                            {booking.status === 2 && (
+                                <PersonalizedButton
+                                    buttonName="Check-In"
+                                    buttonIcon={<DoorOpen />}
+                                    buttonFunction={initCheckIn}
+                                />
+                            )}
 
-                        {booking.status === 3 && (
-                            <PersonalizedButton
-                                buttonName="Facturar"
-                                buttonIcon={<Receipt />}
-                                buttonFunction={generateInvoice}
-                            />
-                        )}
+                            {booking.status === 3 && (
+                                <PersonalizedButton
+                                    buttonName="Facturar"
+                                    buttonIcon={<Receipt />}
+                                    buttonFunction={generateInvoice}
+                                />
+                            )}
 
-                        {booking.status === 4 && (
-                            <PersonalizedButton
-                                buttonName="Check-Out"
-                                buttonIcon={<DoorClosed />}
-                                buttonFunction={initCheckOut}
-                            />
-                        )}
+                            {booking.status === 4 && (
+                                <PersonalizedButton
+                                    buttonName="Check-Out"
+                                    buttonIcon={<DoorClosed />}
+                                    buttonFunction={initCheckOut}
+                                />
+                            )}
 
+                        </div>
                     </div>
                 </div>
+
             )}
 
 

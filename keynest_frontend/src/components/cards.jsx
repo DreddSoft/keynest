@@ -4,28 +4,86 @@ import { FaHouseChimney, FaHotel } from "react-icons/fa6";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { FiCalendar } from "react-icons/fi";
 import PersonalizedButton from "../components/PersonalizedButton.jsx";
+import { useEffect, useState } from "react";
+import { TriangleAlert } from "lucide-react";
 
-function Card({ name, address, locality, id, type, checkIn, checkOut, nights, bookingId, bookingStatus }) {
-    const fullAddress = `${address}, ${locality}.`;
+function Card({ unit }) {
+    const fullAddress = `${unit.address}, ${unit.locality}.`;
+    const [booking, setBooking] = useState(null);
+
+    useEffect(() => {
+
+        if (!unit || !unit.id) return;
+
+        const getNextBooking = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/booking/getNext/${unit.id}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error al capturar las unidades.");
+                }
+
+                const text = await response.text();
+
+                if (!text) {
+                    setBooking(null);
+                    return;
+                }
+
+                const data = JSON.parse(text);
+                setBooking(data);
+
+            } catch (err) {
+                console.error("Error: " + err.message);
+
+            }
+        }
+
+        getNextBooking();
+
+    }, [unit])
+
+    const preCheckIn = async () => {
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/booking/sendPreCheckInEmail/${booking.id}`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("No se pudo enviar el email de precheckIn.");
+            }
+
+        } catch (err) {
+            console.error(err.message);
+        } 
+
+    }
+
 
     const accessUnit = () => {
-        navigate(`/unit/${id}`);
+        navigate(`/unit/${unit.id}`);
     };
 
-
-    // Función para iniciar el precheckIn de una reserva
-    const preCheckIn = async () => {
-        console.log("Se inicia precheckin");
-    }
 
     // Función para iniciar el checkIn de una reserva
     const initCheckIn = async () => {
 
         // Realmente esta función sólo cambia el status de la reserva
-        const URL_CHECKIN = `http://localhost:8080/api/booking/checkIn/${bookingId}`;
+        const URL_CHECKIN = `http://localhost:8080/api/booking/checkIn/${booking.bookingId}`;
 
         // Si ya esta en checkIn, esto es una comprobación redundante.
-        if (bookingStatus === 2) return;
+        if (booking.status === 3) return;
 
         try {
 
@@ -55,20 +113,20 @@ function Card({ name, address, locality, id, type, checkIn, checkOut, nights, bo
             {/* Sección superior: icono + título */}
             <div className="flex flex-col items-center mb-2 gap-1">
                 <div className="bg-gray-200 p-3 rounded mb-2">
-                    {(type === "HOUSE" || type === "COUNTRY_HOUSE")
+                    {(unit.type === "HOUSE" || unit.type === "COUNTRY_HOUSE")
                         ? <FaHouseChimney size={30} />
                         : <FaHotel size={30} />}
                 </div>
-                <h2 className="text-xl font-bold text-center">{type}</h2>
-                <h3 className="text-lg font-semibold text-center">{name}</h3>
+                <h2 className="text-xl font-bold text-center">{unit.type}</h2>
+                <h3 className="text-lg font-semibold text-center">{unit.name}</h3>
             </div>
 
             {/* Contenido central que se expande */}
             <div className="flex-1 flex flex-col justify-start gap-2 text-sm text-gray-700 px-1">
                 <div className="flex items-center gap-2">
                     <FiCalendar size={16} />
-                    <span>{(checkIn != null && checkOut != null && nights != null)
-                        ? `${checkIn} | ${checkOut}, ${nights}`
+                    <span>{(booking && booking.checkIn != null && booking.checkOut != null && booking.nights != null)
+                        ? `${booking.checkIn} | ${booking.checkOut}, ${booking.nights}`
                         : "Sin próximas reservas"}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -76,7 +134,7 @@ function Card({ name, address, locality, id, type, checkIn, checkOut, nights, bo
                     <span>{fullAddress}</span>
                 </div>
             </div>
-            {bookingStatus === 1 && (
+            {booking && booking.status === 1 && (
                 <div className="mt-auto pt-4">
                     <PersonalizedButton
                         buttonName={"Pre Check-In"}
@@ -87,7 +145,7 @@ function Card({ name, address, locality, id, type, checkIn, checkOut, nights, bo
                 </div>
             )}
 
-            {bookingStatus === 2 && (
+            {booking && booking.status === 2 && (
                 <div className="mt-auto pt-4">
                     <PersonalizedButton
                         buttonName={"Check-In"}

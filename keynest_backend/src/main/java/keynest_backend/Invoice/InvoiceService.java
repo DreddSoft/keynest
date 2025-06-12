@@ -1,6 +1,6 @@
 package keynest_backend.Invoice;
 
-import keynest_backend.Logs.Log;
+import keynest_backend.Utils.Log;
 import keynest_backend.Model.Booking;
 import keynest_backend.Model.BookingClient;
 import keynest_backend.Model.Client;

@@ -22,11 +22,5 @@ public class UnitCardDTO {
     String address;
     String localityName;
 
-    // Valores que pueden ser nulos
-    LocalDate checkIn;
-    LocalDate checkOut;
-    Integer nights;
-    Integer bookingId;
-    Integer bookingStatus;
 
 }

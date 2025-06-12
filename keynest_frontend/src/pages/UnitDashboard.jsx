@@ -98,19 +98,9 @@ function UnitDashboard() {
                 {/* Cards */}
                 <section className="flex-1 bg-white p-4 rounded-xl shadow flex flex-wrap justify-center items-center gap-4">
                     {error && <p className="text-red-600 font-bold w-full text-center">{error}</p>}
-                    {units.map((unit, index) => (
+                    {units.map((unit) => (
                         <Card
-                            key={index}
-                            name={unit.name}
-                            address={unit.address}
-                            locality={unit.localityName}
-                            id={unit.id}
-                            type={unit.type}
-                            checkIn={unit.checkIn}
-                            checkOut={unit.checkOut}
-                            nights={unit.nights}
-                            bookingId={unit.bookingId}
-                            bookingStatus={unit.bookingStatus}
+                            unit={unit}
                         />
                     ))}
                 </section>

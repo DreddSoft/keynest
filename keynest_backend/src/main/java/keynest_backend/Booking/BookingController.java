@@ -1,5 +1,7 @@
 package keynest_backend.Booking;
 
+import jakarta.mail.MessagingException;
+import keynest_backend.Model.Booking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,13 @@ public class BookingController {
     @GetMapping(value = "getNext/{unitId}")
     public ResponseEntity<BookingLiteDTO> getNextBooking (@PathVariable Integer unitId) {
 
-        return ResponseEntity.ok(bookingService.getNextBooking(unitId));
+        BookingLiteDTO booking = bookingService.getNextBooking(unitId);
+
+        if (booking == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(booking);
 
     }
 
@@ -98,6 +106,13 @@ public class BookingController {
     public ResponseEntity<BookingResponse> checkOut (@PathVariable Integer bookingId) {
 
         return ResponseEntity.ok(bookingService.checkOut(bookingId));
+    }
+
+    @GetMapping(value = "sendPreCheckInEmail/{bookingId}")
+    public ResponseEntity<BookingResponse> sendPreCheckInEmail (@PathVariable Integer bookingId) throws MessagingException {
+
+        return ResponseEntity.ok(bookingService.sendPreCheckInEmail(bookingId));
+
     }
 
 

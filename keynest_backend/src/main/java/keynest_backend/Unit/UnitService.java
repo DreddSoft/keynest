@@ -1,6 +1,6 @@
 package keynest_backend.Unit;
 
-import keynest_backend.Logs.Log;
+import keynest_backend.Utils.Log;
 import keynest_backend.Model.*;
 import keynest_backend.Repositories.*;
 import keynest_backend.User.Role;
@@ -183,9 +183,6 @@ public class UnitService {
         // Recorremos todas las unidades
         for (Unit unit: units) {
 
-            // Sacar la proxima reserva de la unidad
-            Booking nextBooking = bookingRepository.findBookingThatChecksInToday(unit.getId()).orElse(null);
-
             // Creamos DTO
             UnitCardDTO card = UnitCardDTO.builder()
                     .id(unit.getId())
@@ -193,11 +190,6 @@ public class UnitService {
                     .type(unit.getType().toString())
                     .address(unit.getAddress())
                     .localityName(unit.getLocality().getName())
-                    .checkIn((nextBooking == null) ? null : nextBooking.getCheckIn())
-                    .checkOut((nextBooking == null) ? null : nextBooking.getCheckOut())
-                    .nights((nextBooking == null) ? null : nextBooking.getNights())
-                    .bookingId((nextBooking == null) ? null : nextBooking.getId())
-                    .bookingStatus((nextBooking == null) ? null : nextBooking.getStatus())
                     .build();
 
             // Insertar en lista

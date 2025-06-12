@@ -41,14 +41,6 @@ function AdminHeader({ setStep, step }) {
                     >
                         <Calendar size={16} /> Reservas
                     </Link>
-                    <Link onClick={() => setStep(4)}
-                        className={step === 4
-                            ? "p-2 border-b-2 border-b-white text-sm flex items-center gap-1 duration-200 transition cursor-pointer"
-                            : "p-2 border-b-2 border-transparent hover:border-b-white text-sm flex items-center gap-1 duration-200 transition cursor-pointer"
-                        }
-                    >
-                        <BedSingle size={16} /> Clientes
-                    </Link>
                 </nav>
             </div>
 
@@ -63,12 +55,6 @@ function AdminHeader({ setStep, step }) {
                     </Link>
                     <Link onClick={() => { setStep(3); setIsOpen(false); }} className="block text-sm flex items-center gap-1 w-full rounded-2xl p-2 hover:bg-gray-600 transition duration-200">
                         <Calendar size={16} /> Reservas
-                    </Link>
-                    <Link onClick={() => { setStep(4); setIsOpen(false); }} className="block text-sm flex items-center gap-1 w-full rounded-2xl p-2 hover:bg-gray-600 transition duration-200">
-                        <BedSingle size={16} /> Clientes
-                    </Link>
-                    <Link onClick={() => { setStep(5); setIsOpen(false); }} className="block text-sm flex items-center gap-1 w-full rounded-2xl p-2 hover:bg-gray-600 transition duration-200">
-                        <Settings size={16} /> Configuración
                     </Link>
                 </div>
             )}

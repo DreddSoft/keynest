@@ -1,7 +1,6 @@
 package keynest_backend.Unit;
 
-import keynest_backend.Logs.Log;
-import keynest_backend.Model.Unit;
+import keynest_backend.Utils.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

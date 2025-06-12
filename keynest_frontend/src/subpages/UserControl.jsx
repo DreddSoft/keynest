@@ -11,12 +11,13 @@ function UserControl() {
     const [id, setId] = useState(null);
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
+    const [document, setDocument] = useState(null);
     const [name, setName] = useState(null);
     const [lastname, setLastname] = useState(null);
     const [bday, setBday] = useState(null);
     const [phone, setPhone] = useState(null);
-    const [profilePictureUrl, setProfilePictureUrl] = useState();
-    const [localityId, setLocalityId] = useState();
+    const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+    const [localityId, setLocalityId] = useState(null);
     const [address, setAddress] = useState(null);
     const [postalCode, setPostalCode] = useState(null);
     const [error, setError] = useState(null);
@@ -159,10 +160,11 @@ function UserControl() {
         setError(null);
         setMessageCreated(null);
 
+        console.log(localityId);
+
         e.preventDefault();
         setLoading(true);
         try {
-            const localityId = parseInt(document.getElementById("iptLocality").value);
             const response = await fetch(URL_REGISTER, {
                 method: "POST",
                 credentials: "include",
@@ -176,7 +178,8 @@ function UserControl() {
                     phone,
                     localityId,
                     address,
-                    postalCode
+                    postalCode,
+                    dniNif: document
                 })
             });
             if (response.ok) {
@@ -315,9 +318,8 @@ function UserControl() {
 
         setStep(step);
         setLoading(false);
-        
-    }
 
+    }
 
     return (
         <div>
@@ -364,7 +366,7 @@ function UserControl() {
                                 placeholder="ID o Email"
                                 className="flex-1 px-4 py-2 border border-gray-300 rounded text-sm w-3/4"
                                 id="searchBar"
-                                onChange={(e) => setSearchTerm(e.target.value) }
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
                             <div className="w-1/4">
                                 <PersonalizedButton
@@ -675,7 +677,7 @@ function UserControl() {
 
                 {step === 2 && (
 
-                    <article className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 mt-6">
+                    <form className="bg-white shadow p-6 rounded-lg w-full max-w-2xl mx-auto space-y-4 mt-6">
                         <h4 className="text-gray-800 font-bold text-xl">Crear Nuevo Usuario</h4>
                         {error && <p className="text-sm text-red-600">{error}</p>}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -684,7 +686,8 @@ function UserControl() {
                                 <input
                                     type="email"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                    id="iptEmail"
+                                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                    required
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </label>
@@ -695,7 +698,19 @@ function UserControl() {
                                     type="password"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                     id="iptPass"
+                                    required
                                     onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </label>
+                            <label className="flex flex-col text-sm text-gray-700">
+                                DNI/NIF:
+                                <input
+                                    type="text"
+                                    pattern="[A-Z0-9]+"
+                                    title="Solo letras mayúsculas y números"
+                                    className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                                    required
+                                    onChange={(e) => setDocument(e.target.value)}
                                 />
                             </label>
 
@@ -705,6 +720,8 @@ function UserControl() {
                                     type="text"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                     id="iptName"
+                                    pattern="^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$"
+                                    required
                                     onChange={(e) => setName(e.target.value)}
                                 />
                             </label>
@@ -714,6 +731,8 @@ function UserControl() {
                                 <input
                                     type="text"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                                    pattern="^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$"
+                                    required
                                     id="iptLastname"
                                     onChange={(e) => setLastname(e.target.value)}
                                 />
@@ -724,6 +743,7 @@ function UserControl() {
                                 <input
                                     type="date"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                                    required
                                     id="iptBday"
                                     onChange={(e) => setBday(e.target.value)}
                                 />
@@ -734,6 +754,8 @@ function UserControl() {
                                 <input
                                     type="text"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
+                                    required
+                                    pattern="[0-9]+"
                                     id="iptPhone"
                                     onChange={(e) => setPhone(e.target.value)}
                                 />
@@ -783,7 +805,8 @@ function UserControl() {
                                     disabled={!localityEnabled}
                                     className={`mt-1 p-2 border rounded-md bg-white text-gray-800 ${localityEnabled ? "border-gray-300" : "border-gray-200 text-gray-400"
                                         }`}
-                                    id="iptLocality"
+                                    onChange={(e) => setLocalityId(parseInt(e.target.value))}
+                                    required
                                 >
                                     <option value="" disabled>Selecciona una localidad...</option>
                                     {localities.map((locality) => (
@@ -798,7 +821,7 @@ function UserControl() {
                                 <input
                                     type="text"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                    id="iptPhone"
+                                    required
                                     onChange={(e) => setAddress(e.target.value)}
                                 />
                             </label>
@@ -807,14 +830,16 @@ function UserControl() {
                                 <input
                                     type="text"
                                     className="mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                    id="iptPhone"
+                                    required
                                     onChange={(e) => setPostalCode(e.target.value)}
+                                    pattern="[0-9]+"
                                 />
                             </label>
                         </div>
                         <div className="flex flex-row justify-center items-center">
                             <div className="w-36">
                                 <PersonalizedButton
+                                    buttonType={"submit"}
                                     buttonName={"Crear"}
                                     buttonFunction={createUser}
                                 />
@@ -836,7 +861,7 @@ function UserControl() {
 
                         )}
 
-                    </article>
+                    </form>
                 )}
 
                 {step === 3 && (

@@ -3,10 +3,7 @@ package keynest_backend.Auth;
 import jakarta.servlet.http.HttpServletResponse;
 import keynest_backend.Exceptions.ErrorGeoDataException;
 import keynest_backend.Jwt.JwtService;
-import keynest_backend.Logs.Log;
-import keynest_backend.Model.Country;
 import keynest_backend.Model.Locality;
-import keynest_backend.Model.Province;
 import keynest_backend.Repositories.CountryRepository;
 import keynest_backend.Repositories.LocalityRepository;
 import keynest_backend.Repositories.ProvinceRepository;
@@ -16,13 +13,10 @@ import keynest_backend.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 

@@ -153,20 +153,11 @@ function Unit() {
                 <div className="p-2">
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">Reservas Futuras</h3>
                     <div>
-                        <div>
                             {/* Aqui se muestra una tabla con las proximas reservas */}
                             <BookingList 
                             unitId={unitId}
                              />
                         </div>
-                        {/* PARTE BAJA */}
-                        <div>
-                            {/* Solicitar ampliacion de calendario */}
-                            <div></div>
-                            {/* Otra cosa */}
-                            <div></div>
-                        </div>
-                    </div>
                 </div>
             )}
             {step === 4 && (

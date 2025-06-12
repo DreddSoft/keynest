@@ -1,10 +1,10 @@
 package keynest_backend.ExceptionHandler;
 
+import jakarta.mail.MessagingException;
 import keynest_backend.Exceptions.ErrorGeoDataException;
-import keynest_backend.Logs.Log;
+import keynest_backend.Utils.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -67,11 +67,12 @@ public class GlobalExceptionHandler {
     /**
      * Manejador para excepciones del tipo personalizadas ErrorGeoDataException
      * Se devuelve un código de estado 400 (Bad Request) junto con el mensaje de error.
+     *
      * @param exception - del tipo ErrorGeoDataException
      * @return ResponseEntity con el tipo de error, el mensaje y el código HTTP correspondiente
      */
     @ExceptionHandler(ErrorGeoDataException.class)
-    public ResponseEntity<ExceptionResponse> handlerErrorGeoException (ErrorGeoDataException exception) {
+    public ResponseEntity<ExceptionResponse> handlerErrorGeoException(ErrorGeoDataException exception) {
 
         System.out.println(exception.getMessage());
 
@@ -94,7 +95,23 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity con el tipo de error, el mensaje y el código HTTP correspondiente
      */
     @ExceptionHandler(IOException.class)
-    public ResponseEntity<ExceptionResponse> handlerIoException (IOException exception) {
+    public ResponseEntity<ExceptionResponse> handlerIoException(IOException exception) {
+
+        System.out.println(exception.getMessage());
+
+        ExceptionResponse response = ExceptionResponse.builder()
+                .type(exception.getClass().toString())
+                .message("Error: " + exception.getMessage())
+                .build();
+
+        Log.write(000, "ExceptionHandler", response.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<ExceptionResponse> handlerMessagingException(MessagingException exception) {
 
         System.out.println(exception.getMessage());
 

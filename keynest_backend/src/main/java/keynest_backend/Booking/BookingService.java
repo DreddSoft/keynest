@@ -1,14 +1,13 @@
 package keynest_backend.Booking;
 
+import jakarta.mail.MessagingException;
 import keynest_backend.Client.DocumentTypes;
 import keynest_backend.Client.Gender;
-import keynest_backend.Logs.Log;
+import keynest_backend.Utils.EmailService;
+import keynest_backend.Utils.Log;
 import keynest_backend.Model.*;
 import keynest_backend.Repositories.*;
-import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,6 +28,7 @@ public class BookingService {
     private final LocalityRepository localityRepository;
     private final InvoiceRepository invoiceRepository;
     private final AvailabilityRepository availabilityRepository;
+    private final EmailService emailService;
 
 
 
@@ -40,116 +40,62 @@ public class BookingService {
      */
     public BookingResponse createBooking(BookingCreateRequest request) {
 
-        // Al crear una reserva, el sistema tiene que
-        // - Crear la reserva
-        // - Crear el cliente principal
-        // - Relacionar ambos
+        // Validación de unidad
+        Unit unit = unitRepository.findById(request.getUnitId())
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Unidad con ID %d no encontrada.", request.getUnitId())));
 
-        // Sacamos la unidad
-        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("createBooking - Unidad no encontrada."));
-
-        // Sacamos las noches
-        int nights = (int) ChronoUnit.DAYS.between(request.getCheckIn(), request.getCheckOut());
-
-        // Si el checkOut es antes del checkIn
+        // Validación de fechas
         if (!request.getCheckOut().isAfter(request.getCheckIn())) {
             throw new IllegalArgumentException("La fecha de salida debe ser posterior a la de entrada.");
         }
 
-        Log.write(unit.getUser().getId(), "BookingService", "Se procede a crear la reserva.");
+        int nights = (int) ChronoUnit.DAYS.between(request.getCheckIn(), request.getCheckOut());
 
-        Booking bk = Booking.builder()
-                // Relacion
-                .unit(unit)
-                // Datos
-                .checkIn(request.getCheckIn())
-                .checkOut(request.getCheckOut())
-                .totalPrice(request.getTotalPrice())
-                .isPaid(false)
-                .numGuests(request.getNumGuests())
-                .notes(request.getNotes())
-                // Auditoria
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .isActive(true)
-                .status(1)
-                .nights(nights)
-                .build();
+        Log.write(unit.getUser().getId(), "BookingService", "Iniciando proceso de creación de reserva.");
 
-        // Guardamos las reserva
-        bookingRepository.save(bk);
+        // Verificación y actualización de disponibilidad
+        for (LocalDate date = request.getCheckIn(); date.isBefore(request.getCheckOut()); date = date.plusDays(1)) {
 
-        // Ajustar la disponibilidad desde el checkIn hasta el checkOut
-        for (LocalDate start = request.getCheckIn(); start.isBefore(request.getCheckOut()); start = start.plusDays(1)) {
+            String finalDate = date.toString();
 
-            LocalDate finalStart = start;
+            Availability availability = availabilityRepository.findByUnitIdAndDate(unit.getId(), date)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            String.format("No existe disponibilidad para el dia %s en la unidad %d.", finalDate, unit.getId())));
 
-            Availability a = availabilityRepository.findByUnitIdAndDate(unit.getId(), start).orElseThrow(() -> new IllegalArgumentException(
-                    "No existe la disponibilidad para la undiad: " + unit.getId() + " en la fecha: " + finalStart));
-
-            // Marcamos como no disponible
-            a.setAvailable(false);
-
-            // Guardamos
-            availabilityRepository.save(a);
-
+            availability.setAvailable(false);
+            availabilityRepository.save(availability);
         }
 
-        // Crear el cliente principal
-        // Primero buscar si el cliente existe, por número de documento y luego por email
-        Log.write(unit.getUser().getId(), "BookingService", "Buscando el cliente por número de documento.");
-        Client c = clientRepository.findByDocNumber(request.getDocNumber());
-
-        // Si no lo encuentra por número de documento
-        if (c == null) {
-            Log.write(unit.getUser().getId(), "BookingService", "Cliente no encontrado. Buscando cliente por email.");
-            c = clientRepository.findByEmail(request.getEmail());
+        // Búsqueda del cliente por número de documento y luego por email
+        Client client = clientRepository.findByDocNumber(request.getDocNumber());
+        if (client == null) {
+            client = clientRepository.findByEmail(request.getEmail());
         }
 
-        // Si aún así es nulo, lo creamos
-        if (c == null) {
-
-            Log.write(unit.getUser().getId(), "BookingService", "No encontrado. Creando cliente.");
-
-            // Género
-            Gender gender;
-
-            // Sacar el genero
-            switch (request.getGenderPick()) {
-                case 0:
-                    gender = Gender.MALE;
-                    break;
-                case 1:
-                    gender = Gender.FEMALE;
-                    break;
-                case 2:
-                    gender = Gender.OTHER;
-                    break;
-                default:
-                    gender = Gender.UNSPECIFIED;
-                    break;
-
-            }
-
-            // Sacar el tipo de documento
-            DocumentTypes docType;
-            switch (request.getDocTypePick()) {
-                case 0:
-                    docType = DocumentTypes.DNI;
-                    break;
-                case 1:
-                    docType = DocumentTypes.NIE;
-                    break;
-                default:
-                    docType = DocumentTypes.PASSPORT;
-                    break;
-
-            }
+        // Si no existe el cliente, se crea
+        if (client == null) {
+            Log.write(unit.getUser().getId(), "BookingService", "Cliente no encontrado. Procediendo a su creación.");
 
             // Localidad
-            Locality locality = localityRepository.findById(request.getLocalityId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la localidad."));
+            Locality locality = localityRepository.findById(request.getLocalityId())
+                    .orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la localidad con ID: " + request.getLocalityId()));
 
-            c = Client.builder()
+            // Asignación de enumerados
+            Gender gender = switch (request.getGenderPick()) {
+                case 0 -> Gender.MALE;
+                case 1 -> Gender.FEMALE;
+                case 2 -> Gender.OTHER;
+                default -> Gender.UNSPECIFIED;
+            };
+
+            DocumentTypes docType = switch (request.getDocTypePick()) {
+                case 0 -> DocumentTypes.DNI;
+                case 1 -> DocumentTypes.NIE;
+                default -> DocumentTypes.PASSPORT;
+            };
+
+            // Construcción del cliente
+            client = Client.builder()
                     .name(request.getName())
                     .lastname(request.getLastname())
                     .gender(gender)
@@ -172,33 +118,43 @@ public class BookingService {
                     .isActive(true)
                     .build();
 
-            // Guardamos cliente
-            clientRepository.save(c);
-
+            clientRepository.save(client);
         }
 
-        // Relacionar reserva y cliente
-        BookingClient bc = BookingClient.builder()
-                .booking(bk)
-                .client(c)
-                .isMainGuest(true)
-                .registeredInPolice(false)
-                .notes(c.getNotes())
+        // Creación de la reserva
+        Booking booking = Booking.builder()
+                .unit(unit)
+                .checkIn(request.getCheckIn())
+                .checkOut(request.getCheckOut())
+                .totalPrice(request.getTotalPrice())
+                .isPaid(false)
+                .numGuests(request.getNumGuests())
+                .notes(request.getNotes())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .isActive(true)
+                .status(1)
+                .nights(nights)
                 .build();
 
-        Log.write(unit.getUser().getId(), "BookingService", "Relacionando Reserva con Cliente principal.");
-        bookingClientRepository.save(bc);
+        bookingRepository.save(booking);
 
-       String response;
+        // Relación cliente principal y reserva
+        BookingClient bookingClient = BookingClient.builder()
+                .booking(booking)
+                .client(client)
+                .isMainGuest(true)
+                .registeredInPolice(false)
+                .notes(client.getNotes())
+                .build();
 
-        if (bk == null) {
-            response = "Error al crear la reserva.";
-        }
+        bookingClientRepository.save(bookingClient);
 
-        response = "Reserva " + bk.getId() + " creada correctamente.";
+        Log.write(unit.getUser().getId(), "BookingService", "Reserva creada y relacionada con cliente principal. ID reserva: " + booking.getId());
 
-        return BookingResponse.builder().message(response).build();
-
+        return BookingResponse.builder()
+                .message("Reserva creada correctamente con ID: " + booking.getId())
+                .build();
     }
 
     // Metodo para conseguir todas las noches reservadas de todas las unidades de un usuario
@@ -216,27 +172,26 @@ public class BookingService {
 
     }
 
-    // Metodo para obtener la proxima reserva de la unidad
+    /**
+     * Método de servicio para obtener la próxima o actual reserva de una unidad
+     * @param unitId
+     * @return
+     */
     public BookingLiteDTO getNextBooking (Integer unitId) {
 
         // Sacamos reserva si hay hoy
-        Booking booking = bookingRepository.findBookingThatChecksInToday(unitId).orElse(null);
+        Booking booking = bookingRepository.findNextBooking(unitId).stream().findFirst().orElse(null);
 
         if (booking == null) {
             return null;
         }
 
-        // Formateamos las fechas a tipo ESP
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate checkIn = LocalDate.parse(booking.getCheckIn().toString(), formatter);
-        LocalDate checkOut = LocalDate.parse(booking.getCheckOut().toString(), formatter);
-
         // Construimos el LiteDTO
         return BookingLiteDTO
                 .builder()
                 .bookingId(booking.getId())
-                .checkIn(checkIn)
-                .checkOut(checkOut)
+                .checkIn(booking.getCheckIn())
+                .checkOut(booking.getCheckOut())
                 .status(booking.getStatus())
                 .nights(booking.getNights())
                 .total(booking.getTotalPrice())
@@ -365,5 +320,44 @@ public class BookingService {
         return BookingResponse.builder().message("Algo ha ocurrido, no se ha realizado el check-Out.").build();
 
     }
+
+    /**
+     * Envía un correo de pre-check-in al cliente principal de la reserva.
+     * Este proceso cambia el estado de la reserva a "PRE-CHECK-IN" (status = 2)
+     * y dispara el envío de un email con el enlace al formulario correspondiente.
+     *
+     * @param bookingId ID de la reserva a gestionar
+     * @return BookingResponse con un mensaje de confirmación
+     * @throws MessagingException si ocurre un error al enviar el email
+     * @throws IllegalArgumentException si no se encuentra la reserva con el ID indicado
+     */
+    public BookingResponse sendPreCheckInEmail(Integer bookingId) throws MessagingException {
+
+        // Buscar la reserva por ID; lanzar excepción si no existe
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("No se ha encontrado ninguna reserva con ID %d. Verifique el identificador proporcionado.", bookingId)
+                ));
+
+        // Escribir en el log el inicio del proceso
+        Log.write(
+                booking.getUnit().getUser().getId(),
+                "BookingService | sendPreCheckInEmail",
+                String.format("Inicio del proceso de pre-check-in para la reserva ID %d. Estado actualizado a PRE-CHECK-IN y envío de correo en curso.", bookingId)
+        );
+
+        // Actualizar el estado de la reserva
+        booking.setStatus(2); // 2 = PRE-CHECK-IN
+        bookingRepository.save(booking);
+
+        // Enviar el correo de pre-check-in
+        emailService.sendPreCheckInEmail(bookingId);
+
+        // Retornar respuesta informativa
+        return BookingResponse.builder()
+                .message(String.format("El correo de pre-check-in de la reserva %d ha sido enviado correctamente al cliente principal de la reserva.", bookingId))
+                .build();
+    }
+
 
 }
