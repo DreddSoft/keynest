@@ -49,10 +49,16 @@ function Card({ unit }) {
 
     }, [unit])
 
+    // Funcion PreCheckIn
     const preCheckIn = async () => {
 
+        if (booking.status !== 1) {
+            return;
+        }
+
+
         try {
-            const response = await fetch(`http://localhost:8080/api/booking/sendPreCheckInEmail/${booking.id}`, {
+            const response = await fetch(`http://localhost:8080/api/booking/sendPreCheckInEmail/${booking.bookingId}`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -64,9 +70,11 @@ function Card({ unit }) {
                 throw new Error("No se pudo enviar el email de precheckIn.");
             }
 
+            window.location.reload();
+
         } catch (err) {
             console.error(err.message);
-        } 
+        }
 
     }
 
@@ -99,7 +107,7 @@ function Card({ unit }) {
                 throw new Error("No se ha podido hacer check-in en la reserva.");
             }
 
-
+            window.location.reload();
 
         } catch (err) {
             console.error(err.message);

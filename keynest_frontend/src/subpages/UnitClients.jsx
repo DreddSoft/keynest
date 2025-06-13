@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Loader2, TriangleAlert, Check } from "lucide-react";
+import { format } from "date-fns";
 
 function UnitClients({ unit }) {
 
@@ -44,7 +45,8 @@ function UnitClients({ unit }) {
 
 
             } catch (err) {
-                setError(err.message);
+                console.error(err.message);
+                setError("Ups! Algo ha ocurrido al recuperar los clientes de su unidad. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
             } finally {
                 setLoading(false);
             }
@@ -134,7 +136,7 @@ function UnitClients({ unit }) {
                                         <td className="p-3 border-b">{c.id}</td>
                                         <td className="p-3 border-b">{c.name}</td>
                                         <td className="p-3 border-b">{c.lastname}</td>
-                                        <td className="p-3 border-b">{c.birthday}</td>
+                                        <td className="p-3 border-b">{format(new Date(c.birthday), "dd/MM/yyyy")}</td>
                                         <td className="p-3 border-b">{c.nationality}</td>
                                         <td className="p-3 border-b">{c.countryName}</td>
                                         <td className="p-3 border-b">{c.provinceName}</td>

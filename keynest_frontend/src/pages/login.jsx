@@ -58,7 +58,7 @@ function Login({ setIsAuthenticated }) {
       navigate('/dashboard');
 
     } catch (err) {
-      setError('Incio de sesion erroneo. ' + err.message);
+      setError(err.message);
       setIsAuthenticated(false);
     } finally {
       setLoading(false);

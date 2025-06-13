@@ -10,6 +10,10 @@ function BookingList({ unitId }) {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    // Cosas del email
+    const [subject, setSubject] = useState(null);
+    const [body, setBody] = useState(null);
+
 
     const URL = `http://localhost:8080/api/booking/futureBooking/${unitId}`;
 
@@ -31,52 +35,89 @@ function BookingList({ unitId }) {
                 const data = await response.json();
                 setBookings(data);
             } catch (err) {
-                setError(err.message);
+                console.error(err.message);
+                setError("Ups! Algo ha ocurrido al intentar capturar las próximas reservas de su unidad. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
             }
         };
 
         fetchBookings();
     }, [unitId]);
 
-    const today = new Date().toISOString().split("T")[0];
-
     function selectBooking(booking) {
+
+        setSubject("Reserva " + booking.id + " | Check-In: " + format(new Date(booking.checkIn), "dd/MM/yyyy") + " | " + booking.name + " " + booking.lastname);
 
         setBooking(booking);
     };
 
 
-    const sendEmail = async () => {
+    const sendEmail = async (dataBooking) => {
 
         resetMessages();
-
-        if (booking.status !== 1) {
-            setError("El estado de la reserva no permite hacer el precheckIn.");
-            return;
-        }
 
         setLoading(true);
 
         try {
-                const response = await fetch(`http://localhost:8080/api/booking/sendPreCheckInEmail/${booking.id}`, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
+            const response = await fetch(`http://localhost:8080/api/booking/sendEmail`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: dataBooking.email,
+                    subject,
+                    body
+                })
+            });
 
-                if (!response.ok) {
-                    throw new Error("No se pudo enviar el email de precheckIn.");
-                }
-
-                const data = await response.text();
-                setOk(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+            if (!response.ok) {
+                throw new Error("No se pudo enviar el email de contacto.");
             }
+
+            const data = await response.json();
+            setOk(data.message);
+        } catch (err) {
+            console.error(err.message);
+            setError("Ups! No se ha podido enviar el email de contacto. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    const deteleBooking = async (bk) => {
+
+        resetMessages();
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/booking`, {
+                method: "DELETE",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: bk.id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ups! Algo ha ocurrido. No se ha podido elimar la reserva seleccionada.");
+            }
+
+            const data = await response.json();
+            setOk(data.message);
+
+            window.location.reload();
+        } catch (err) {
+            console.error(err.message);
+            setError("Ups! Algo ha ocurrido. No se ha podido elimar la reserva seleccionada.");
+        } finally {
+            setLoading(false);
+        }
 
     }
 
@@ -84,7 +125,7 @@ function BookingList({ unitId }) {
 
         setError(false);
         setOk(false);
-        
+
     }
 
     return (
@@ -134,8 +175,8 @@ function BookingList({ unitId }) {
                             >
                                 <td className="p-3 border-b">{b.id}</td>
                                 <td className="p-3 border-b">{b.name}</td>
-                                <td className="p-3 border-b">{b.checkIn}</td>
-                                <td className="p-3 border-b">{b.checkOut}</td>
+                                <td className="p-3 border-b">{format(new Date(b.checkIn), "dd/MM/yyyy")}</td>
+                                <td className="p-3 border-b">{format(new Date(b.checkOut), "dd/MM/yyyy")}</td>
                                 <td className="p-3 border-b">{b.noches}</td>
                                 <td className="p-3 border-b">{b.guests}</td>
                                 <td className="p-3 border-b">{b.total.toFixed(2)} €</td>
@@ -154,32 +195,11 @@ function BookingList({ unitId }) {
                         <aside className="bg-white border border-gray-300 shadow-lg rounded-lg p-4">
                             <h3 className="text-lg font-bold text-gray-700 mb-4">Acciones</h3>
                             <div className="flex flex-col gap-2">
-                                {booking.status === 1 && booking.checkIn === today && (
+                                {booking && (
                                     <PersonalizedButton
-                                        buttonName="PreCheck-In"
-                                        buttonId="preCheckIn"
-                                        buttonFunction={() => console.log("PreCheckIn")}
-                                    />
-                                )}
-                                {booking.status === 2 && (
-                                    <PersonalizedButton
-                                        buttonName="Check-In"
-                                        buttonId="checkIn"
-                                        buttonFunction={() => console.log("CheckIn")}
-                                    />
-                                )}
-                                {booking.status === 3 && (
-                                    <PersonalizedButton
-                                        buttonName="Facturar"
-                                        buttonId="facturar"
-                                        buttonFunction={() => console.log("Facturar")}
-                                    />
-                                )}
-                                {booking.status === 4 && (
-                                    <PersonalizedButton
-                                        buttonName="Check-Out"
-                                        buttonId="checkOut"
-                                        buttonFunction={() => console.log("CheckOut")}
+                                        buttonName="Borrar Reserva"
+                                        buttonId="delete"
+                                        buttonFunction={() => deteleBooking(booking)}
                                     />
                                 )}
                             </div>
@@ -216,7 +236,7 @@ function BookingList({ unitId }) {
                                     placeholder="Escribe tu mensaje aquí..."
                                     rows="8"
                                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm resize-none"
-                                    id="messageTextArea"
+                                    onChange={(e) => setBody(e.target.value)}
                                 ></textarea>
                             </div>
 
@@ -224,7 +244,7 @@ function BookingList({ unitId }) {
                             <div className="text-right">
                                 <PersonalizedButton
                                     buttonName={"Enviar"}
-                                    buttonFunction={() => sendEmail()}
+                                    buttonFunction={() => sendEmail(booking)}
                                 />
                             </div>
                             <div>

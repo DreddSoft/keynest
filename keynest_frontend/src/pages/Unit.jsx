@@ -15,6 +15,7 @@ function Unit() {
     const navigate = useNavigate();
     const [step, setStep] = useState(2);
     const [loading, setLoading] = useState(true);
+    const userId = parseInt(localStorage.getItem("userId"));
 
     const URL = `http://localhost:8080/api/unit/${unitId}`;
 
@@ -170,7 +171,7 @@ function Unit() {
 
             {step === 6 && (
                 <div>
-                    <ContactForm />
+                    <ContactForm unitId={unit.id} userId={userId} />
                 </div>
             )}
 

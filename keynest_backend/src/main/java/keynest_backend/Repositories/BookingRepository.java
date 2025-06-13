@@ -55,6 +55,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
             b.checkOut,
             b.nights,
             c.name,
+            c.lastname,
+            c.email,
             b.totalPrice,
             b.numGuests
             )

@@ -359,5 +359,35 @@ public class BookingService {
                 .build();
     }
 
+    //
+    public BookingResponse sendEmail (SendEmailRequest request) throws MessagingException {
+
+        emailService.sendEmail(request.getEmail(), request.getSubject(), request.getBody());
+
+        return BookingResponse.builder().message("Email enviado correctamente.").build();
+
+    }
+
+    public BookingResponse deleteBooking (BookingDeleteRequest request) {
+
+        // Sacar la reserva
+        Booking booking = bookingRepository.findById(request.getId()).orElse(null);
+
+        if (booking == null) {
+            return BookingResponse.builder().message(
+                    String.format("No se ha encontrado la unidad con ID %d. Por tanto, no se ha podido eliminar.", request.getId())
+            ).build();
+        }
+
+        bookingRepository.delete(booking);
+
+        Log.write(booking.getUnit().getUser().getId(), "BookingService | deleteBoking", "Se ha eliminado la reserva correctamente.");
+
+        return BookingResponse.builder().message(
+                String.format("Eliminada correctamente la reserva con ID %d.", request.getId())
+        ).build();
+
+    }
+
 
 }

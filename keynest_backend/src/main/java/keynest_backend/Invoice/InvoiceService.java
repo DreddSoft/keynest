@@ -1,10 +1,7 @@
 package keynest_backend.Invoice;
 
+import keynest_backend.Model.*;
 import keynest_backend.Utils.Log;
-import keynest_backend.Model.Booking;
-import keynest_backend.Model.BookingClient;
-import keynest_backend.Model.Client;
-import keynest_backend.Model.Invoice;
 import keynest_backend.Repositories.*;
 import keynest_backend.User.User;
 import lombok.RequiredArgsConstructor;
@@ -99,6 +96,11 @@ public class InvoiceService {
         // Seteamos en invoice
         invoice.setPdfUrl(urlPdfInvoice);
 
+        // Antes de guardar ponemos el stado de la reserva a 4 (facturada)
+        invoice.getBooking().setStatus(4);
+
+        bookingRepository.save(invoice.getBooking());
+
         // Guardaos
         invoiceRepository.save(invoice);
 
@@ -111,11 +113,17 @@ public class InvoiceService {
      * Verifica que tanto la unidad como el usuario existen antes de proceder.
      *
      * @param unitId ID del unidad de alojamiento.
-     * @param userId ID del usuario propietario.
      * @return Lista de objetos InvoiceDTO correspondientes a la unidad.
      * @throws IllegalArgumentException si el usuario o la unidad no existen.
      */
-    public List<InvoiceDTO> getInvoicesByUnit(Integer unitId, Integer userId) {
+    public List<InvoiceDTO> getInvoicesByUnit(Integer unitId) {
+
+        // Sacar unidad
+        Unit unit = unitRepository.findById(unitId).orElseThrow(() -> new IllegalArgumentException(
+                String.format("No se encuentra la unidad %d", unitId)
+        ));
+
+        Integer userId = unit.getUser().getId();
 
         // Verificamos que la unidad y el usuario existen
         if (!unitRepository.existsById(unitId) || !userRepository.existsById(userId)) {

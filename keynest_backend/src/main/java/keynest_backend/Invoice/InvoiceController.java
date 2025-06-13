@@ -27,13 +27,12 @@ public class InvoiceController {
      * Siempre que pertenezcan al usuario autenticado o autorizado
      *
      * @param unitId ID de la unidad de alojamiento.
-     * @param userId ID del usuario propietario.
      * @return ResponseEntity con la lista de InvoiceDTO o 400 si no se encuentran facturas.
      */
-    @GetMapping(value = "list/{unitId}/{userId}")
-    public ResponseEntity<List<InvoiceDTO>> getInvoicesByUnit (@PathVariable Integer unitId, @PathVariable Integer userId) {
+    @GetMapping(value = "list/{unitId}")
+    public ResponseEntity<List<InvoiceDTO>> getInvoicesByUnit (@PathVariable Integer unitId) {
 
-        List<InvoiceDTO> invoices = invoiceService.getInvoicesByUnit(unitId, userId);
+        List<InvoiceDTO> invoices = invoiceService.getInvoicesByUnit(unitId);
 
         // Si la lista está vacía, se retorna 404 not found.
         if (invoices.isEmpty()) {

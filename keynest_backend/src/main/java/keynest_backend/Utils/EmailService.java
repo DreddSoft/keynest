@@ -80,4 +80,17 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    // Metodo para mandar un mail personalizado
+    public void sendEmail(String toEmail, String subject, String htmlBody) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setTo(toEmail);
+        helper.setSubject(subject);
+        helper.setText(htmlBody, true); // true = HTML
+
+        mailSender.send(message);
+    }
 }

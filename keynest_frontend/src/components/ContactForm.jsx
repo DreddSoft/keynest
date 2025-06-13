@@ -1,56 +1,77 @@
 import React from "react";
 import PersonalizedButton from "../components/PersonalizedButton.jsx";
 import { useState } from "react";
+import { Loader2, TriangleAlert, Check, AlertCircle } from "lucide-react";
 
 
 
-function ContactForm(unitId, userId, value) {
 
-    const [subject, setSubject] = useState();
-    const [ok, setOk] = useState();
-    const [message, setMessage] = useState();
-    const [error, setError] = useState();
-    const EMAIL_ADMIN = "admin@keynest.com";
-    const URL_EMAIL = "";
+function ContactForm({unitId, userId}) {
 
-    function subjectGeneric(unitId, userId) {
+    const [subject, setSubject] = useState(null);
+    // const [category, setCategory] = useState(null);
+    const [body, setBody] = useState(null);
 
-        let stringSubject = `Usuario: ${userId} - unidad: ${unitId} | ${value}`;
+    // Otras
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false)
+    const [ok, setOk] = useState(null);
+    const EMAIL_ADMIN = "abontar033@g.educaand.es";
 
-        setSubject(stringSubject);
-
-    }
 
     const sendEmail = async () => {
 
-        setMessage(document.getElementById("messageTextArea").value);
+        resetMessages();
+
+        setLoading(true);
+        
 
         try {
-            const response = await fetch(URL_EMAIL, {
-                method: 'POST',
-                credentials: 'include',
+            const response = await fetch(`http://localhost:8080/api/booking/sendEmail`, {
+                method: "POST",
+                credentials: "include",
                 headers: {
-                    'Content-Type': 'application/json',
-
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ email: EMAIL_ADMIN, subject: subject, message:message })
-            })
+                body: JSON.stringify({
+                    email: EMAIL_ADMIN,
+                    subject,
+                    body
+                })
+            });
 
             if (!response.ok) {
-                throw new Error("No se ha podido enviar la notificacion.");   
-            } else {
-                setOk("Mensaje enviado con exito.");
+                throw new Error("No se pudo enviar el email de contacto.");
             }
+
+            const data = await response.json();
+            setOk(data.message);
         } catch (err) {
-            setError("Error: " + err.message);
+            console.error(err.message);
+            setError("Ups! No se ha podido enviar el email de contacto. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
+        } finally {
+            setLoading(false);
         }
-        
+
     }
 
+    function resetMessages() {
+
+        setError(false);
+        setOk(false);
+
+    }
 
     return (
         <div className="flex flex-col justify-center items-center">
             <h4 className="text-lg font-semibold text-gray-800 mb-4">Solicitud al administrador</h4>
+
+
+            {loading && (
+                <div className="flex justify-center items-center">
+                    <Loader2 className="animate-spin w-6 h-6 text-blue-800" />
+                </div>
+            )}
 
             <div className="w-full max-w-xl bg-white border border-gray-300 rounded-lg shadow-md p-4 space-y-4">
                 {/* Campo Para */}
@@ -70,7 +91,7 @@ function ContactForm(unitId, userId, value) {
                     <select
                         className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
                         defaultValue=""
-                        onChange={(e) => subjectGeneric(unitId, userId, e.targe.value)}
+                        onChange={(e) => setSubject(`Usuario: ${userId} - Unidad: ${unitId} | Categoria: ` + e.target.value)}
                     >
                         <option value="" disabled>Selecciona una categoría</option>
                         <option value="incidencia">Incidencia</option>
@@ -87,7 +108,7 @@ function ContactForm(unitId, userId, value) {
                         placeholder="Escribe tu mensaje aquí..."
                         rows="8"
                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm resize-none"
-                        id="messageTextArea"
+                        onChange={(e) => setBody(e.target.value)}
                     ></textarea>
                 </div>
 

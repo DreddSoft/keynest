@@ -64,7 +64,8 @@ function UnitSettings({ unit }) {
                 }
 
             } catch (err) {
-                setError(err.message);
+                console.error(err.message);
+                setError("Error al capturar la unidad.")
             } finally {
                 setLoading(false);
             }
@@ -101,7 +102,8 @@ function UnitSettings({ unit }) {
             const data = await response.json();
             setMessage(data.message);
         } catch (err) {
-            setError(err.message);
+            console.error(err.message);
+            setError("No se pudo enviar el email de precheckIn.");
         } finally {
             setLoading(false);
         }
@@ -140,14 +142,13 @@ function UnitSettings({ unit }) {
 
         } catch (err) {
             console.error(err.message);
+            setError("No se ha podido hacer check-in en la reserva.");
         } finally {
             setLoading(false);
         }
 
     }
 
-    // Funcion para facturar
-    //TODO: Implementar metodo facturar
     const generateInvoice = async () => {
         resetMessages();
         setLoading(true);
@@ -178,10 +179,11 @@ function UnitSettings({ unit }) {
                 throw new Error("La respuesta no contiene una URL válida para el PDF.");
             }
 
-            window.open(data.url, '_blank');
+            window.open(`http://localhost:8080/invoices/${data.invoiceNumber}.pdf`, '_blank');
 
         } catch (err) {
-            setError(err.message);
+            console.error(err.message);
+            setError("No se pudo generar la factura. Inténtelo de nuevo más tarde o contacte con el administrador.");
         } finally {
             setLoading(false);
         }
@@ -218,6 +220,7 @@ function UnitSettings({ unit }) {
 
         } catch (err) {
             console.error(err.message);
+            setError("No se ha podido realizar el Check-In. Por favor, inténtelo de nuevo más tarde o contacte con el administrador.");
         } finally {
             setLoading(false);
         }
@@ -266,7 +269,8 @@ function UnitSettings({ unit }) {
             setMessage(text.message);
 
         } catch (err) {
-            setError(err.message);
+            console.error(err.message);
+            setError("Ups! Algo ha ocurrido al intentar bloquear las fechas. Inténtelo de nuevo más tarde o contacte con el administrador.");
         } finally {
             setLoading(false);
         }
@@ -308,7 +312,8 @@ function UnitSettings({ unit }) {
             setMessage(text.message);
 
         } catch (err) {
-            setError(err.message);
+            console.error(err.message)
+            setError("Ups! Algo ha ocurrido al intentar desbloquear las fechas, consulte con el administrador o vuelvalo a intentar.");
         } finally {
             setLoading(false);
         }
@@ -351,7 +356,8 @@ function UnitSettings({ unit }) {
             setMessage(text.message);
 
         } catch (err) {
-            setError(err.message);
+            console.error(err.message);
+            setError("Ups! Algo ha ocurrido al intentar cambiar la estancia mínima de su unidad. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
         } finally {
             setLoading(false);
         }
@@ -394,7 +400,8 @@ function UnitSettings({ unit }) {
             setMessage(text.message);
 
         } catch (err) {
-            setError(err.message);
+            console.error(err.message);
+            setError("Ups! Algo ha ocurrido al intentar cambiar el precio por noche de su unidad. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
         } finally {
             setLoading(false);
         }
@@ -427,7 +434,7 @@ function UnitSettings({ unit }) {
 
             <h4>Reserva para hoy:</h4>
             {/* Aqui la data de si hay que hacer checkIn */}
-            {booking && (
+            {booking && booking.status !== 5 && (
                 <div className="grid grid-cols-1 gap-6 md:mx-32 ">
                     <div className=" bg-gray-50 shadow-lg rounded-lg p-4 border border-gray-200">
 

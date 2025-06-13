@@ -108,10 +108,30 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.checkOut(bookingId));
     }
 
+    /**
+     * Endpoint para enviar el email de precheckin
+     * @param bookingId
+     * @return ResponseEntity con un objeto de la clase Bookingresponse que contiene la respuesta de la opreación.
+     * @throws MessagingException
+     */
     @GetMapping(value = "sendPreCheckInEmail/{bookingId}")
     public ResponseEntity<BookingResponse> sendPreCheckInEmail (@PathVariable Integer bookingId) throws MessagingException {
 
         return ResponseEntity.ok(bookingService.sendPreCheckInEmail(bookingId));
+
+    }
+
+    @PostMapping("sendEmail")
+    public ResponseEntity<BookingResponse> sendEmail (@RequestBody SendEmailRequest request) throws MessagingException {
+
+        return ResponseEntity.ok(bookingService.sendEmail(request));
+
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<BookingResponse> deleteBooking (@RequestBody BookingDeleteRequest request) {
+
+        return ResponseEntity.ok(bookingService.deleteBooking(request));
 
     }
 

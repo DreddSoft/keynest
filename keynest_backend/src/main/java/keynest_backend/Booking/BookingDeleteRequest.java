@@ -5,22 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingListDTO {
+public class BookingDeleteRequest {
 
     Integer id;
-    LocalDate checkIn;
-    LocalDate checkOut;
-    int noches;
-    String name;
-    String lastname;
-    String email;
-    double total;
-    int guests;
 
 }

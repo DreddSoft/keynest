@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Loader2, TriangleAlert } from "lucide-react";
+import { format } from "date-fns";
 
 function UnitBilling({ unit }) {
     const [invoices, setInvoices] = useState([]);
@@ -13,7 +14,7 @@ function UnitBilling({ unit }) {
 
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:8080/api/invoice/list/${unit.id}/${unit.userId}`, {
+                const response = await fetch(`http://localhost:8080/api/invoices/list/${unit.id}`, {
                     method: "GET",
                     credentials: "include",
                     headers: {
@@ -34,8 +35,10 @@ function UnitBilling({ unit }) {
         fetchInvoices();
     }, [unit]);
 
-    const handleOpenPDF = (url) => {
-        if (url) window.open(url, "_blank");
+    const handleOpenPDF = (invoiceNumber) => {
+
+        // console.log(invoiceNumber);
+        if (invoiceNumber) window.open(`http://localhost:8080/invoices/${invoiceNumber}.pdf`, "_blank");
     };
 
     return (
@@ -74,11 +77,11 @@ function UnitBilling({ unit }) {
                         {invoices.map((invoice) => (
                             <tr
                                 key={invoice.id}
-                                onClick={() => handleOpenPDF(invoice.pdfUrl)}
+                                onClick={() => handleOpenPDF(invoice.invoiceNumber)}
                                 className="hover:bg-gray-100 cursor-pointer transition-colors duration-200"
                             >
                                 <td className="py-2 px-4">{invoice.invoiceNumber}</td>
-                                <td className="py-2 px-4">{invoice.issueDate}</td>
+                                <td className="py-2 px-4">{format(new Date(invoice.issueDate), "dd/MM/yyyy")}</td>
                                 <td className="py-2 px-4">{invoice.receptorFullName}</td>
                                 <td className="py-2 px-4">{invoice.receptorDocNumber}</td>
                                 <td className="py-2 px-4">{invoice.taxBase.toFixed(2)} €</td>
