@@ -68,4 +68,47 @@ public class AvailabilityController {
 
     }
 
+    /**
+     * Endpoint para bloquear fechas de una unidad.
+     *
+     * @param request checkAvailabilityResponse que contiene el id de la unidad y la fecha de inicio y final
+     * @return ResponseEntity con un mensaje AvailabilityResponse y el codigo de estado 200 (OK).
+     */
+    @PostMapping("blockdates")
+    public ResponseEntity<AvailabilityResponse> blockDatesInUnit (@RequestBody CheckAvailabilityRequest request) {
+
+        return ResponseEntity.ok(availabilityService.blockDatesInUnit(request));
+
+    }
+
+    /**
+     * Endpoint para desbloquear fechas de una unidad
+     *
+     * @param request checkAvailabilityResponse que contiene el id de la unidad y la fecha de inicio y final
+     * @return ResponseEntity con un mensaje AvailabilityResponse y el codigo de estado 200 (OK).
+     */
+    @PostMapping("unblockdates")
+    public ResponseEntity<AvailabilityResponse> unblockDatesInUnit (@RequestBody CheckAvailabilityRequest request) {
+
+        return ResponseEntity.ok(availabilityService.unblockDatesInUnit(request));
+    }
+
+    /**
+     * Endpoint para cambiar la estancia mínima de una unidad
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("changeminstay")
+    public ResponseEntity<AvailabilityResponse> changeMinStayInUnit (@RequestBody ChangeMinStayRequest request) {
+
+        return ResponseEntity.ok(availabilityService.changeMinStayInUnit(request));
+    }
+
+    @PostMapping("changeprice")
+    public ResponseEntity<AvailabilityResponse> changePricePerNigh (@RequestBody ChangePriceRequest request) {
+
+        return ResponseEntity.ok(availabilityService.changePricerPerNight(request));
+    }
+
 }

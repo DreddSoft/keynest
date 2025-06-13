@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PersonalizedButton from "@/components/PersonalizedButton";
-import { Lock, DollarSign, CalendarClock, Loader2, TriangleAlert, Mail, DoorOpen, DoorClosed, Receipt } from "lucide-react";
+import { Lock, DollarSign, CalendarClock, Loader2, TriangleAlert, Mail, DoorOpen, DoorClosed, Receipt, LockOpen, Check } from "lucide-react";
 import FloatingFormWrapper from "@/components/FloatingFormWrapper";
 
 function UnitSettings({ unit }) {
@@ -98,8 +98,8 @@ function UnitSettings({ unit }) {
                 throw new Error("No se pudo enviar el email de precheckIn.");
             }
 
-            const data = await response.text();
-            setMessage(data);
+            const data = await response.json();
+            setMessage(data.message);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -129,6 +129,7 @@ function UnitSettings({ unit }) {
                 headers: {
                     'Content-Type': 'application/json'
                 }
+
             });
 
             if (!response.ok) {
@@ -227,6 +228,176 @@ function UnitSettings({ unit }) {
 
         setError(null);
         setMessage(null);
+
+    }
+
+    const setBlock = async () => {
+
+        resetMessages();
+
+        setLoading(true);
+
+        if (initDate > endDate) {
+            throw new Error("Error en bloqueo: La fecha incial no puede ser posterior a la fecha final.");
+        }
+
+        try {
+
+            const response = await fetch(`http://localhost:8080/api/availability/blockdates`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    unitId: unit.id,
+                    checkIn: initDate,
+                    checkOut: endDate
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ups! Algo ha ocurrido al intentar bloquear las fechas, consulte con el administrador o vuelvalo a intentar.");
+
+            }
+
+            const text = await response.json();
+
+            setMessage(text.message);
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    const setUnblock = async () => {
+
+        resetMessages();
+
+        setLoading(true);
+
+        if (initDate > endDate) {
+            throw new Error("Error en desbloqueo: La fecha incial no puede ser posterior a la fecha final.");
+        }
+
+        try {
+
+            const response = await fetch(`http://localhost:8080/api/availability/unblockdates`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    unitId: unit.id,
+                    checkIn: initDate,
+                    checkOut: endDate
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ups! Algo ha ocurrido al intentar desbloquear las fechas, consulte con el administrador o vuelvalo a intentar.");
+
+            }
+
+            const text = await response.json();
+
+            setMessage(text.message);
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    const changeMinStay = async () => {
+
+        resetMessages();
+
+        setLoading(true);
+
+        if (initDate > endDate) {
+            throw new Error("Error en el cambio de estancia mínima: La fecha incial no puede ser posterior a la fecha final.");
+        }
+
+        try {
+
+            const response = await fetch(`http://localhost:8080/api/availability/changeminstay`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    unitId: unit.id,
+                    startDate: minStayInitDate,
+                    endDate: minStayEndDate,
+                    minStay
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ups! Algo ha ocurrido al intentar cambiar la estancia mínima. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
+
+            }
+
+            const text = await response.json();
+
+            setMessage(text.message);
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    const changePrice = async () => {
+
+        resetMessages();
+
+        setLoading(true);
+
+        if (initDate > endDate) {
+            throw new Error("Error en el cambio de precio por noche: La fecha inicial no puede ser posterior a la fecha final.");
+        }
+
+        try {
+
+            const response = await fetch(`http://localhost:8080/api/availability/changeprice`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    unitId: unit.id,
+                    startDate: priceInitDate,
+                    endDate: priceEndDate,
+                    price
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ups! Algo ha ocurrido al intentar cambiar el precio por noche. Inténtelo de nuevo más tarde o póngase en contacto con el administrador.");
+
+            }
+
+            const text = await response.json();
+
+            setMessage(text.message);
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
 
     }
 
@@ -355,7 +526,37 @@ function UnitSettings({ unit }) {
                     </label>
                     {isValidDate ? (
                         <div className="mt-4">
-                            <PersonalizedButton buttonName="Bloquear" buttonIcon={<Lock />} />
+                            <PersonalizedButton buttonName="Bloquear" buttonIcon={<Lock />} buttonFunction={setBlock} />
+                        </div>
+                    ) : (
+                        <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>
+                    )}
+                </FloatingFormWrapper>
+
+                {/* Desbloquear */}
+
+                <FloatingFormWrapper title="Desbloquear Fechas">
+                    <label className="flex flex-col text-sm text-gray-700">
+                        Fecha Inicio:
+                        <input
+                            type="date"
+                            value={initDate}
+                            onChange={(e) => setInitDate(e.target.value)}
+                            className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
+                        />
+                    </label>
+                    <label className="flex flex-col text-sm text-gray-700 mt-2">
+                        Fecha Fin:
+                        <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-800"
+                        />
+                    </label>
+                    {isValidDate ? (
+                        <div className="mt-4">
+                            <PersonalizedButton buttonName="Desbloquear" buttonIcon={<LockOpen />} buttonFunction={setUnblock} />
                         </div>
                     ) : (
                         <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>
@@ -394,7 +595,7 @@ function UnitSettings({ unit }) {
                     </label>
                     {isValidDatePrice ? (
                         <div className="mt-4">
-                            <PersonalizedButton buttonName="Cambiar" buttonIcon={<DollarSign />} />
+                            <PersonalizedButton buttonName="Cambiar" buttonIcon={<DollarSign />} buttonFunction={changePrice} />
                         </div>
                     ) : (
                         <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>
@@ -433,7 +634,7 @@ function UnitSettings({ unit }) {
                     </label>
                     {isValidDateMinStay ? (
                         <div className="mt-4">
-                            <PersonalizedButton buttonName="Cambiar" buttonIcon={<CalendarClock />} />
+                            <PersonalizedButton buttonName="Cambiar" buttonIcon={<CalendarClock />} buttonFunction={changeMinStay} />
                         </div>
                     ) : (
                         <p className="text-red-600 text-xs mt-2">La fecha de inicio debe ser anterior o igual a la fecha de fin.</p>

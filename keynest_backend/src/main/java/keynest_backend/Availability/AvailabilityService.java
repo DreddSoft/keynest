@@ -1,9 +1,11 @@
 package keynest_backend.Availability;
 
+import jakarta.transaction.Transactional;
 import keynest_backend.Model.Availability;
 import keynest_backend.Model.Unit;
 import keynest_backend.Repositories.AvailabilityRepository;
 import keynest_backend.Repositories.UnitRepository;
+import keynest_backend.Utils.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -140,6 +142,91 @@ public class AvailabilityService {
 
         return AvailabilityResponse.builder()
                 .message("Disponibilidad creada con exito.")
+                .build();
+
+    }
+
+    // Método para bloquear fechas (available = false) de una unidad
+    @Transactional
+    public AvailabilityResponse blockDatesInUnit (CheckAvailabilityRequest request) {
+
+        // Sacar la unidad
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la unidad."));
+
+        Log.write(unit.getUser().getId(), "AvailabilityService | blockDatesInUnit", "Procediendo a comprobar las fechas de disponibilidad y bloquearlas.");
+
+
+        availabilityRepository.updateAvailabilityStatus(request.getUnitId(), request.getCheckIn(), request.getCheckOut(), false);
+
+        Log.write(unit.getUser().getId(),
+                "AvailabilityService | blockDatesInUnit",
+                String.format("Bloqueos realizados desde %s hasta %s en la unidad %d.", request.getCheckIn(), request.getCheckOut(), request.getUnitId()));
+
+        return AvailabilityResponse.builder()
+                .message(String.format("Se han bloqueado las fechas desde %s hasta %s correctamente.", request.getCheckIn().toString(), request.getCheckOut().toString()))
+                .build();
+
+    }
+
+    // Método para bloquear fechas (available = false) de una unidad
+    @Transactional
+    public AvailabilityResponse unblockDatesInUnit (CheckAvailabilityRequest request) {
+
+        // Sacar la unidad
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la unidad."));
+
+        Log.write(unit.getUser().getId(), "AvailabilityService | unblockDatesInUnit", "Procediendo a comprobar las fechas de disponibilidad y desbloquearlas.");
+
+        availabilityRepository.updateAvailabilityStatus(request.getUnitId(), request.getCheckIn(), request.getCheckOut(), true);
+
+        Log.write(unit.getUser().getId(),
+                "AvailabilityService | unblockDatesInUnit",
+                String.format("Desbloqueos realizados desde %s hasta %s en la unidad %d.", request.getCheckIn(), request.getCheckOut(), request.getUnitId()));
+
+        return AvailabilityResponse.builder()
+                .message(String.format("Se han desbloqueado las fechas desde %s hasta %s correctamente.", request.getCheckIn().toString(), request.getCheckOut().toString()))
+                .build();
+
+    }
+
+    // Método para cambiar la estancia mínima de una unidad
+    @Transactional
+    public AvailabilityResponse changeMinStayInUnit (ChangeMinStayRequest request) {
+
+        // Sacar la unidad
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la unidad."));
+
+        Log.write(unit.getUser().getId(), "AvailabilityService | changeMinStayInUnit", "Procediendo a comprobar las fechas de disponibilidad y cambiar estancia minima.");
+
+        availabilityRepository.updateMinStay(request.getUnitId(), request.getStartDate(), request.getEndDate(), request.getMinStay());
+
+        Log.write(unit.getUser().getId(),
+                "AvailabilityService | changeMinStayInUnit",
+                String.format("Cambios de estancia mínima desde %s hasta %s en la unidad %d.", request.getStartDate(), request.getEndDate(), request.getUnitId()));
+
+        return AvailabilityResponse.builder()
+                .message(String.format("Se ha cambia la estancia mínima para las fechas desde %s hasta %s correctamente.", request.getStartDate().toString(), request.getEndDate().toString()))
+                .build();
+
+    }
+
+    // Método para cambiar la el precio por noche de una unidad
+    @Transactional
+    public AvailabilityResponse changePricerPerNight (ChangePriceRequest request) {
+
+        // Sacar la unidad
+        Unit unit = unitRepository.findById(request.getUnitId()).orElseThrow(() -> new IllegalArgumentException("No se ha encontrado la unidad."));
+
+        Log.write(unit.getUser().getId(), "AvailabilityService | changePricerPerNight", "Procediendo a comprobar las fechas de disponibilidad y cambiar el precio.");
+
+        availabilityRepository.updatePricePerNight(request.getUnitId(), request.getStartDate(), request.getEndDate(), request.getPrice());
+
+        Log.write(unit.getUser().getId(),
+                "AvailabilityService | changePricerPerNight",
+                String.format("Cambios de precios realizados desde %s hasta %s en la unidad %d.", request.getStartDate(), request.getEndDate(), request.getUnitId()));
+
+        return AvailabilityResponse.builder()
+                .message(String.format("Se han cambiado los precios para las fechas desde %s hasta %s correctamente.", request.getStartDate().toString(), request.getEndDate().toString()))
                 .build();
 
     }

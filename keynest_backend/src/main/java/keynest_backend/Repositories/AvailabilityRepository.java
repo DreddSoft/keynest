@@ -4,6 +4,7 @@ import keynest_backend.Availability.AvailabilityDTO;
 import keynest_backend.Model.Availability;
 import keynest_backend.Model.Unit;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -56,6 +57,44 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
             @Param("unitId") Integer unitId,
             @Param("date") LocalDate date
     );
+
+    @Modifying
+    @Query("""
+    UPDATE Availability a
+    SET a.isAvailable = :available
+    WHERE a.unit.id = :unitId
+      AND a.dateAvailable BETWEEN :startDate AND :endDate
+""")
+    int updateAvailabilityStatus(@Param("unitId") Integer unitId,
+                                 @Param("startDate") LocalDate startDate,
+                                 @Param("endDate") LocalDate endDate,
+                                 @Param("available") boolean available);
+
+    @Modifying
+    @Query("""
+    UPDATE Availability a
+    SET a.pricePerNight = :newPrice
+    WHERE a.unit.id = :unitId
+      AND a.dateAvailable BETWEEN :startDate AND :endDate
+""")
+    int updatePricePerNight(@Param("unitId") Integer unitId,
+                            @Param("startDate") LocalDate startDate,
+                            @Param("endDate") LocalDate endDate,
+                            @Param("newPrice") double newPrice);
+
+    @Modifying
+    @Query("""
+    UPDATE Availability a
+    SET a.minStay = :minStay
+    WHERE a.unit.id = :unitId
+      AND a.dateAvailable BETWEEN :startDate AND :endDate
+""")
+    int updateMinStay(@Param("unitId") Integer unitId,
+                      @Param("startDate") LocalDate startDate,
+                      @Param("endDate") LocalDate endDate,
+                      @Param("minStay") int minStay);
+
+
 
 
 }
