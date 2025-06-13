@@ -66,9 +66,15 @@ public class InvoiceService {
         // Obtenemos el último número de la serie F
         Integer lastNumberFSeries = invoiceRepository.findMaxSeriesNumberF();
 
+        System.out.println("Ultima serie de numero F: " + lastNumberFSeries);
+
         if (lastNumberFSeries == null) {    // Se entiende que es el primero
             lastNumberFSeries = 1;
         }
+
+        lastNumberFSeries = (int) lastNumberFSeries + 1;
+
+        System.out.println("Ultima serie de numero F: " + lastNumberFSeries);
 
         // Crear la factura
         Invoice invoice = Invoice.builder()
@@ -104,7 +110,10 @@ public class InvoiceService {
         // Guardaos
         invoiceRepository.save(invoice);
 
-        return InvoicePDFUrlResponse.builder().url(urlPdfInvoice).build();
+        return InvoicePDFUrlResponse.builder()
+                .url(urlPdfInvoice)
+                .invoiceNumber(invoice.getInvoiceNumber())
+                .build();
 
     }
 

@@ -236,6 +236,7 @@ public class BookingService {
 
         // 4 Creamos DTO
         return BookingDTO.builder()
+                .id(booking.getId())
                 .checkIn(booking.getCheckIn())
                 .checkOut(booking.getCheckOut())
                 .price(booking.getTotalPrice())
@@ -247,6 +248,7 @@ public class BookingService {
                 .name(client.getName())
                 .lastname(client.getLastname())
                 .email(client.getEmail())
+                .isActive(booking.isActive())
                 .build();
 
     }

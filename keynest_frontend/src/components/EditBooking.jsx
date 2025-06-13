@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Loader2, TriangleAlert, Check, Pencil, Ban } from "lucide-react";
+import { Loader2, TriangleAlert, Check, Pencil, Ban, Hammer, CircleX, CircleCheck, Trash2 } from "lucide-react";
 import PersonalizedButton from "@/components/PersonalizedButton";
 
 function EditBooking({ adminId }) {
@@ -17,14 +17,8 @@ function EditBooking({ adminId }) {
     const [checkIn, setCheckIn] = useState(null);
     const [checkOut, setCheckOut] = useState(null);
     const [price, setPrice] = useState(null);
-    const [isPaid, setIsPaid] = useState(null);
     const [numGuests, setNumGuests] = useState(null);
     const [notes, setNotes] = useState(null);
-    const [status, setStatus] = useState(null);
-    const [nights, setNights] = useState(null);
-    const [name, setName] = useState(null);
-    const [lastname, setLastname] = useState(null);
-    const [email, setEmail] = useState(null);
 
 
     const handleSearch = async () => {
@@ -97,14 +91,18 @@ function EditBooking({ adminId }) {
                 </div>
             )}
 
-            <h2 className="text-lg font-semibold text-gray-800">Buscar Unidad</h2>
+            <h2 className="text-lg font-semibold text-gray-800">Buscar Reserva</h2>
 
             <div className="flex items-center space-x-2">
                 <input
                     type="text"
                     placeholder="ID de la reserva"
                     className="flex-1 px-4 py-2 border border-gray-300 rounded text-sm w-3/4"
-                    onBlur={() => setTouched(true)}
+                    onBlur={(e) => {
+                        setBookingId(parseInt(e.target.value))
+                        setTouched(true)
+
+                    }}
                     id="searchBar"
                 />
                 <div className="w-1/4">
@@ -160,9 +158,8 @@ function EditBooking({ adminId }) {
                             Email:
                             <input
                                 type="email"
-                                value={modify ? email : (bookingData ? bookingData.email : "")}
-                                disabled={!modify}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={bookingData ? bookingData.email : ""}
+                                disabled
                                 className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                             />
                         </label>
@@ -223,10 +220,7 @@ function EditBooking({ adminId }) {
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
-                            <label className={modify
-                                ? "hidden"
-                                : "flex flex-col text-sm text-gray-700"
-                            }>
+                            <label className="flex flex-col text-sm text-gray-700">
                                 Pagado:
                                 <input
                                     type="text"
@@ -235,28 +229,11 @@ function EditBooking({ adminId }) {
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
-
-                            <label className={modify
-                                ? "flex flex-col text-sm text-gray-700"
-                                : "hidden"
-                            }>
-                                Pagado:
-                                <select
-                                    onChange={(e) => setIsPaid(e.target.value === "true")}
-                                    className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
-                                >
-                                    <option value="" disabled selected>Esta pagada...</option>
-                                    <option value={true}>SI</option>
-                                    <option value={false}>NO</option>
-                                </select>
-                            </label>
-
                             <label className="flex flex-col text-sm text-gray-700">
                                 Status:
                                 <select
-                                    onChange={(e) => setStatus(parseInt(e.target.value))}
                                     value={modify ? status : (bookingData ? bookingData.status : 6)}
-                                    disabled={!modify}
+                                    disabled
                                     className="mt-1 p-2 border border-gray-300 rounded-md bg-white text-gray-800"
                                 >
                                     <option value="0" >CANCELADA</option>
@@ -283,9 +260,8 @@ function EditBooking({ adminId }) {
                                 Noches:
                                 <input
                                     type="number"
-                                    value={modify ? nights : (bookingData ? bookingData.nights : "")}
-                                    disabled={!modify}
-                                    onChange={(e) => setNights(parseInt(e.target.value))}
+                                    value={bookingData ? bookingData.nights : ""}
+                                    disabled
                                     className="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-800 text-center"
                                 />
                             </label>
@@ -308,7 +284,7 @@ function EditBooking({ adminId }) {
                             : "flex flex-row justify-center items-center gap-4 mt-4"
                         }>
 
-                        {bookingData && bookingData.status !== 0 && (
+                        {bookingData && bookingData.isActive === true && (
                             <>
                                 <button
                                     className={bookingData
@@ -336,7 +312,7 @@ function EditBooking({ adminId }) {
                                 </button>
                             </>
                         )}
-                        {bookingData && bookingData.status !== 0 && (
+                        {bookingData && !bookingData.isActive && (
                             <>
                                 <button
                                     className={bookingData

@@ -1,8 +1,7 @@
 import Button2 from "@/components/Button2";
-import { House, HousePlus, Loader2, Search, CalendarCog } from "lucide-react";
+import { House, Loader2 } from "lucide-react";
 import { useState } from "react";
 import BookingsPerUnit from "@/components/BookingsPerUnit";
-import EditBooking from "@/components/EditBooking";
 
 function BookingsPanel({ adminId }) {
 
@@ -36,13 +35,6 @@ function BookingsPanel({ adminId }) {
                         step={step}
                         valueStep={1}
                     />
-                    <Button2
-                        icon={<HousePlus size={16} />}
-                        buttonName={"Editar Reserva"}
-                        buttonFunction={() => changeStep(2)}
-                        step={step}
-                        valueStep={2}
-                    />
                 </nav>
 
             </header>
@@ -52,10 +44,6 @@ function BookingsPanel({ adminId }) {
                     <BookingsPerUnit />
                 )}
 
-                {step === 2 && (
-
-                    <EditBooking adminId={adminId} />
-                )}
             </main >
         </div >
     )

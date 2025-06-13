@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookingDTO {
 
+    Integer id;
+
     // DAtos de la reserva
     LocalDate checkIn;
     LocalDate checkOut;
@@ -27,4 +29,5 @@ public class BookingDTO {
     String name;
     String lastname;
     String email;
+    Boolean isActive;
 }

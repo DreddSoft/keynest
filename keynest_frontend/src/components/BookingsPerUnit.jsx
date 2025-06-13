@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Loader2, TriangleAlert, Check, Search } from "lucide-react";
 import PersonalizedButton from "@/components/PersonalizedButton";
 import { Navigate, useNavigate } from "react-router";
+import { format } from "date-fns";
 
 function BookingsPerUnit() {
     const [unitId, setUnitId] = useState("");
@@ -24,7 +25,7 @@ function BookingsPerUnit() {
 
         try {
 
-            const response = await fetch(`http://localhost:8080/api/futureBooking/${unitId}`, {
+            const response = await fetch(`http://localhost:8080/api/booking/futureBooking/${unitId}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
@@ -119,10 +120,10 @@ function BookingsPerUnit() {
                                 onDoubleClick={() => openBooking(booking.id)}
                                 >
                                     <td className="py-2 px-4 border-b">{booking.id}</td>
-                                    <td className="py-2 px-4 border-b">{booking.checkIn}</td>
-                                    <td className="py-2 px-4 border-b">{booking.checkOut}</td>
+                                    <td className="py-2 px-4 border-b">{format(new Date(booking.checkIn), "dd/MM/yyyy")}</td>
+                                    <td className="py-2 px-4 border-b">{format(new Date(booking.checkOut), "dd/MM/yyyy")}</td>
                                     <td className="py-2 px-4 border-b">{booking.noches}</td>
-                                    <td className="py-2 px-4 border-b">{booking.name}</td>
+                                    <td className="py-2 px-4 border-b">{booking.name + " " + booking.lastname}</td>
                                     <td className="py-2 px-4 border-b">{booking.total}</td>
                                     <td className="py-2 px-4 border-b">{booking.guests}</td>
                                 </tr>

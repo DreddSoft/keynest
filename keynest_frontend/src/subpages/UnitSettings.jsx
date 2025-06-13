@@ -119,7 +119,7 @@ function UnitSettings({ unit }) {
         const URL_CHECKIN = `http://localhost:8080/api/booking/checkIn/${booking.bookingId}`;
 
         // Si ya esta en checkIn, esto es una comprobación redundante.
-        if (booking.status === 2) return;
+        if (booking.status === 3) return;
 
         setLoading(true);
 

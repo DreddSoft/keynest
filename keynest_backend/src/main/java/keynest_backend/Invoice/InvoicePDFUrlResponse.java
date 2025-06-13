@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class InvoicePDFUrlResponse {
 
     public String url;
+    String invoiceNumber;
 }
