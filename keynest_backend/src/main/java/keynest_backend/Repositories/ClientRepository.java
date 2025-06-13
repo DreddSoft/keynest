@@ -22,5 +22,15 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     @Query("SELECT c FROM Client c WHERE c.email = :email")
     Client findByEmail(@Param("email") String email);
 
+    // Buscar clientes por unidad
+    @Query("""
+        SELECT bc.client
+        FROM BookingClient bc
+        JOIN bc.booking b
+        WHERE b.unit.id = :unitId
+    """)
+    List<Client> findClientsByUnitId(@Param("unitId") Integer unitId);
+
+
 
 }

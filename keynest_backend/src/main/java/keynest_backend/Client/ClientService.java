@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -148,6 +150,47 @@ public class ClientService {
                     .email(client.getEmail())
                     .phone(client.getPhone())
                     .build();
+
+    }
+
+    public List<ClientDTO> getClientsPerUnit (Integer unitId) {
+
+        // Capturamos
+        List<Client> clients = clientRepository.findClientsByUnitId(unitId);
+
+        if (clients == null) {
+            return null;
+        }
+
+        List<ClientDTO> clientDTOS = new ArrayList<>();
+
+        for (Client c : clients) {
+
+            // Crear DTO
+            ClientDTO dto = ClientDTO.builder()
+                    .id(c.getId())
+                    .name(c.getName())
+                    .lastname(c.getLastname())
+                    .gender(c.getGender().name())
+                    .birthday(c.getBirthday().toString())
+                    .nationality(c.getNationality())
+                    .docType(c.getDocType().name())
+                    .docNumber(c.getDocNumber())
+                    .docIssueDate(c.getDocIssueDate().toString())
+                    .docExpirationDate(c.getDocExpirationDate().toString())
+                    .localityName(c.getLocality().getName())
+                    .provinceName(c.getLocality().getProvince().getName())
+                    .countryName(c.getLocality().getProvince().getCountry().getName())
+                    .address(c.getAddress())
+                    .postalCode(c.getPostalCode())
+                    .email(c.getEmail())
+                    .phone(c.getPhone())
+                    .build();
+
+            clientDTOS.add(dto);
+        }
+
+        return clientDTOS;
 
     }
 

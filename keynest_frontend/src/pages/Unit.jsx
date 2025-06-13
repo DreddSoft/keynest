@@ -6,6 +6,7 @@ import BookingList from "@/subpages/BookingList.jsx";
 import UnitSettings from "@/subpages/UnitSettings.jsx";
 import UnitInfo from "@/subpages/UnitInfo.jsx";
 import UnitBilling from "@/subpages/UnitBilling";
+import UnitClients from "@/subpages/UnitClients";
 
 function Unit() {
     const { unitId } = useParams();
@@ -161,9 +162,7 @@ function Unit() {
                 </div>
             )}
             {step === 4 && (
-                <div>
-                    Esto es Clientes
-                </div>
+                <UnitClients unit={unit} />
             )}
             {step === 5 && (
                 <UnitBilling unit={unit} />
