@@ -39,6 +39,11 @@ function UserControl() {
     const URL_UPDATE_USER = `http://localhost:8080/api/users`;
     const URL_CHANGE_PASS = `http://localhost:8080/api/users/pass`;
 
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const PASSWORD_REGEX = /^[a-zA-Z0-9]+$/;
+    const DIGITS_ONLY_REGEX = /^[0-9]+$/;
+
+
     useEffect(() => {
         const fetchCountries = async () => {
             setLoading(true);
@@ -160,7 +165,20 @@ function UserControl() {
         setError(null);
         setMessageCreated(null);
 
-        console.log(localityId);
+        if (!EMAIL_REGEX.test(email)) {
+            setError("El email no tiene un formato correcto.");
+            return;
+        }
+
+        if (!PASSWORD_REGEX.test(password)) {
+            setError("La contraseña sólo admite letras minúsculas, mayúsculas y números.");
+            return;
+        }
+
+        if (!DIGITS_ONLY_REGEX.test(phone)) {
+            setError("El teléfono sólo permite dígitos.");
+            return;
+        }
 
         e.preventDefault();
         setLoading(true);
@@ -203,6 +221,13 @@ function UserControl() {
 
         e.preventDefault();
         setLoading(true);
+
+
+        if (!DIGITS_ONLY_REGEX.test(phone)) {
+            setError("El teléfono sólo permite dígitos.");
+            return;
+        }
+
         try {
             const response = await fetch(URL_UPDATE_USER, {
                 method: "PUT",
@@ -281,6 +306,10 @@ function UserControl() {
         setError(null);
         setMessageCreated(null);
         setLoading(true);
+
+        if (!PASSWORD_REGEX.test(password)) {
+            setError("La contraseña introducida no cumple el formato esperado. Se admiten letras mayúsculas, minúsculas y números.")
+        }
 
         try {
 

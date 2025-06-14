@@ -44,6 +44,9 @@ function CreateUnit({ adminId }) {
     const URL_UNIT = `http://localhost:8080/api/unit`;
 
 
+    const REGEX = /^\d+$/;
+
+
     useEffect(() => {
         const fetchCountries = async () => {
             setLoading(true);
@@ -125,6 +128,11 @@ function CreateUnit({ adminId }) {
 
         // Cargando
         setLoading(true);
+
+        if (!REGEX.test(userId)) {
+            setError("El id del usuario tiene que ser digitos solo.");
+            return;
+        }
 
         try {
 

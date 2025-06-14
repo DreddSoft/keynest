@@ -14,6 +14,9 @@ function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const PASSWORD_REGEX = /^[a-zA-Z0-9]+$/;
+
   // Logica de funcionalidad
   const handleSubmit = async (e) => {
 
@@ -23,6 +26,17 @@ function Login({ setIsAuthenticated }) {
 
     // Loading
     setLoading(true);
+
+
+    if (!EMAIL_REGEX.test(username)) {
+      setError("El email introducido no cumple con el formato requerido.");
+      return;
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      setError("La contraseña no cumple los campos requeridos.");
+      return;
+    }
 
     try {
 

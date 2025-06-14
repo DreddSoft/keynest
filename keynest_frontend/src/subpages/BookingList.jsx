@@ -197,7 +197,7 @@ function BookingList({ unitId }) {
                             <div className="flex flex-col gap-2">
                                 {booking && (
                                     <PersonalizedButton
-                                        buttonName="Borrar Reserva"
+                                        buttonName="Cancelar Reserva"
                                         buttonId="delete"
                                         buttonFunction={() => deteleBooking(booking)}
                                     />
